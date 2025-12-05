@@ -1,0 +1,149 @@
+{% extends 'base_tpl.html' %}
+
+{% block breadcrumb-content %}
+    <nav aria-label="breadcrumb" class="-intro-x mr-auto hidden sm:flex">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'administration:dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'configurable:clinical_procedure_list' %}">Clinical Procedures</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ task.task }} Assessments</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block main-content %}
+
+{% include 'messages.html' %}
+
+
+    <div class="intro-y flex flex-col sm:flex-row items-center mt-8">
+        <h2 class="text-lg font-medium mr-auto">
+            {{ task.task }} Assessments
+        </h2>
+        <div class="w-full sm:w-auto flex mt-4 sm:mt-0">
+            <button data-tw-toggle="modal" data-tw-target="#add-modal"  class="btn btn-primary shadow-md mr-2">Add Assessment</button>
+
+            <div id="add-modal" class="modal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <form action="{% url 'configurable:clinical_procedure_task_assessment_add' task.id %}" method="POST">
+                            {% csrf_token %}
+                            <!-- BEGIN: Modal Header -->
+                            <div class="modal-header">
+                                <h2 class="font-medium text-base mr-auto">Add Assessment</h2>                                             
+                            </div> <!-- END: Modal Header -->
+                            <!-- BEGIN: Modal Body -->
+                            <div class="modal-body grid grid-cols-12 gap-4 gap-y-3">
+                                <div class="col-span-12 sm:col-span-12"> 
+                                    <label for="modal-form-1" class="form-label">Number*</label> 
+                                    <input id="number" name='number' type="text" class="form-control" placeholder="Number" required maxlength='10'> 
+                                </div>  
+                                <div class="col-span-12 sm:col-span-12"> 
+                                    <label for="modal-form-1" class="form-label">Text*</label> 
+                                    <textarea id="question" name='question' type="text" class="form-control" placeholder="Question Text" required></textarea> 
+                                </div>    
+                                <div class="col-span-12 sm:col-span-12"> 
+                                    <label for="modal-form-1" class="form-label">Text Type*</label> 
+                                    <select name='question_type' id='question_type' class='form-select' required>
+                                        <option></option>
+                                        <option value='Heading'>Heading</option>
+                                        <option value='Note'>Note</option>
+                                        <option value='Question'>Question</option>
+                                    </select>
+                                </div> 
+                                <div class="col-span-12 sm:col-span-12"> 
+                                    <label for="modal-form-1" class="form-label">Penalty*</label> 
+                                    <select name='penalty' id='penalty' class='form-select' required>
+                                        <option></option>
+                                        <option value='0'>0</option>
+                                        <option value='10'>-10</option>
+                                        <option value='50'>-50</option>
+                                    </select>
+                                </div>                                                                       
+                            </div> <!-- END: Modal Body -->
+                            <!-- BEGIN: Modal Footer -->
+                            <div class="modal-footer"> 
+                                <button type="button" data-tw-dismiss="modal" class="btn btn-outline-secondary w-20 mr-1">Cancel</button> 
+                                <button type="submit" class="btn btn-primary w-60">Add Assessment</button> 
+                            </div> <!-- END: Modal Footer -->
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+             <button data-tw-toggle="modal" data-tw-target="#copy-modal"  class="btn btn-success shadow-md mr-2">Copy Assessment</button>
+
+            <div id="copy-modal" class="modal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <form action="{% url 'configurable:clinical_procedure_task_assessment_copy' task.id %}" method="POST">
+                            {% csrf_token %}
+                            <!-- BEGIN: Modal Header -->
+                            <div class="modal-header">
+                                <h2 class="font-medium text-base mr-auto">Copy Assessment</h2>                                             
+                            </div> <!-- END: Modal Header -->
+                            <!-- BEGIN: Modal Body -->
+                            <div class="modal-body grid grid-cols-12 gap-4 gap-y-3">
+                                   
+                                <div class="col-span-12 sm:col-span-12"> 
+                                    <label for="modal-form-1" class="form-label">Copy Assessment from the following procedure*</label> 
+                                    <select name='task' id='task' class='tom-select' required>
+                                        <option></option>
+                                        {% for p in tasks %}
+                                            <option value='{{ p.id }}'>{{ p.task }}</option>
+                                        {% endfor %}                                        
+                                    </select>
+                                </div> 
+                                                                                                   
+                            </div> <!-- END: Modal Body -->
+                            <!-- BEGIN: Modal Footer -->
+                            <div class="modal-footer"> 
+                                <button type="button" data-tw-dismiss="modal" class="btn btn-outline-secondary w-20 mr-1">Cancel</button> 
+                                <button type="submit" class="btn btn-success w-60">Copy Assessment</button> 
+                            </div> <!-- END: Modal Footer -->
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <button data-tw-toggle="modal" data-tw-target="#upload-modal"  class="btn btn-warning shadow-md mr-2">Bulk Upload</button>
+
+            <div id="upload-modal" class="modal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <form action="{% url 'configurable:clinical_procedure_assessment_bulk_upload_excel' task.id %}" method="POST" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <!-- BEGIN: Modal Header -->
+                            <div class="modal-header">
+                                <h2 class="font-medium text-base mr-auto">Upload Assessment</h2>                                             
+                            </div> <!-- END: Modal Header -->
+                            <!-- BEGIN: Modal Body -->
+                            <div class="modal-body grid grid-cols-12 gap-4 gap-y-3">
+                                   
+                                <div class="col-span-12 sm:col-span-12"> 
+                                    <label for="modal-form-1" class="form-label">Upload Assessment*</label> 
+                                    <input type='file' class='form-control' required name='assessment_csv' id='assessment_csv'>
+                                </div> 
+                                                                                                   
+                            </div> <!-- END: Modal Body -->
+                            <!-- BEGIN: Modal Footer -->
+                            <div class="modal-footer"> 
+                                <button type="button" data-tw-dismiss="modal" class="btn btn-outline-secondary w-20 mr-1">Cancel</button> 
+                                <button type="submit" class="btn btn-success w-60">Upload Assessment</button> 
+                            </div> <!-- END: Modal Footer -->
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            
+        </div>
+    </div>
+
+    <div class="intro-y p-5 mt-5">
+        <div id='assessment_table'>
+            {% include 'configurable/partials/assessment_table.html' %}
+        </div>
+        
+    </div>
+
+{% endblock %}

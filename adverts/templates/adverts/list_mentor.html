@@ -1,0 +1,302 @@
+{% extends 'base.html' %}
+{% load bootstrap3 %}
+
+{% block css-content %}
+
+<style type="text/css">
+
+table.timecard {
+	margin: auto;
+	width: 100%;
+	border-collapse: collapse;
+	border: 1px solid #fff; /*for older IE*/
+	border-style: solid;
+}
+
+table.timecard caption {
+	background-color: #f79646;
+	color: #fff;
+  font-size: 0.875rem;
+	font-weight: normal;
+	letter-spacing: .4em;
+}
+
+table.timecard thead th {
+	padding: 8px;
+	background-color: #ffffff;
+	font-size: 0.875rem;
+  font-weight: bold;
+}
+
+table.timecard thead th#thDay {
+	width: 40%;
+}
+
+table.timecard thead th#thRegular, table.timecard thead th#thOvertime, table.timecard thead th#thTotal {
+	width: 20%;
+}
+
+table.timecard th, table.timecard td {
+	padding: 10px;
+	border-width: 1px;
+	border-style: solid;
+}
+
+table.timecard td {
+	text-align: left;
+  font-size: 0.875rem;
+}
+
+table.timecard tbody th {
+	text-align: left;
+	font-weight: normal;
+}
+
+table.timecard tfoot {
+	font-weight: bold;
+	font-size: 0.875rem;
+	background-color: #687886;
+	color: #fff;
+}
+
+table.timecard tr.even {
+	background-color: #008080;
+}
+</style>
+
+
+{% endblock %}
+
+{% block main-content %}
+<div class="row">
+  <div class="col-md-12 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          <nav aria-label="breadcrumb">
+              <ol class="breadcrumb bg-inverse-info">
+                  {% if user.is_authenticated and user.roles_id == 12 %}
+                    <li class="breadcrumb-item"><a href="{% url 'mentor:dashboard' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'mentor:advert_create' %}">Create Advert</a></li>
+                    <li class="breadcrumb-item active" aria-current="page"><a>Adverts</a></li>
+                  {% elif user.is_authenticated and user.roles_id == 3 %}
+                    <li class="breadcrumb-item"><a href="{% url 'contact:dashboard' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'contact:advert_create' %}">Create Advert</a></li>
+                    <li class="breadcrumb-item active" aria-current="page"><a>Adverts</a></li>
+                  {% endif %}
+
+              </ol>
+            </nav>
+
+            {% include 'messages.html' %}
+
+        </div>
+      </div>
+  </div>
+</div>
+{% if announcements.count > 0 %}
+
+<!--<div class="row">
+  <div class="col-md-12 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          {% for a in announcements %}
+						{{ a.announcement }}
+					{% endfor %}
+        </div>
+      </div>
+  </div>
+</div>-->
+
+{% for a in announcements %}
+  <div class="alert alert-fill-primary alert-dismissible" role="alert">
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+    {{ a.announcement }}<br>
+  </div><br>
+{% endfor %}
+
+{% endif %}
+<div class="row">
+  <div class="col-lg-12 grid-margin stretch-card">
+              <div class="card">
+                <div class="card-body">
+                  <h4 class="card-title">List of Adverts</h4>
+                  <p class="card-description">
+                    To add a department, click the 'PLUS' button in the department column.<br> To remove a department, click on the department<br>
+                    To view the applicants, click the user icon in the applicants column.<br>
+                    To edit the post, click the blue button and to delete, click the red button
+                  </p>
+                  <div class="table-responsive">
+                    <table class="timecard table-striped table-bordered">
+                      <thead>
+                        <tr>
+													<th>#</th>
+                          <th>Type</th>
+                          <th>Post Details</th>
+                          <th>Departments</th>
+                          <th>File</th>
+                          <th>Applicants</th>
+													<th>Date Created</th>
+                          <th>Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for advert in adverts %}
+                            <tr>
+															<td>{{ forloop.counter }}</td>
+                              <td class="py-1">{{advert.type.type}}<br><br>{{ advert.type_price.period }} - {{ advert.type_price.price }}</td>
+                              <td><b>Position:</b> {{advert.position}}<br><br><b>Contract:</b> {{advert.contract}} <br><b>Remuneration:</b> {{advert.paid}} Position<br><b>Post Date:</b>{{ advert.post_date }} - {{ advert.cut_off_date }}</td>
+                              <td>
+                                {% for dept in advert.departments.all %}
+                                  {% if user.is_authenticated and user.roles_id == 3 %}
+                                      <a href="{% url 'contact:advert_remove_department' advert.id dept.id %}" data-toggle="tooltip" data-placement="bottom" title="Click to remove"><div class="badge badge-primary badge-pill">{{dept.department}}</div></a><br><br>
+                                  {% elif user.is_authenticated and user.roles_id == 12 %}
+                                      <a href="{% url 'mentor:advert_remove_department' advert.id dept.id %}" data-toggle="tooltip" data-placement="bottom" title="Click to remove"><div class="badge badge-primary badge-pill">{{dept.department}}</div></a><br><br>
+                                  {% endif %}
+                                {% empty %}
+                                  No Departments added
+                                {% endfor %}
+                                <button class="btn btn-inverse-primary btn-rounded btn-icon" data-toggle="modal" data-target="#department{{ advert.id }}"><i class="fa fa-plus-circle"></i></button>
+
+                                <div class="modal fade" id="department{{ advert.id }}" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true">
+                                  <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                      <div class="modal-header">
+                                        <h5 class="modal-title" id="ModalLabel">Add Department to Advert: {{ advert.position }}</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                          <span aria-hidden="true">&times;</span>
+                                        </button>
+                                      </div>
+                                      {% if user.is_authenticated and user.roles_id == 3 %}
+                                          <form action="{% url 'contact:advert_add_department' advert.id %}" method="POST">
+                                      {% elif user.is_authenticated and user.roles_id == 12 %}
+                                          <form action="{% url 'mentor:advert_add_department' advert.id %}" method="POST">
+                                      {% endif %}
+                                        {% csrf_token %}
+                                      <div class="modal-body">
+                                        <div class="form-group">
+                                          <label for="date_visit">Department</label>
+                                          <select name="department" id="id_department" class="form-control">
+                                            {% for faculty in faculties %}
+                                              <optgroup label="{{ faculty.faculty }}">
+                                              {% for department in faculty.departments.all %}
+                                                <option value="{{ department.id }}">{{ department.department }}</option>
+                                              {% endfor %}
+                                            {% endfor %}
+                                          </select>
+                                        </div>
+                                      </div>
+                                      <div class="modal-footer">
+                                        <button type="submit" class="btn btn-success">Add Department</button>
+                                        <button type="button" class="btn btn-light" data-dismiss="modal">Close</button>
+                                      </div>
+                                      </form>
+                                    </div>
+                                  </div>
+                                </div>
+                              </td>
+                              <td>
+                                {% if advert.file != '' %}
+                                  <a href="{{ advert.file.url }}" target="_blank" style="target-new: tab;">Download File</a>
+                                {% endif %}
+                                <br>
+                                <button type="button" class="btn btn-inverse-primary btn-rounded btn-icon" data-toggle="modal" data-target="#file{{ advert.id }}"><i class="fa fa-cloud-upload"></i></button>
+
+                                <div class="modal fade" id="file{{ advert.id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel-3" aria-hidden="true">
+                                  <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                      <div class="modal-header">
+                                        <h5 class="modal-title" id="exampleModalLabel-3">Upload Advert File: {{advert.title}}</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                          <span aria-hidden="true">&times;</span>
+                                        </button>
+                                      </div>
+                                      <form action="{% url 'mentor:advert_file' advert.id %}" method="POST" enctype="multipart/form-data">
+                                        {% csrf_token %}
+                                      <div class="modal-body">
+                                        <p>Please select file to upload</p>
+                                        <div class="row">
+                                          <div class="col-md-12">
+                                            <div class="form-group row">
+
+                                              <div class="col-sm-10">
+                                                {% bootstrap_field form.file show_label=False%}
+                                              </div>
+                                            </div>
+                                          </div>
+
+                                        </div>
+                                      </div>
+                                      <div class="modal-footer">
+                                        <button type="submit" class="btn btn-success">Upload</button>
+                                        <button type="button" class="btn btn-light" data-dismiss="modal">No</button>
+                                      </div>
+                                      </form>
+                                    </div>
+                                  </div>
+                                </div>
+                              </td>
+                           
+                              <td>
+                               <!-- {% if currentDate > advert.cut_off_date %}-->
+                                  {%  if user.is_authenticated and user.roles_id == 12  %}
+                                    <a class="btn btn-warning btn-rounded btn-icon" href="{% url 'mentor:view_applicants' advert.id %}"> <br><i class="ti-user"></i></a>
+                                  {%  elif user.is_authenticated and user.roles_id == 3  %}
+                                    <a class="btn btn-warning btn-rounded btn-icon" href="{% url 'contact:view_applicants' advert.id %}"> <br><i class="ti-user"></i></a>
+                                  {% endif %}
+                                <!--{% else %}
+                                  You will be able to view applicants' cvs after the cut off date
+                                {% endif %}-->
+                              </td>
+															<td>{{ advert.created_at }}</td>
+                              <td>
+                                
+                                  {%  if user.is_authenticated and user.roles_id == 12  %}
+                                    <a href="{% url 'mentor:advert_edit' advert.id %}" class="btn btn-info btn-rounded btn-icon"> <br><i class="fa fa-edit"></i></a>
+                                  {%  elif user.is_authenticated and user.roles_id == 3  %}
+                                    <a href="{% url 'contact:advert_edit' advert.id %}" class="btn btn-info btn-rounded btn-icon"> <br><i class="fa fa-edit"></i></a>
+                                  {% endif %}
+                                    <button type="button" class="btn btn-danger btn-rounded btn-icon" data-toggle="modal" data-target="#delete{{ advert.id }}" > <i class="fa fa-trash-o"></i> </button>
+
+                                    <div class="modal fade" id="delete{{ advert.id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel-3" aria-hidden="true">
+                                      <div class="modal-dialog" role="document">
+                                        <div class="modal-content">
+                                          <div class="modal-header">
+                                            <h5 class="modal-title" id="exampleModalLabel-3">Delete Advert</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                              <span aria-hidden="true">&times;</span>
+                                            </button>
+                                          </div>
+                                          {%  if user.is_authenticated and user.roles_id == 12  %}
+                                            <form action="{% url 'mentor:advert_delete' advert.id %}" method="POST">
+                                          {%  elif user.is_authenticated and user.roles_id == 3  %}
+                                            <form action="{% url 'contact:advert_delete' advert.id %}" method="POST">
+                                          {% endif %}
+                                            {% csrf_token %}
+                                          <div class="modal-body">
+                                            <p>Are you sure you want to delete this advert?</p>
+                                          </div>
+                                          <div class="modal-footer">
+                                            <button type="submit" class="btn btn-success">Yes</button>
+                                            <button type="button" class="btn btn-light" data-dismiss="modal">No</button>
+                                          </div>
+                                          </form>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  
+
+                              </td>
+                            </tr>
+                        {% empty %}
+                            <tr><td colspan="7">Sorry no adverts added</td></tr>
+                        {% endfor %}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+</div>
+{% endblock %}

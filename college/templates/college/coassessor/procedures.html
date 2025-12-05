@@ -1,0 +1,96 @@
+{% extends 'base_tpl.html' %}
+
+{% block breadcrumb-content %}
+    <nav aria-label="breadcrumb" class="-intro-x mr-auto hidden sm:flex">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'college:co_assessor_dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'college:co_assessor_learning_programme_cohorts' learning_programme.id %}">{{ learning_programme.programme_code }} Cohorts</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'college:co_assessor_learning_programme_cohort_registration_periods' learning_programme_cohort.id %}">{{ learning_programme_cohort.title }} Registrations</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Formative Procedures</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block main-content %}
+
+{% include 'messages.html' %}
+
+
+    <div class="intro-y flex flex-col sm:flex-row items-center mt-8">
+        <h2 class="text-lg font-medium mr-auto">
+            {{ learning_programme_cohort_registration_period.title }} Formative Procedures
+        </h2>        
+    </div>
+
+    <div class="intro-y p-5 mt-5">
+        
+        <div class="overflow-x-auto">
+            <table class="table table-report -mt-2">
+                <thead>
+                    <tr>
+                        <th class="whitespace-nowrap">#</th>                    
+                        <th class="whitespace-nowrap">Procedure</th>
+                        <th class="whitespace-nowrap">Compulsory</th>
+                        <th class="whitespace-nowrap">Weight</th>
+                        <th class="whitespace-nowrap">Lecturer</th>
+                        <th class="whitespace-nowrap">Clinical Facilitator</th>
+                        <th class="whitespace-nowrap">Co-Assessor</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in items %}
+                    <tr class="intro-x">
+                        <td class="w-40">
+                            {{ forloop.counter }}
+                        </td>
+                        <td>
+                            {{ r.procedure.task }}
+                        </td>
+                        <td>
+                            {{ r.compulsory }}
+                        </td>
+                        <td>
+                            {{ r.weights }}
+                        </td>
+                        <td>
+                            {{ r.lecturer.first_name }} {{ r.lecturer.last_name }}
+                        </td>
+                        <td>
+                            {{ r.clinical_facilitator.first_name }} {{ r.clinical_facilitator.last_name }}
+                        </td>
+                        <td>
+                            {{ r.co_assessor.first_name }} {{ r.co_assessor.last_name }}
+                        </td>
+                        <td class="table-report__action">
+                            <div class="flex justify-center items-center">
+
+                                <div class="dropdown ml-auto sm:ml-0">
+                                    <button class="dropdown-toggle btn px-2 box" aria-expanded="false" data-tw-toggle="dropdown">
+                                        <span class="w-5 h-5 flex items-center justify-center"> <i class="w-4 h-4" data-lucide="plus"></i> </span>
+                                    </button>
+                                    <div class="dropdown-menu w-48">
+                                        <ul class="dropdown-content">                                             
+                                            <li>
+                                                <a class="dropdown-item" href="{% url 'students:co_assessor_learning_programme_cohort_procedure_student_formative_assessment_list' learning_programme_cohort_registration_period.id r.id %}"> <i data-lucide="users" class="w-4 h-4 mr-1"></i>Capture Assessments </a>
+                                            </li>                                                                                     
+                                        </ul>
+                                    </div>
+                                </div>
+                                
+                            </div>
+                          
+                           
+                        </td>
+                      
+                    </tr>
+                    {% empty %}
+                    <tr class="intro-x"><td colspan='6'>Nothing added yet</td></tr>
+                    {% endfor %}
+                    
+                <tbody>
+            </table>
+        </div>
+    </div>
+
+{% endblock %}

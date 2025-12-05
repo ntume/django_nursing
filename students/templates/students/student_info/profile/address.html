@@ -1,0 +1,125 @@
+<!-- BEGIN: Page -->
+<div class="intro-y box col-span-12 2xl:col-span-6">
+    <div class="flex items-center px-5 py-5 sm:py-3 border-b border-slate-200/60 dark:border-darkmode-400">
+        <h2 class="font-medium text-base mr-auto">
+            Address and Communication Details
+        </h2>
+    </div>
+    <div class="p-5">
+        <form 
+            hx-post="{% url 'students:edit_profile_address_details' student.id %}"
+            hx-trigger="submit"
+            hx-target="#messages_learner_address"
+            action="#"                    
+            hx-on::before-request="btn_learner_address.disabled = true;btn_learner_address.innerHTML ='Saving....'; return true;"
+            hx-on::after-request="btn_learner_address.disabled = false;btn_learner_address.innerHTML ='Saved!'; return true;">
+
+
+            {% csrf_token %}    
+            <div class="grid grid-cols-12 gap-4 gap-y-5 mt-5 border-indigo-600 px-8 py-8">
+                
+                <div class="intro-y col-span-12 sm:col-span-6">
+                    <label for="id_physical_address_1" class="form-label">Physical Address Line 1*</label>
+                    <input type="text" class="form-control" name="physical_address_1" id="id_physical_address_1" placeholder="Physical Address Line 1" value="{{ student.physical_address_1|default_if_none:'' }}" required>
+                </div>
+                <div class="intro-y col-span-12 sm:col-span-6">
+                    <label for="id_postal_address_2" class="form-label w-full">Postal Address Line 1*</label>
+                    <input name='postal_address_1' id="id_postal_address_1" type="text" class="form-control" placeholder="Postal Address 2" value='{{ student.postal_address_1|default_if_none:""  }}' required>
+                </div> 
+                
+                <div class="intro-y col-span-12 sm:col-span-6">
+                    <label for="id_physical_address_2" class="form-label">Physical Address Line 2*</label>
+                    <input type="text" class="form-control" name="physical_address_2" id="id_physical_address_2" placeholder="Physical Address Line 2" value="{{ student.physical_address_2|default_if_none:'' }}" required>
+                </div>
+                <div class="intro-y col-span-12 sm:col-span-6">
+                    <label for="id_postal_address_2" class="form-label w-full">Postal Address Line 2*</label>
+                    <input name='postal_address_2' id="id_postal_address_2" type="text" class="form-control" placeholder="Postal Address 2" value='{{ student.postal_address_2|default_if_none:""  }}' required>
+                </div> 
+                
+                <div class="intro-y col-span-12 sm:col-span-6">
+                    <label for="id_physical_address_3" class="form-label">Physical Address Line 3</label>
+                    <input type="text" class="form-control" name="physical_address_3" id="id_physical_address_3" placeholder="Physical Address Line 3" value="{{ student.physical_address_3|default_if_none:'' }}">
+                </div>
+                <div class="intro-y col-span-12 sm:col-span-6">
+                    <label for="id_postal_address_2" class="form-label w-full">Postal Address Line 3</label>
+                    <input name='postal_address_3' id="id_postal_address_3" type="text" class="form-control" placeholder="Postal Address 2" value='{{ student.postal_address_3|default_if_none:""  }}'>
+                </div> 
+
+                <div class="intro-y col-span-12 sm:col-span-6">
+                    <label for="id_area" class="form-label w-90">Pysical Address Postal Code*<br><i class='text-danger'>Start typing the suburb name and choose from the list</i></label>
+                    <select name='area' class='tom-select' required>
+                        <option></option>
+                        {% for area in areas %}
+                            {% if student.area == area %}
+                                <option value='{{ area.id }}' selected>{{area.postal_code}} * {{area.suburb}}</option>
+                            {% else %}
+                                <option value='{{ area.id }}'>{{area.postal_code}} * {{area.suburb}}</option>
+                            {% endif %}
+                            
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="intro-y col-span-12 sm:col-span-6">
+                    <label for="id_area_postal" class="form-label w-90">Postal Address Postal Code*<br><i class='text-danger'>Start typing the suburb name and choose from the list</i></label>
+                    <select name='postal_address_postal_code' class='tom-select' required>
+                        <option></option>
+                        {% for area in areas %}
+                            {% if student.postal_address_postal_code == area %}
+                                <option value='{{ area.id }}' selected>{{area.postal_code}} * {{area.suburb}}</option>
+                            {% else %}
+                                <option value='{{ area.id }}'>{{area.postal_code}} * {{area.suburb}}</option>
+                            {% endif %}                        
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="intro-y col-span-12 sm:col-span-6">
+                    <div class="form-check mt-10"> <input id="copy_address" class="form-check-input" type="checkbox" value=""> <label class="form-check-label text-primary" for="checkbox-switch-1">Same for Postal Address</label> </div>
+                </div>
+                <div class="intro-y col-span-12 sm:col-span-6">
+                </div> 
+                
+
+                
+
+                <div class="intro-y col-span-12 sm:col-span-6">
+                    <label for="id_trading_name" class="form-label w-48">Type of Area*</label>
+                    <select name="type_of_area" id="id_type_of_area" class="form-select" required >
+                        <option></option>
+                        {% if student.type_of_area == "Rural" %}
+                            <option value="Rural" selected>Rural</option>
+                            <option value="Urban">Urban</option>
+                        {% else %}
+                            <option value="Rural">Rural</option>
+                            <option value="Urban" selected>Urban</option>
+                        {% endif %}
+                    </select>
+                </div>
+
+                
+                <div class="intro-y col-span-12 sm:col-span-6">
+                    <label for="id_email" class="form-label w-96">Email Address*</label>
+                    <input maxlength='30' type="text" class="form-control" name="email" id="id_email" placeholder="Email Address" value="{{ student.email|default_if_none:'' }}" required>
+                </div>
+                <div class="intro-y col-span-12 sm:col-span-6">
+                    <label for="id_phone_number" class="form-label w-96">Telephone Number</label>
+                    <input type="text" class="form-control" name="phone_number" id="id_phone_number" placeholder="Phone Number"  value="{{ student.phone_number|default_if_none:'' }}" maxlength="10" >
+                </div>
+                <div class="intro-y col-span-12 sm:col-span-6">
+                    <label for="id_cellphone" class="form-label w-96">Cellphone Number*</label>
+                    <input type="text" class="form-control" name="cellphone" id="id_cellphone" placeholder="Cellphone Number"  value="{{ student.cellphone|default_if_none:'' }}" maxlength="10" required>
+                </div>
+                <div class="intro-y col-span-12 sm:col-span-6">
+                    <label for="id_fax" class="form-label w-96">Fax Number</label>
+                    <input type="text" class="form-control" name="fax" id="id_fax" placeholder="Fax Number" value="{{ student.fax|default_if_none:'' }}" maxlength="10">
+                </div>            
+            </div>
+        
+                <div class="mt-5 px-8 py-8">
+                    <button id='btn_learner_address' type="submit" class="btn btn-primary w-96 ml-2">Save Learner Contact and Address Information</button>
+                </div>
+        </form>   
+        <div id='messages_learner_address'></div>
+    </div>
+</div>

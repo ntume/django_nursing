@@ -1,0 +1,61 @@
+{% include 'messages.html' %}        
+<table class="table table-report -mt-2">
+    <thead>
+        <tr>
+            <th class="whitespace-nowrap">#</th>                  
+            <th class="whitespace-nowrap">Student Number</th>
+            <th class="whitespace-nowrap">Full Name</th>                    
+            <th class="whitespace-nowrap">Email</th>
+            <th class="whitespace-nowrap">Assessor 1 Mark</th>
+            <th class="whitespace-nowrap">Assessor 2 Mark</th>
+            <th class="whitespace-nowrap">Final Mark</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for l in students %}
+        <tr class="intro-x">
+            <td class="w-40">
+                {{ forloop.counter }}
+                <div id='messages_attachments_{{ forloop.counter }}'></div>
+            </td>
+            <td>
+                {{ l.registration__student_learning_programme__student__student_number }}
+            </td>
+            <td>
+                {{ l.registration__student_learning_programme__student__first_name }} {{ l.registration__student_learning_programme__student__last_name }}
+            </td>
+            <td>
+                {{ l.registration__student_learning_programme__student__email }}
+            </td>
+            <td>
+                <form>
+                    {% csrf_token %} 
+                    <input type='number' class='form-control' name='marks' value='{{ l.summative_assessor1 }}' max='100' min='0'
+                        hx-post="{% url 'students:lecturer_learning_programme_cohort_module_summative_student_assessment_save' l.id 1 %}"
+                        hx-trigger="change"
+                        hx-target="#summative_assessment_div"
+                        action="#">
+                </form>
+            </td> 
+            <td>
+                <form>
+                    {% csrf_token %} 
+                    <input type='number' class='form-control' name='marks' value='{{ l.summative_assessor2 }}' max='100' min='0'
+                        hx-post="{% url 'students:lecturer_learning_programme_cohort_module_summative_student_assessment_save' l.id 2 %}"
+                        hx-trigger="change"
+                        hx-target="#summative_assessment_div"
+                        action="#">
+                </form>
+            </td> 
+            <td>{{ l.year_mark }}</td>
+        </tr>
+        {% empty %}
+        <tr class="intro-x">
+            <td colspan='7'>
+                No students added yet
+            </td>
+        </tr>
+        {% endfor %}
+        
+    <tbody>
+</table>

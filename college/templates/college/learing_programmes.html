@@ -1,0 +1,336 @@
+{% extends 'base_tpl.html' %}
+
+{% block breadcrumb-content %}
+    <nav aria-label="breadcrumb" class="-intro-x mr-auto hidden sm:flex">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'administration:dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Learning Programmes Management</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block main-content %}
+
+{% include 'messages.html' %}
+
+
+    <div class="intro-y flex flex-col sm:flex-row items-center mt-8">
+        <h2 class="text-lg font-medium mr-auto">
+            Learning Programmes
+        </h2>
+        <div class="w-full sm:w-auto flex mt-4 sm:mt-0">
+            <button data-tw-toggle="modal" data-tw-target="#add-modal"  class="btn btn-primary shadow-md mr-2">Add Learning Programme</button>
+
+            <div id="add-modal" class="modal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <form action="{% url 'college:learning_programme_add' %}" method="POST">
+                            {% csrf_token %}
+                            <!-- BEGIN: Modal Header -->
+                            <div class="modal-header">
+                                <h2 class="font-medium text-base mr-auto">Add Learning Programme</h2>                                             
+                            </div> <!-- END: Modal Header -->
+                            <!-- BEGIN: Modal Body -->
+                            <div class="modal-body grid grid-cols-12 gap-4 gap-y-3">
+                                <div class="col-span-12 sm:col-span-12"> 
+                                    <label for="modal-form-1" class="form-label">Programme Name*</label> 
+                                    <input id="programme_name" name='programme_name' type="text" class="form-control" placeholder="Programme Name" required maxlength='100'> 
+                                </div>
+                                <div class="col-span-12 sm:col-span-12"> 
+                                    <label for="modal-form-1" class="form-label">Programme Code*</label> 
+                                    <input id="programme_code" name='programme_code' type="text" class="form-control" placeholder="Programme Code" required maxlength='10'> 
+                                </div>
+                                <div class="col-span-12 sm:col-span-12"> 
+                                    <label for="modal-form-1" class="form-label">Total Credits*</label> 
+                                    <input id="total_credits" name='total_credits' type="number" class="form-control" placeholder="Total Credits" required min='0'> 
+                                </div>                                
+                                <div class="col-span-12 sm:col-span-12"> 
+                                    <label for="modal-form-1" class="form-label">Duration*</label> 
+                                    <input id="duration" name='duration' type="number" class="form-control" placeholder="Duration of Programme" required min='0'> 
+                                </div>                                
+                                <div class="col-span-12 sm:col-span-12"> 
+                                    <label for="modal-form-1" class="form-label">Active</label> 
+                                    <select name='active' class='form-select'>
+                                        <option></option>
+                                        <option value="Yes">Yes</option>
+                                        <option value="No">No</option>
+                                    </select>
+                                </div>                                                                            
+                            </div> <!-- END: Modal Body -->
+                            <!-- BEGIN: Modal Footer -->
+                            <div class="modal-footer"> 
+                                <button type="button" data-tw-dismiss="modal" class="btn btn-outline-secondary w-20 mr-1">Cancel</button> 
+                                <button type="submit" class="btn btn-primary w-60">Add Learning Programme</button> 
+                            </div> <!-- END: Modal Footer -->
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            
+        </div>
+    </div>
+
+    <div class="intro-y p-5 mt-5">
+        
+        <div class="overflow-x-auto">
+            <table class="table table-report -mt-2">
+                <thead>
+                    <tr>
+                        <th class="whitespace-nowrap">#</th>                    
+                        <th class="whitespace-nowrap">Programme Name</th>
+                        <th class="whitespace-nowrap">Programme Code</th>
+                        <th class="whitespace-nowrap">Credits</th>
+                        <th class="whitespace-nowrap">Duration</th>
+                        <th class="whitespace-nowrap">Active</th>
+                        <th class="whitespace-nowrap">Periods</th>
+                        <th class="whitespace-nowrap">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in items %}
+                    <tr class="intro-x">
+                        <td class="w-40">
+                            {{ forloop.counter }}
+                        </td>
+                        <td>
+                            {{ r.programme_name }}
+                        </td>
+                        <td>
+                            {{ r.programme_code }}
+                        </td>
+                        <td>    
+                            {{ r.credits }}
+                        </td>
+                        <td>    
+                            {{ r.duration }}
+                        </td>
+                        <td>
+                            {% if r.active == 'Yes' %}
+                                <a href="{% url 'college:learning_programme_toggle' r.id %}" class="btn btn-warning mr-1 mb-2"> <i data-lucide="check" class="w-5 h-5"></i> </a>
+                            {% else %}
+                                <a href="{% url 'college:learning_programme_toggle' r.id %}" class="btn btn-danger mr-1 mb-2"> <i data-lucide="x" class="w-5 h-5"></i> </a>
+                            {% endif %}      
+                        </td>
+                        <td>
+                            {% for p in r.periods.all %}
+                                
+                          
+                                <div class="flex justify-center items-center">
+
+                                    <div class="dropdown ml-auto sm:ml-0">
+                                        <button class="dropdown-toggle btn px-2 box" aria-expanded="false" data-tw-toggle="dropdown">
+                                            <span class="w-40 h-5 flex items-center justify-center"> <i class=" h-4" data-lucide="arrow-down"></i> <b>{{ p.period }}</b></span>
+                                        </button>
+                                        <div class="dropdown-menu w-40">
+                                            <ul class="dropdown-content">
+                                                <li>
+                                                    <a class="dropdown-item" href="javascript:;" data-tw-toggle="modal" data-tw-target="#edit_period_{{ r.id }}_{{ p.id }}"> <i data-lucide="check-square" class="w-4 h-4 mr-1"></i> Edit </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item" href="javascript:;" data-tw-toggle="modal" data-tw-target="#delete_period_{{ r.id }}_{{ p.id }}"> <i data-lucide="check-square" class="w-4 h-4 mr-1"></i> Delete </a>
+                                                </li>
+                                                <li>
+                                                    <a href="{% url 'college:learning_programme_period_wil_requirements' p.id %}" class="dropdown-item"> <i data-lucide="files" class="w-4 h-4 mr-2"></i> Discipline Hours </a>
+                                                </li>
+                                                <li>
+                                                    <a href="{% url 'college:lp_block_template' r.id p.id %}" class="dropdown-item"> <i data-lucide="file" class="w-4 h-4 mr-2"></i> Period Block Template </a>
+                                                </li>
+                                                <li>
+                                                    <a href="{% url 'college:learning_programme_period_block_requirements' p.id %}" class="dropdown-item"> <i data-lucide="check" class="w-4 h-4 mr-2"></i> Programme Block Hours </a>
+                                                </li>
+                                                <li>
+                                                    <a href="{% url 'college:learning_programme_period_modules' p.id %}" class="dropdown-item"> <i data-lucide="star" class="w-4 h-4 mr-2"></i> Modules </a>
+                                                </li> 
+                                                <li>
+                                                    <a href="{% url 'college:learning_programme_period_sessions' p.id %}" class="dropdown-item"> <i data-lucide="clock" class="w-4 h-4 mr-2"></i> Timetable Sessions </a>
+                                                </li>
+                                                <li>
+                                                    <a href="{% url 'college:learning_programme_period_moderation_criteria' p.id %}" class="dropdown-item"> <i data-lucide="files" class="w-4 h-4 mr-2"></i> Moderation Criteria Theory</a>
+                                                </li>
+                                                <li>
+                                                    <a href="{% url 'college:learning_programme_period_moderation_criteria_wil' p.id %}" class="dropdown-item"> <i data-lucide="files" class="w-4 h-4 mr-2"></i> Moderation Criteria WIL</a>
+                                                </li>
+                                                
+                                                
+                                            </ul>
+                                        </div>
+                                    </div>
+                                                                   
+                                </div>
+                                <br>
+                                <div id="edit_period_{{ r.id }}_{{ p.id }}" class="modal" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog modal-xl">
+                                        <form action="{% url 'college:learning_programme_period_edit' r.id p.id %}" method="POST">       
+                                            {% csrf_token %}                                  
+                                            <div class="modal-content">
+                                                <div class="modal-body p-5">
+                                                    <div class="mt-5 col-span-12 sm:col-span-12"> 
+                                                        <label for="id_beginning" class="form-label">Period</label> 
+                                                        <input type='text' name="period" id="period" class="form-control" value="{{ p.period }}" required maxlength='20'>
+                                                    </div>
+                                                    <div class="mt-5 col-span-12 sm:col-span-12"> 
+                                                        <label for="id_beginning" class="form-label">Position</label> 
+                                                        <input type='number' name="position" id="position" class="form-control" value="{{ p.position }}" required min='1'>
+                                                    </div>                                                    
+                                                    <br><br>
+                                                    <div class="px-5 pb-8 text-center"> 
+                                                        <button type="button" data-tw-dismiss="modal" class="btn btn-outline-secondary w-24 mr-1">Cancel</button> 
+                                                        <button type="submit" class="btn btn-success w-60 text-white">Edit Period</button> 
+                                                    </div>
+                                                    
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+
+                                <div id="delete_period_{{ r.id }}_{{ p.id }}" class="modal" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-body p-0">
+                                                <form action="{% url 'college:learning_programme_period_delete' r.id p.id %}" method="POST">
+                                                    {% csrf_token %}
+                                                    <div class="p-5 text-center">
+                                                        <i data-lucide="x-circle" class="w-16 h-16 text-danger mx-auto mt-3"></i> 
+                                                        <div class="text-3xl mt-5">Are you sure?</div>
+                                                        <div class="text-slate-500 mt-2">
+                                                            Do you really want to delete this record? 
+                                                            <br>
+                                                            This process cannot be undone.
+                                                        </div>
+                                                    </div>
+                                                    <div class="px-5 pb-8 text-center">
+                                                        <button type="button" data-tw-dismiss="modal" class="btn btn-outline-secondary w-24 mr-1">Cancel</button>
+                                                        <button type="submit" class="btn btn-danger w-24">Delete</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+
+                            <a class="btn btn-success w-60 ml-2 text-white mb-5" data-tw-toggle="modal" data-tw-target="#add_period_{{ r.id }}"> <i data-lucide="plus" class="w-4 h-4 mr-1"></i> Add Period</a>
+                            <div id="add_period_{{ r.id }}" class="modal" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog modal-xl">
+                                    <form action="{% url 'college:learning_programme_period_add' r.id %}" method="POST">       
+                                        {% csrf_token %}                                  
+                                        <div class="modal-content">
+                                            <div class="modal-body p-5">
+                                                <div class="mt-5 col-span-12 sm:col-span-12"> 
+                                                    <label for="id_beginning" class="form-label">Period</label> 
+                                                    <input type='text' name="period" id="period" class="form-control" required maxlength='20'>
+                                                </div>
+                                                <div class="mt-5 col-span-12 sm:col-span-12"> 
+                                                    <label for="id_beginning" class="form-label">Position</label> 
+                                                    <input type='number' name="position" id="position" class="form-control" required min='1'>
+                                                </div>                                                    
+                                                <br><br>
+                                                <div class="px-5 pb-8 text-center"> 
+                                                    <button type="button" data-tw-dismiss="modal" class="btn btn-outline-secondary w-24 mr-1">Cancel</button> 
+                                                    <button type="submit" class="btn btn-success w-60 text-white">Add Period</button> 
+                                                </div>
+                                                
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </td>
+                      
+                        <td class="table-report__action w-56">
+                            <div class="flex justify-center items-center">
+
+                                <div class="dropdown ml-auto sm:ml-0">
+                                    <button class="dropdown-toggle btn px-2 box" aria-expanded="false" data-tw-toggle="dropdown">
+                                        <span class="w-5 h-5 flex items-center justify-center"> <i class="w-4 h-4" data-lucide="plus"></i> </span>
+                                    </button>
+                                    <div class="dropdown-menu w-40">
+                                        <ul class="dropdown-content">
+                                            <li>
+                                                <a class="dropdown-item" href="javascript:;" data-tw-toggle="modal" data-tw-target="#edit-modal_{{ r.id }}"> <i data-lucide="check-square" class="w-4 h-4 mr-1"></i> Edit </a>
+                                            </li>
+                                            <li>
+                                                <a href="{% url 'college:learning_programme_documents' r.id %}" class="dropdown-item"> <i data-lucide="files" class="w-4 h-4 mr-2"></i> Documents </a>
+                                            </li>
+                                            <li>
+                                                <a href="{% url 'college:learning_programme_elos' r.id %}" class="dropdown-item"> <i data-lucide="file" class="w-4 h-4 mr-2"></i> ELOs </a>
+                                            </li>
+                                            <li>
+                                                <a href="{% url 'college:learning_programme_competencies' r.id %}" class="dropdown-item"> <i data-lucide="check" class="w-4 h-4 mr-2"></i> Competencies </a>
+                                            </li>
+                                            <li>
+                                                <a href="{% url 'college:learning_programme_modules' r.id %}" class="dropdown-item"> <i data-lucide="award" class="w-4 h-4 mr-2"></i> Modules </a>
+                                            </li>
+                                           
+                                        </ul>
+                                    </div>
+                                </div>
+                                
+                                <div id="edit-modal_{{ r.id }}" class="modal" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <form action="{% url 'college:learning_programme_edit' r.id %}" method="POST">
+                                                {% csrf_token %}
+                                                <!-- BEGIN: Modal Header -->
+                                                <div class="modal-header">
+                                                    <h2 class="font-medium text-base mr-auto">Edit Learning Programme</h2>                                             
+                                                </div> <!-- END: Modal Header -->
+                                                <!-- BEGIN: Modal Body -->
+                                                <div class="modal-body grid grid-cols-12 gap-4 gap-y-3">
+                                                    <div class="col-span-12 sm:col-span-12"> 
+                                                        <label for="modal-form-1" class="form-label">Programme Name*</label> 
+                                                        <input value="{{ r.programme_name }}" id="programme_name" name='programme_name' type="text" class="form-control" placeholder="Programme Name" required maxlength='100'> 
+                                                    </div>
+                                                    <div class="col-span-12 sm:col-span-12"> 
+                                                        <label for="modal-form-1" class="form-label">Programme Code*</label> 
+                                                        <input value="{{ r.programme_code }}" id="programme_code" name='programme_code' type="text" class="form-control" placeholder="Programme Code" required maxlength='10'> 
+                                                    </div>
+                                                    <div class="col-span-12 sm:col-span-12"> 
+                                                        <label for="modal-form-1" class="form-label">Total Credits*</label> 
+                                                        <input value="{{ r.total_credits }}" id="total_credits" name='total_credits' type="number" class="form-control" placeholder="Total Credits" required min='0'> 
+                                                    </div>                                
+                                                    <div class="col-span-12 sm:col-span-12"> 
+                                                        <label for="modal-form-1" class="form-label">Duration*</label> 
+                                                        <input value="{{ r.duration }}" id="duration" name='duration' type="number" class="form-control" placeholder="Duration of Programme" required min='0'> 
+                                                    </div>                                
+                                                    <div class="col-span-12 sm:col-span-12"> 
+                                                        <label for="modal-form-1" class="form-label">Active</label> 
+                                                        <select name='active' class='form-select'>
+                                                            <option></option>
+                                                            {% if r.active == 'Yes' %}
+                                                                <option value="Yes" selected>Yes</option>
+                                                                <option value="No">No</option>
+                                                            {% elif r.active == 'No' %}
+                                                                <option value="Yes">Yes</option>
+                                                                <option value="No" selected>No</option>
+                                                            {% else %}
+                                                                <option value="Yes">Yes</option>
+                                                                <option value="No">No</option>
+                                                            {% endif %}
+                                                        </select>
+                                                    </div>                                                                            
+                                                </div> <!-- END: Modal Body -->
+                                                <!-- BEGIN: Modal Footer -->
+                                                <div class="modal-footer"> 
+                                                    <button type="button" data-tw-dismiss="modal" class="btn btn-outline-secondary w-20 mr-1">Cancel</button> 
+                                                    <button type="submit" class="btn btn-primary w-60">Edit Learning Programme</button> 
+                                                </div> <!-- END: Modal Footer -->
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>                                
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr class="intro-x"><td colspan='8'>Nothing added yet</td></tr>
+                    {% endfor %}
+                    
+                <tbody>
+            </table>
+        </div>
+    </div>
+
+{% endblock %}

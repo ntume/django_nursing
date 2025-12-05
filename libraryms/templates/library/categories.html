@@ -1,0 +1,154 @@
+{% extends 'base_tpl.html' %}
+
+{% block breadcrumb-content %}
+    <nav aria-label="breadcrumb" class="-intro-x mr-auto hidden sm:flex">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'administration:dashboard_librarian' %}">Dashboard</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Book Categories</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block main-content %}
+
+{% include 'messages.html' %}
+
+
+    <div class="intro-y flex flex-col sm:flex-row items-center mt-8">
+        <h2 class="text-lg font-medium mr-auto">
+            Book Categories
+        </h2>
+        <div class="w-full sm:w-auto flex mt-4 sm:mt-0">
+            <button data-tw-toggle="modal" data-tw-target="#add-modal"  class="btn btn-primary shadow-md mr-2">Add Book Category</button>
+
+            <div id="add-modal" class="modal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <form action="{% url 'library:category_add' %}" method="POST">
+                            {% csrf_token %}
+                            <!-- BEGIN: Modal Header -->
+                            <div class="modal-header">
+                                <h2 class="font-medium text-base mr-auto">Add Category</h2>                                             
+                            </div> <!-- END: Modal Header -->
+                            <!-- BEGIN: Modal Body -->
+                            <div class="modal-body grid grid-cols-12 gap-4 gap-y-3">
+                                <div class="col-span-12 sm:col-span-12"> 
+                                    <label for="modal-form-1" class="form-label">Category</label> 
+                                    <input id="category" name='category' type="text" class="form-control" placeholder="Category" maxlength='200' required> 
+                                </div>  
+                                <div class="col-span-12 sm:col-span-12"> 
+                                    <label for="modal-form-1" class="form-label">Dewey Decimal Code</label> 
+                                    <input id="dewey_code" name='dewey_code' type="number" class="form-control" placeholder="Dewey Code" min='0' required> 
+                                </div>                                                              
+                                <div class="col-span-12 sm:col-span-12"> 
+                                    <label for="modal-form-1" class="form-label">Description</label> 
+                                    <input id="description" name='description' type="text" class="form-control" placeholder="Description" required> 
+                                </div>
+                            </div> <!-- END: Modal Body -->
+                            <!-- BEGIN: Modal Footer -->
+                            <div class="modal-footer"> 
+                                <button type="button" data-tw-dismiss="modal" class="btn btn-outline-secondary w-20 mr-1">Cancel</button> 
+                                <button type="submit" class="btn btn-primary w-40">Add Category</button> 
+                            </div> <!-- END: Modal Footer -->
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="intro-y box p-5 mt-5">
+        
+        <div class="overflow-x-auto">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th class="whitespace-nowrap">#</th>
+                        <th class="whitespace-nowrap">Category</th>
+                        <th class="whitespace-nowrap">Dewey Decimal Code</th>
+                        <th class="whitespace-nowrap">Description</th>
+                        <th class="flex justify-center items-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in items %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ item.category }}</td>
+                            <td>{{ item.dewey_code }}</td>
+                            <td>{{ item.description }}</td>
+                            <td>
+                                <div class="flex justify-center items-center">
+                                    <a class="flex items-center mr-3" href="javascript:;" data-tw-toggle="modal" data-tw-target="#edit-modal_{{ item.id }}"> <i data-lucide="check-square" class="w-4 h-4 mr-1"></i> Edit </a>
+                                    <div id="edit-modal_{{ item.id }}" class="modal" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <form action="{% url 'library:category_edit' item.id %}" method="POST">
+                                                    {% csrf_token %}
+                                                    <!-- BEGIN: Modal Header -->
+                                                    <div class="modal-header">
+                                                        <h2 class="font-medium text-base mr-auto">Edit Category</h2>                                             
+                                                    </div> <!-- END: Modal Header -->
+                                                    <!-- BEGIN: Modal Body -->
+                                                    <div class="modal-body grid grid-cols-12 gap-4 gap-y-3">
+                                                        <div class="col-span-12 sm:col-span-12"> 
+                                                            <label for="modal-form-1" class="form-label">Category</label> 
+                                                            <input id="category" name='category' type="text" class="form-control" maxlength='200' value="{{ item.category }}" required> 
+                                                        </div> 
+                                                        <div class="col-span-12 sm:col-span-12"> 
+                                                            <label for="modal-form-1" class="form-label">Dewey Decimal Code</label> 
+                                                            <input id="dewey_code" name='dewey_code' type="number" class="form-control" value="{{ item.dewey_code }}" min='0' required> 
+                                                        </div>                                                              
+                                                        <div class="col-span-12 sm:col-span-12"> 
+                                                            <label for="modal-form-1" class="form-label">Description</label> 
+                                                            <input id="description" name='description' type="text" class="form-control" value="{{ item.description }}" required> 
+                                                        </div>
+                                                                                           
+                                                    </div> <!-- END: Modal Body -->
+                                                    <!-- BEGIN: Modal Footer -->
+                                                    <div class="modal-footer"> 
+                                                        <button type="button" data-tw-dismiss="modal" class="btn btn-outline-secondary w-20 mr-1">Cancel</button> 
+                                                        <button type="submit" class="btn btn-primary w-40">Edit Category</button> 
+                                                    </div> <!-- END: Modal Footer -->
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <a class="flex items-center text-danger" href="javascript:;" data-tw-toggle="modal" data-tw-target="#delete-confirmation-modal_{{ item.id }}"> <i data-lucide="trash-2" class="w-4 h-4 mr-1"></i> Delete </a>
+                                    <div id="delete-confirmation-modal_{{ item.id }}" class="modal" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-body p-0">
+                                                    <form action="{% url 'library:category_delete' item.id %}" method="POST">
+                                                        {% csrf_token %}
+                                                        <div class="p-5 text-center">
+                                                            <i data-lucide="x-circle" class="w-16 h-16 text-danger mx-auto mt-3"></i> 
+                                                            <div class="text-3xl mt-5">Are you sure?</div>
+                                                            <div class="text-slate-500 mt-2">
+                                                                Do you really want to delete this record? 
+                                                                <br>
+                                                                This process cannot be undone.
+                                                            </div>
+                                                        </div>
+                                                        <div class="px-5 pb-8 text-center">
+                                                            <button type="button" data-tw-dismiss="modal" class="btn btn-outline-secondary w-24 mr-1">Cancel</button>
+                                                            <button type="submit" class="btn btn-danger w-24">Delete</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    {% empty %}
+                    <tr><td colspan = '5'>No category added, please add at least one category</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+{% endblock %}

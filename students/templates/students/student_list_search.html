@@ -1,0 +1,273 @@
+{% extends 'base_vertical.html' %}
+
+{% block main-content %}
+<div class="row">
+  <div class="col-md-12 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          <nav aria-label="breadcrumb">
+              <ol class="breadcrumb bg-inverse-info">
+                {%  if user.is_authenticated and user.roles_id == 2  %}
+                  <li class="breadcrumb-item"><a href="{% url 'wil:dashboard' %}">Dashboard</a></li>
+                  <li class="breadcrumb-item active" aria-current="page"><a>{{department.department}}</a></li>
+                  {% elif user.is_authenticated and user.roles_id == 10  or user.is_authenticated and user.roles_id == 11 %}
+                    <li class="breadcrumb-item"><a href="{% url 'psycad:dashboard' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'psycad:faculties' %}">Faculties</a></li>
+                    <li class="breadcrumb-item active" aria-current="page"><a>{{department.department}}</a></li>
+                  {% endif %}
+              </ol>
+            </nav>
+
+            {% include 'messages.html' %}
+
+        </div>
+      </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-lg-12 grid-margin stretch-card">
+              <div class="card">
+                <div class="card-body">
+                  <h4 class="card-title">Search Phrase: {{ phrase }}</h4>
+                  <p class="card-description">
+                    <div class="row">
+                      <div class="col-md-5">
+                        <ul class="navbar-nav mr-lg-2">
+                          <li class="nav-item nav-search d-none d-lg-block">
+                            <div class="input-group">
+                              <form action="{% url 'wil:students_search' department.department %}" method="POST">
+                                {% csrf_token %}
+                                <div class="form-group">
+                                  <div class="input-group">
+                                    <input type="text" class="form-control" placeholder="Search..." aria-label="Search..." name="search" required>
+                                    <div class="input-group-append">
+                                      <button class="btn btn-sm btn-icon" type="submit"><span class="input-group-text" id="search">
+                                      <i class="ti-search"></i>
+                                    </span></button>
+                                    </div>
+                                  </div>
+                                </div>
+                            </form>
+                            </div>
+                          </li>
+                        </ul>
+                      </div>
+                      <div class="col-md-7 pull-right">
+                        {%  if user.is_authenticated and user.roles_id == 2  %}
+                          <form method="GET"><button type="button" class="btn btn-primary btn-icon-text btn-rounded pull-right"> <i class="ti-user btn-icon-prepend"></i>Student Memo </button></form>
+                          <form method="GET" action="{% url 'wil:students_messenger' department.department %}"><input type="hidden" name="filter" value="{{filter}}"><button type="submit" class="btn btn-warning btn-icon-text btn-rounded pull-right"> <i class="ti-email btn-icon-prepend"></i>Student Messenger </button></form>
+                          <form method="GET" action="{% url 'wil:student_cv_list' department.department %}"><input type="hidden" name="filter" value="{{filter}}"><button type="submit" class="btn btn-info btn-icon-text btn-rounded pull-right"> <i class="ti-printer btn-icon-prepend"></i>Student CV List </button></form>
+                        {% elif user.is_authenticated and user.roles_id == 10  or user.is_authenticated and user.roles_id == 11%}
+                          <form method="GET"><button type="button" class="btn btn-primary btn-icon-text btn-rounded pull-right"> <i class="ti-user btn-icon-prepend"></i>Student Memo </button></form>
+                          <form method="GET" action="{% url 'psycad:students_messenger' department.department %}"><input type="hidden" name="filter" value="{{filter}}"><button type="submit" class="btn btn-warning btn-icon-text btn-rounded pull-right"> <i class="ti-email btn-icon-prepend"></i>Student Messenger </button></form>
+                          <form method="GET" action="{% url 'psycad:student_cv_list' department.department %}"><input type="hidden" name="filter" value="{{filter}}"><button type="submit" class="btn btn-info btn-icon-text btn-rounded pull-right"><i class="ti-printer btn-icon-prepend"></i>Student CV List </button></form>
+                        {% endif %}
+                      </div>
+                    </div>
+                  </p><br><br><br>
+                  <div class="table-responsive">
+                    <table class="table table-bordered">
+                      <thead>
+                        <tr>
+                          <th>Student Details</th>
+                          <th>Department</th>
+                          <th>Contacts</th>
+                          <th>Gender</th>
+                          <th>Race</th>
+                          <th>Date Added</th>
+                          <th>Status</th>
+                          {% if user.is_authenticated and user.roles_id == 2 %}<th>WIL Subjects</th>{% endif %}
+                          <th>Reset Password</th>
+                          <th>View Student</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for student in students %}
+                            <tr>
+                              <td class="py-1">
+                                <b>{{student.student_number}}</b><br><br>
+                                {{student.name}} {{student.surname}}
+                              </td>
+                              <td>{{ student.department.department }}</td>
+                              <td>
+                                <b>Email:</b> {{ student.email }}<br><br>
+                                <b>Cellphone:</b> {{ student.contact_number }}
+                              </td>
+                              <td>
+
+                                  {% if student.gender == 1 %}
+                                    Male
+                                  {% else %}
+                                    Female
+                                  {% endif %}
+
+                              </td>
+                              <td>
+                                {% if student.race == 1 %}
+                                  BLACK
+                                {% elif student.race == 2 %}
+                                  COLOURED
+                                {% elif student.race == 3 %}
+                                  ASIAN
+                                {% elif student.race == 4 %}
+                                  WHITE
+                                {% endif %}
+                              </td>
+                              <td> {{ student.created_at }} </td>
+                              <td>
+                                <form method="POST" action="{% url 'psycad:update_student_user' department.department student.id %}">
+                                  {% csrf_token %}
+                                  {% if student.status == 1 %}
+                                      <button type="submit" class="btn btn-outline-success btn-rounded btn-icon">
+                                        <i class="ti-thumb-up"></i>
+                                      </button>
+                                      <input type="hidden" name="task" value="deactivate">
+                                  {% elif student.status == 2 %}
+                                      <button type="submit" class="btn btn-outline-secondary btn-rounded btn-icon">
+                                        <i class="fa fa-question"></i>
+                                      </button>
+                                      <input type="hidden" name="task" value="new">
+                                  {% elif student.status == 3 %}
+                                      <button type="submit" class="btn btn-outline-danger btn-rounded btn-icon">
+                                        <i class="ti-thumb-down"></i>
+                                      </button>
+                                      <input type="hidden" name="task" value="activate">
+                                  {% endif %}
+                              </form>
+
+                              </td>
+                              {% if user.is_authenticated and user.roles_id == 2 %}
+                                <td>
+                                  {% if student.department.id == LecturerUser.department.id %}
+                                      {% for stud_subj in student.subjects.all %}
+                                          <a href="{% url 'wil:search_student_subject_get' stud_subj.subject_id student.student_number %}">{{ stud_subj.subject.program.programme_code }} - [{{ stud_subj.subject.year }} S{{ stud_subj.subject.semester }}]</a> <br><br>
+                                      {% empty %}
+                                        <i>No WIL subjects added yet</i><br><br>
+                                      {% endfor %}
+                                  {% else %}
+                                      {% for stud_subj in student.subjects.all %}
+                                          {{ stud_subj.subject.program.programme_code }} - [{{ stud_subj.subject.year }} S{{ stud_subj.subject.semester }}] <br><br>
+                                      {% empty %}
+                                        <i>No WIL subjects added yet</i><br><br>
+                                      {% endfor %}
+                                  {% endif %}
+                                </td>
+                              {% endif %}
+                              <td>
+                              {% if student.user %}
+                                {% if user.is_authenticated and user.roles_id == 2 %}
+                                  <form action="{% url 'wil:reset_password' department.department student.id %}" method="GET">
+                                    <button type="submit" class="btn btn-outline-warning btn-rounded btn-icon">
+                                      <i class="ti-shield"></i>
+                                    </button>
+                                  </form>
+                                {% elif user.is_authenticated and user.roles_id == 10  or user.is_authenticated and user.roles_id == 11%}
+                                <form action="{% url 'psycad:reset_password' department.department student.id %}" method="GET">
+                                  <button type="submit" class="btn btn-outline-warning btn-rounded btn-icon">
+                                    <i class="ti-shield"></i>
+                                  </button>
+                                </form>
+                                {% endif %}
+                              {% else %}
+                                <button type="button" class="btn btn-secondary btn-rounded btn-icon" data-toggle="tooltip" data-placement="bottom" title="Sorry you can not reset this students password because they are not active, you need to activate them first" data-custom-class="tooltip-danger"> <i class="ti-shield"></i> </button>
+                              {% endif %}
+                              </td>
+                              <td>
+                                {% if user.is_authenticated and user.roles_id == 2 %}
+                                  {% if student.department.id == LecturerUser.department.id %}
+                                    <form action="{% url 'wil:view_student' department.department student.id %}" method="GET">
+                                      <button type="submit" class="btn btn-outline-primary btn-rounded btn-icon">
+                                        <i class="ti-user"></i>
+                                      </button>
+                                    </form>
+                                  {% else %}
+                                    <button type="submit" class="btn btn-outline-default btn-rounded btn-icon" data-toggle="tooltip" data-placement="bottom" title="Sorry student does not belong to your department so you can not view his profile. Ask the student to correct the department if he is in your department" data-custom-class="tooltip-info">
+                                      <i class="ti-user"></i>
+                                    </button>
+                                  {% endif %}
+                                {% elif user.is_authenticated and user.roles_id == 10 or user.is_authenticated and user.roles_id == 11 %}
+                                  <form action="{% url 'psycad:view_student' department.department student.id %}" method="GET">
+                                    <button type="submit" class="btn btn-outline-primary btn-rounded btn-icon">
+                                      <i class="ti-user"></i>
+                                    </button>
+                                  </form>
+                                {% endif %}
+
+                              </td>
+                            </tr>
+                        {% empty %}
+                            <tr><td colspan="10">Sorry no students added yet</td></tr>
+                        {% endfor %}
+                      </tbody>
+                    </table>
+
+
+
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-lg-12 grid-margin stretch-card">
+                <div class="card">
+                  <div class="card-body">
+
+                    <nav>
+                    {% if is_paginated %}
+                      <ul class="pagination flex-wrap pagination-rounded">
+                        <li class="page-item"><a class="page-link" href="#"><i class="ti-angle-left"></i></a></li>
+                        {% if page_obj.has_previous %}
+                          <li class="page-item"><a  class="page-link" href="?page={{ page_obj.previous_page_number }}">&laquo;</a></li>
+                        {% else %}
+                          <li class="disabled page-link"><span>&laquo;</span></li>
+                        {% endif %}
+                        {% for i in paginator.page_range %}
+                          {% if page_obj.number == i %}
+                            <li class="active page-link"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+                          {% else %}
+                            <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+                          {% endif %}
+                        {% endfor %}
+                        {% if page_obj.has_next %}
+                          <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">&raquo;</a></li>
+                        {% else %}
+                          <li class="disabled page-link"><span>&raquo;</span></li>
+                        {% endif %}
+                        <li class="page-item"><a class="page-link" href="#"><i class="ti-angle-right"></i></a></li>
+                      </ul>
+                    {% endif %}
+                    </nav>
+
+                    <nav>
+                    {% if students.has_other_pages %}
+                      <ul class="pagination flex-wrap pagination-rounded">
+                        <li class="page-item"><a class="page-link" href="#"><i class="ti-angle-left"></i></a></li>
+                        {% if students.has_previous %}
+                          <li class="page-item"><a  class="page-link" href="?page={{ students.previous_page_number }}&department={{department.department}}&filter={{filter}}">&laquo;</a></li>
+                        {% else %}
+                          <li class="disabled page-link"><span>&laquo;</span></li>
+                        {% endif %}
+                        {% for i in students.paginator.page_range %}
+                          {% if students.number == i %}
+                            <li class="active page-link"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+                          {% else %}
+                            <li class="page-item"><a class="page-link" href="?page={{ i }}&department={{department.department}}&filter={{filter}}">{{ i }}</a></li>
+                          {% endif %}
+                        {% endfor %}
+                        {% if students.has_next %}
+                          <li class="page-item"><a class="page-link" href="?page={{ students.next_page_number }}&department={{department.department}}&filter={{filter}}">&raquo;</a></li>
+                        {% else %}
+                          <li class="disabled page-link"><span>&raquo;</span></li>
+                        {% endif %}
+                        <li class="page-item"><a class="page-link" href="#"><i class="ti-angle-right"></i></a></li>
+                      </ul>
+                    {% endif %}
+                    </nav>
+                </div>
+                </div>
+            </div>
+          </div>
+
+{% endblock %}

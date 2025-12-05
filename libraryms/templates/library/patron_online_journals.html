@@ -1,0 +1,69 @@
+{% extends 'base_vertical.html' %}
+
+{% block breadcrumb-content %}
+    <nav aria-label="breadcrumb" class="-intro-x h-full mr-auto">
+        <ol class="breadcrumb breadcrumb-light">
+            <li class="breadcrumb-item"><a href="{% url 'students:student_dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Online Resources</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block main-content %}
+
+{% include 'messages.html' %}
+
+
+    <div class="intro-y flex flex-col sm:flex-row items-center mt-8">
+        <h2 class="text-lg font-medium mr-auto">
+            Journals
+        </h2>       
+    </div>
+
+
+    <div class="intro-y p-5 mt-5">
+        
+        <div class="overflow-x-auto">
+            <table class="table table-report -mt-2">
+                <thead>
+                    <tr>
+                        <th class="whitespace-nowrap">#</th>     
+                        <th class="whitespace-nowrap"></th>               
+                        <th class="whitespace-nowrap">Title</th>
+                        <th class="whitespace-nowrap">Publisher</th>
+                        <th class="whitespace-nowrap">URL</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in items %}
+                    <tr class="intro-x">
+                        <td>
+                            {{ forloop.counter }}
+                        </td>
+                        <td>
+                            {% if r.thumbnail %}
+                                <img alt="{{r.publisher.name}}" src="{{ r.thumbnail.url }}" data-action="zoom" class="w-full rounded-md">
+                            {% endif %}
+                        </td>
+                        <td>
+                            {{ r.title }}
+                        </td>
+                        <td>
+                            {{ r.publisher.name }}
+                        </td>
+                        <td>    
+                            <a class='text-primary' href="{{ r.url }}" target="_blank">{{ r.url }}</a>
+                        </td>
+                             
+                    </tr>
+                    {% empty %}
+                    <tr class="intro-x"><td colspan='6'>Nothing added yet</td></tr>
+                    {% endfor %}
+                    
+                <tbody>
+            </table>
+        </div>
+
+    </div>
+
+{% endblock %}

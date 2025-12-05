@@ -1,0 +1,230 @@
+{% extends 'base.html' %}
+
+{% block main-content %}
+<div class="row">
+  <div class="col-md-12 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          <nav aria-label="breadcrumb">
+              <ol class="breadcrumb bg-inverse-info">
+
+                  <li class="breadcrumb-item"><a href="{% url 'mentor:dashboard' %}">Dashboard</a></li>
+                  <li class="breadcrumb-item"><a href="{% url 'mentor:view_students' department.department %}">{{department.department}}</a></li>
+                  <li class="breadcrumb-item active" aria-current="page"><a>CV List</a></li>
+
+              </ol>
+            </nav>
+
+            {% include 'messages.html' %}
+
+        </div>
+      </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-lg-12 grid-margin stretch-card">
+              <div class="card">
+
+                <form method="POST" name="frmnotify" action="{% url 'mentor:download_cvs' page_obj.number %}">
+                {% csrf_token %}
+                <input  type = "hidden" name = "userscustomLoop" value = "{{ students|length }}">
+                <div class="card-body">
+                  <h4 class="card-title">List of Student CVs - {{department.department}}</h4>
+                  <p class="card-description">
+                    <div class="row">
+                      <div class="col-md-5">
+
+                      </div>
+                      <div class="col-md-7 pull-right">
+                          <button type="button" class="btn btn-primary btn-icon-text btn-rounded pull-right" onclick="downloadcvs()"> <i class="ti-user btn-icon-prepend"></i>ZIP CVs</button>
+                      </div>
+                    </div>
+                  </p><br><br><br>
+                  <div class="table-responsive">
+                    <table class="table table-bordered">
+                      <thead>
+                        <tr>
+                          <th><input type="checkbox" name="toggle" value="all" class="form-control" onclick = "checkall()">ALL</th>
+                          <th>Student Details</th>
+                          <th>Contacts</th>
+                          <th>Gender</th>
+                          <th>Race</th>
+                          <th>Date Added</th>
+                          <th>Employed</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for student in students %}
+                            <tr>
+                              <td class="py-1">
+                                <input type="checkbox" name="students[]" value="{{ student.id }}">
+                              </td>
+                              <td>
+                                <b>{{student.student_number}}</b><br><br>
+                                {{student.name}} {{student.surname}}
+                              </td>
+                              <td>
+                                <b>Email:</b> {{student.email}}<br><br>
+                                <b>Cellphone:</b> {{student.contact_number}}
+                              </td>
+                              <td>
+
+                                  {% if student.gender == 1 %}
+                                    Male
+                                  {% else %}
+                                    Female
+                                  {% endif %}
+
+                              </td>
+                              <td>
+                                {% if student.race == 1 %}
+                                  BLACK
+                                {% elif student.race == 2 %}
+                                  COLOURED
+                                {% elif student.race == 3 %}
+                                  ASIAN
+                                {% elif student.race == 4 %}
+                                  WHITE
+                                {% endif %}
+                              </td>
+                              <td> {{ student.created_at }} </td>
+                              <td>
+                                  {% if student.employed == 1 %}
+                                      <button type="button" class="btn btn-outline-success btn-rounded btn-icon">
+                                        <i class="ti-check"></i>
+                                      </button>
+                                  {% else %}
+                                      <button type="button" class="btn btn-outline-danger btn-rounded btn-icon">
+                                        <i class="ti-close"></i>
+                                      </button>
+                                  {% endif %}
+                              </td>
+
+                            </tr>
+                        {% empty %}
+                            <tr><td colspan="10">Sorry no completed CVsd</td></tr>
+                        {% endfor %}
+                      </tbody>
+                    </table>
+
+
+
+                  </div>
+                </div>
+                  </form>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-lg-12 grid-margin stretch-card">
+                <div class="card">
+                  <div class="card-body">
+
+                    <nav>
+                    {% if is_paginated %}
+                      <ul class="pagination flex-wrap pagination-rounded">
+                        <li class="page-item"><a class="page-link" href="#"><i class="ti-angle-left"></i></a></li>
+                        {% if page_obj.has_previous %}
+                          <li class="page-item"><a  class="page-link" href="?page={{ page_obj.previous_page_number }}&department={{department.department}}&filter={{filter}}">&laquo;</a></li>
+                        {% else %}
+                          <li class="disabled page-link"><span>&laquo;</span></li>
+                        {% endif %}
+                        {% for i in paginator.page_range %}
+                          {% if page_obj.number == i %}
+                            <li class="active page-link"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+                          {% else %}
+                            <li class="page-item"><a class="page-link" href="?page={{ i }}&department={{department.department}}&filter={{filter}}">{{ i }}</a></li>
+                          {% endif %}
+                        {% endfor %}
+                        {% if page_obj.has_next %}
+                          <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}&department={{department.department}}&filter={{filter}}">&raquo;</a></li>
+                        {% else %}
+                          <li class="disabled page-link"><span>&raquo;</span></li>
+                        {% endif %}
+                        <li class="page-item"><a class="page-link" href="#"><i class="ti-angle-right"></i></a></li>
+                      </ul>
+                    {% endif %}
+                    </nav>
+
+                    <nav>
+                    {% if students.has_other_pages %}
+                      <ul class="pagination flex-wrap pagination-rounded">
+                        <li class="page-item"><a class="page-link" href="#"><i class="ti-angle-left"></i></a></li>
+                        {% if students.has_previous %}
+                          <li class="page-item"><a  class="page-link" href="?page={{ students.previous_page_number }}&department={{department.department}}&filter={{filter}}">&laquo;</a></li>
+                        {% else %}
+                          <li class="disabled page-link"><span>&laquo;</span></li>
+                        {% endif %}
+                        {% for i in students.paginator.page_range %}
+                          {% if students.number == i %}
+                            <li class="active page-link"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+                          {% else %}
+                            <li class="page-item"><a class="page-link" href="?page={{ i }}&department={{department.department}}&filter={{filter}}">{{ i }}</a></li>
+                          {% endif %}
+                        {% endfor %}
+                        {% if students.has_next %}
+                          <li class="page-item"><a class="page-link" href="?page={{ students.next_page_number }}&department={{department.department}}&filter={{filter}}">&raquo;</a></li>
+                        {% else %}
+                          <li class="disabled page-link"><span>&raquo;</span></li>
+                        {% endif %}
+                        <li class="page-item"><a class="page-link" href="#"><i class="ti-angle-right"></i></a></li>
+                      </ul>
+                    {% endif %}
+                    </nav>
+                </div>
+                </div>
+            </div>
+          </div>
+
+{% endblock %}
+
+{% block js-content %}
+
+<script language="JavaScript" type="text/javascript">
+
+  function checkall(){
+    var loop = document.frmnotify.userscustomLoop.value;
+
+    //boxes = document.frmnotify.notify.length;
+    if (loop > 1){
+      for(i=0;i<loop;i++){
+          if(document.forms["frmnotify"].elements["students[]"][i].checked == true )
+             document.forms["frmnotify"].elements["students[]"][i].checked = false;
+           else if(document.forms["frmnotify"].elements["students[]"][i].checked == false)
+             document.forms["frmnotify"].elements["students[]"][i].checked = true;
+      }
+    }
+    else{
+      if(document.forms["frmnotify"].elements["students[]"].checked == true )
+         document.forms["frmnotify"].elements["students[]"].checked = false;
+       else if(document.forms["frmnotify"].elements["students[]"].checked == false)
+         document.forms["frmnotify"].elements["students[]"].checked = true;
+    }
+  }
+
+  function downloadcvs(){
+            var loop = document.frmnotify.userscustomLoop.value;
+            var tocheck = false;
+
+            if (loop > 1){
+              for (i = 0; i < loop; i++) {
+                 if (document.forms["frmnotify"].elements["students[]"][i].checked == true)
+                   tocheck = true;
+              }
+            }
+            else{
+              if (document.forms["frmnotify"].elements["students[]"].checked == true)
+                tocheck = true;
+            }
+
+            if(tocheck == true)
+                  document.frmnotify.submit();
+            else if(tocheck == false)
+                alert('Pease select atleast one student cv to download');
+	}
+
+</script>
+
+
+{% endblock %}

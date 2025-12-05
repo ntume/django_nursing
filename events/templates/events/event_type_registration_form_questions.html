@@ -1,0 +1,495 @@
+{% extends 'base_vertical.html' %}
+{% load bootstrap3 %}
+
+{% block css-content %}
+
+<style type="text/css">
+
+table.timecard {
+	margin: auto;
+	width: 100%;
+	border-collapse: collapse;
+	border: 1px solid #fff; /*for older IE*/
+	border-style: solid;
+}
+
+table.timecard caption {
+	background-color: #f79646;
+	color: #fff;
+  font-size: 0.875rem;
+	font-weight: normal;
+	letter-spacing: .4em;
+}
+
+table.timecard thead th {
+	padding: 8px;
+	background-color: #ffffff;
+	font-size: 0.875rem;
+  font-weight: bold;
+}
+
+table.timecard thead th#thDay {
+	width: 40%;
+}
+
+table.timecard thead th#thRegular, table.timecard thead th#thOvertime, table.timecard thead th#thTotal {
+	width: 20%;
+}
+
+table.timecard th, table.timecard td {
+	padding: 10px;
+	border-width: 1px;
+	border-style: solid;
+}
+
+table.timecard td {
+	text-align: left;
+  font-size: 0.875rem;
+}
+
+table.timecard tbody th {
+	text-align: left;
+	font-weight: normal;
+}
+
+table.timecard tfoot {
+	font-weight: bold;
+	font-size: 0.875rem;
+	background-color: #687886;
+	color: #fff;
+}
+
+table.timecard tr.even {
+	background-color: #008080;
+}
+</style>
+
+
+{% endblock %}
+
+{% block main-content %}
+
+<div class="row">
+  <div class="col-md-12 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          <nav aria-label="breadcrumb">
+              <ol class="breadcrumb bg-inverse-info">
+                {%  if user.is_authenticated and user.roles_id == 2  %}
+                  <li class="breadcrumb-item"><a href="{% url 'wil:dashboard' %}">Dashboard</a></li>
+                  <li class="breadcrumb-item"><a href="{% url 'wil:event_list' %}">Recruitment Programs</a></li>
+                  <li class="breadcrumb-item active" aria-current="page"><a>>Recruitment Program Types</a></li>
+                {% elif user.is_authenticated and user.roles_id == 10 %}
+                  <li class="breadcrumb-item"><a href="{% url 'psycad:dashboard' %}">Dashboard</a></li>
+                  <li class="breadcrumb-item"><a href="{% url 'psycad:event_list' %}">Recruitment Programs</a></li>
+                  <li class="breadcrumb-item"><a href="{% url 'psycad:config_eventtypes' %}">Recruitment Program Types</a></li>
+                  <li class="breadcrumb-item"><a href="{% url 'psycad:event_types_registration_form' event_type.id %}">{{ event_type.type }} Registration Forms</a></li>
+                  <li class="breadcrumb-item active" aria-current="page"><a>{{ regform.title }}</a></li>
+                {% endif %}
+              </ol>
+            </nav>
+
+            {% include 'messages.html' %}
+
+        </div>
+      </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-lg-12 grid-margin stretch-card">
+              <div class="card">
+                <div class="card-body">
+
+
+									<ul class="nav nav-pills nav-pills-custom" id="pills-tab-custom" role="tablist">
+		                <li class="nav-item">
+		                  <a class="nav-link active" id="pills-home-tab-custom" data-toggle="pill" href="#pills-tertiary" role="tab" aria-controls="pills-home" aria-selected="true">
+		                    List of Questions
+		                  </a>
+		                </li>
+		                <li class="nav-item">
+		                  <a class="nav-link" id="pills-profile-tab-custom" data-toggle="pill" href="#pills-school" role="tab" aria-controls="pills-profile" aria-selected="false">
+		                    View Form
+		                  </a>
+		                </li>
+		              </ul>
+
+									<div class="tab-content tab-content-custom-pill" id="pills-tabContent-custom">
+		                <div class="tab-pane fade show active" id="pills-tertiary" role="tabpanel" aria-labelledby="pills-home-tab-custom">
+											<h4 class="card-title">List of Questions</h4>
+
+                  <p class="card-description">
+                    <button type="button" class="btn btn-success btn-icon-text btn-rounded pull-right" data-toggle="modal" data-target="#new_question"> <i class="ti-plus btn-icon-prepend"></i>Add New Question </button><br><br>
+                    <div class="modal fade" id="new_question" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true">
+                      <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="ModalLabel">Add Question to Registration Form: {{ regform.title }}</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                              <span aria-hidden="true">&times;</span>
+                            </button>
+                          </div>
+                          <form action="{% url 'psycad:registration_form_questions' event_type.id regform.id %}" method="POST" enctype='multipart/form-data'>
+                            {% csrf_token %}
+                          <div class="modal-body">
+                            <div class="form-group">
+                              <label for="question">Question</label>
+                              <input type="text" name="question" id="id_question" class="form-control" required>
+                            </div>
+
+                            <div class="form-group">
+                              <label for="type">Question Type</label>
+                              <select name="type" id="id_type" class="form-control" required>
+                                {% for t in types %}
+                                  <option value="{{ t.id }}">{{ t.type }}</option>
+                                {% empty %}
+                                  <option value="">No Question Types Added Yet</option>
+                                {% endfor %}
+                              </select>
+                            </div>
+
+														<div class="form-group">
+                              <label for="choice">Is this answer required or can it be skipped?:</label>
+                              <select name="required" id="id_required" class="form-control">
+                                  <option value="Yes">Yes, it is required</option>
+                                  <option value="No">No, it is not required</option>
+                              </select>
+                            </div>
+
+                            <div class="form-group" id="div_many_one_choice" style="display: none;">
+                              <label for="choice">How many answers to be chosen:</label>
+                              <select name="choice" id="id_choice" class="form-control">
+                                  <option value="one">User can choose only one answer</option>
+                                  <option value="many">User can choose more than one answer</option>
+                              </select>
+                            </div>
+
+                            <div class="form-group" id="div_image" style="display: none;">
+                              <label for="choice">Upload Image:</label>
+                              <input type="file" name="upload_file" id="id_upload_file" class='form-control'>
+                            </div>
+
+                          </div>
+                          <div class="modal-footer">
+                            <button type="submit" class="btn btn-success">Add Question</button>
+                            <button type="button" class="btn btn-light" data-dismiss="modal">Close</button>
+                          </div>
+                          </form>
+                        </div>
+                      </div>
+                    </div>
+                  </p>
+                  <div class="table-responsive">
+                    <table class="timecard table-striped table-bordered">
+                      <thead>
+                        <tr>
+                          <th>#</th>
+                          <th>Question</th>
+                          <th>Type</th>
+                          <th>Choices</th>
+													<th>Question Number</th>
+                          <th>Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for question in questions %}
+                            <tr>
+                              <td class="py-1">{{ forloop.counter }}</td>
+                              <td>{{ question.question }}<br><br><b>Required: </b>{{ question.required }}</td>
+                              <td>{{ question.type.type }}
+                                {% if question.upload_file %}
+                                <br>
+                                <a data-iframe="true" id="open-pdf_{{ question.id }}" data-src="{{ question.upload_file.url }}"><i class="fa fa-file-pdf-o icon-lg text-primary"></i></a>
+                                {% endif %}
+                              </td>
+                              <td>
+                                {% if question.choice == 'one' %}
+                                  User can choose <b>only one</b> answer
+                                {% elif question.choice == 'many' %}
+                                  User can choose <b>more than one</b> answer
+                                {% endif %}
+                              </td>
+															<td>{{ question.question_number }}</td>
+                              <td>
+
+                                <button type="button" class="btn btn-success btn-rounded btn-icon" data-toggle="modal" data-target="#edit{{ question.id }}" > <i class="fa fa-edit"></i></button>
+
+                                <button type="button" class="btn btn-danger btn-rounded btn-icon" data-toggle="modal" data-target="#del{{ question.id }}" > <i class="fa fa-trash-o"></i> </button>
+
+                                <div class="modal fade" id="edit{{ question.id }}" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true">
+                                  <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                      <div class="modal-header">
+                                        <h5 class="modal-title" id="ModalLabel">Edit Question</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                          <span aria-hidden="true">&times;</span>
+                                        </button>
+                                      </div>
+                                      <form action="{% url 'psycad:edit_event_types_registration_form_question' event_type.id regform.id question.id %}" method="POST"  enctype='multipart/form-data'>
+                                        {% csrf_token %}
+                                        <div class="modal-body">
+                                          <div class="form-group">
+                                            <label for="question">Question</label>
+                                            <input type="text" name="question" id="id_question" class="form-control" value="{{ question.question }}">
+                                          </div>
+
+                                          <div class="form-group">
+                                            <label for="type">Question Type</label>
+                                            <select name="type" id="id_type_{{ question.id }}" class="form-control">
+                                              {% for t in types %}
+                                                {% if t.id == question.type.id %}
+                                                  <option value="{{ t.id }}" selected>{{ t.type }}</option>
+                                                {% else %}
+                                                  <option value="{{ t.id }}">{{ t.type }}</option>
+                                                {% endif %}
+                                              {% empty %}
+                                                <option value="">No Question Types Added Yet</option>
+                                              {% endfor %}
+                                            </select>
+                                          </div>
+
+																					<div class="form-group">
+							                              <label for="choice">Is this answer required or can it be skipped?</label>
+							                              <select name="required" id="id_required" class="form-control">
+																							{% if question.required == 'Yes' %}
+							                                  <option value="Yes" selected>Yes, it is required</option>
+							                                  <option value="No">No, it is not required</option>
+																							{% else %}
+																								<option value="Yes">Yes, it is required</option>
+																								<option value="No" selected>No, it is not required</option>
+																							{% endif %}
+							                              </select>
+							                            </div>
+
+                                          <div class="form-group" id="div_many_one_choice_{{ question.id }}" {% if question.type.options == 'Yes' %} style="display: block;" {% else %} style="display: none;" {% endif %}>
+                                            <label for="choice">How many answers to be chosen:</label>
+                                            <select name="choice" id="id_choice_{{ question.id }}" class="form-control">
+                                              {% if question.choice == 'one' %}
+                                                <option value="one" selected>User can choose only one answer</option>
+                                                <option value="many">User can choose more than one answer</option>
+                                              {% else %}
+                                                <option value="one">User can choose only one answer</option>
+                                                <option value="many" selected>User can choose more than one answer</option>
+                                              {% endif %}
+                                            </select>
+                                          </div>
+
+                                          <div class="form-group" id="div_image_{{ question.id }}" style="display: none;">
+                                            <label for="choice">Upload Image:</label>
+                                            <input type="file" name="upload_file" id="id_upload_file_{{ question.id }}" class='form-control'>
+                                          </div>
+
+																					<div class="form-group">
+							                              <label for="choice">Question Numbering</label>
+							                              <input type="number" name="question_number" id="id_question_number" class="form-control" value="{{ question.question_number }}" min="1">
+							                            </div>
+
+                                        </div>
+                                      <div class="modal-footer">
+                                        <input type="hidden" name="task" value="edit">
+                                        <button type="submit" class="btn btn-success">Edit Question</button>
+                                        <button type="button" class="btn btn-light" data-dismiss="modal">Close</button>
+                                      </div>
+                                      </form>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                <div class="modal fade" id="del{{ question.id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel-3" aria-hidden="true">
+                                  <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                      <div class="modal-header">
+                                        <h5 class="modal-title" id="exampleModalLabel-3">Delete Question</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                          <span aria-hidden="true">&times;</span>
+                                        </button>
+                                      </div>
+                                      <form action="{% url 'psycad:delete_registration_form_question' event_type.id regform.id question.id %}" method="POST">
+                                        {% csrf_token %}
+                                      <div class="modal-body">
+                                        <p>Are you sure you want to delete this question: {{ question.question }}?</p>
+                                      </div>
+                                      <div class="modal-footer">
+                                        <input type="hidden" name="task" value="delete">
+                                        <button type="submit" class="btn btn-success">Yes</button>
+                                        <button type="button" class="btn btn-light" data-dismiss="modal">No</button>
+                                      </div>
+                                      </form>
+                                    </div>
+                                  </div>
+                                </div>
+
+                              </td>
+                            </tr>
+                        {% empty %}
+                            <tr><td colspan="8">Sorry no questions added</td></tr>
+                        {% endfor %}
+                      </tbody>
+                    </table>
+                  </div>
+									</div>
+									<div class="tab-pane fade" id="pills-school" role="tabpanel" aria-labelledby="pills-profile-tab-custom">
+	                  <h4 class="card-title">View Form</h4>
+	                  <p class="card-description">
+	                    This page shows you how the form will look to the company contact person
+	                  </p>
+
+										<form class="forms-sample">
+	                    {% csrf_token %}
+	                    {% for question in questions.all %}
+	                    {% if question.type.type == "note" %}
+	                    <p>{{ question.question }}</p>
+                      {% elif question.type.type == "image" %}
+                        
+                          {% if question.upload_file %}
+                            <label for="exampleInputName1">{{ question.question }}</label>
+                            <br>
+                            <a data-iframe="true" id="open-pdf_view_{{ question.id }}" data-src="{{ question.upload_file.url }}"><i class="fa fa-file-pdf-o icon-lg text-primary"></i></a>
+                            <br><br>
+                          {% endif %}
+	                    {% else %}
+	                      <div class="form-group">
+	                        <label for="exampleInputName1">{{ question.question }}</label>
+	                        {% if question.type.options == 'No' %}
+														{% if question.type.type == 'Large Text Input' %}
+															<textarea class="form-control" id="{{ question.id }}" name="{{ question.id }}" rows="5" {% if question.required == 'Yes' %} required {% endif %}></textarea>
+														{% else %}
+															<input type="{{question.type.type}}" class="form-control" id="{{ question.id }}" name="{{ question.id }}" {% if question.required == 'Yes' %} required {% endif %}>
+														{% endif %}
+	                        {% elif question.type.options == 'Yes' %}
+	                            {% if question.choice == 'many' %}
+
+	                                <select id="{{ question.id }}" name="{{ question.id }}[]" class="js-question-single" multiple {% if question.required == 'Yes' %} required {% endif %}>
+	                                  {% for o in question.type.type_options.all %}
+	                                    <option value="{{o.option}}">{{o.option}}</option>
+	                                  {% endfor %}
+	                                </select>
+
+	                            {% else %}
+
+	                                <select id="{{ question.id }}" name="{{ question.id }}" class="form-control select" autocomplete="off" {% if question.required == 'Yes' %} required {% endif %}>
+	                                  {% for o in question.type.type_options.all %}
+	                                    <option value="{{o.option}}">{{o.option}}</option>
+	                                  {% endfor %}
+	                                </select>
+
+	                            {% endif %}
+	                        {% endif %}
+	                      </div>
+	                    {% endif %}
+	                    {% empty %}
+	                        <p class="text-primary mb-1">No questions added yet</p>
+	                    {% endfor %}
+	                    <button type="button" class="btn btn-primary mr-2">Submit</button>
+	                    <button class="btn btn-light">Cancel</button>
+	                  </form>
+
+
+									</div>
+								</div>
+								</div>
+              </div>
+            </div>
+</div>
+{% endblock %}
+
+{% block js-content %}
+
+<script type="text/javascript">
+
+    $(document).ready(function() {
+        $('.js-company-single').select2({
+          placeholder: 'Select an option',
+          width: '100%'
+        });
+    });
+
+    $(document).ready(function(){
+      $('#id_type').on('change', function(){
+
+        {% for t in types %}
+          if(this.value == {{ t.id }}){
+            {% if t.options ==  "Yes" %}
+              document.getElementById("div_many_one_choice").style.display = "block";
+              $("#id_choice").attr("required", true);
+            {% else %}
+              document.getElementById("div_many_one_choice").style.display = "none";
+              $("#id_choice").attr("required", false);
+            {% endif %}
+
+            {% if t.type == 'image' %}
+              document.getElementById("div_image").style.display = "block";
+              $("#id_upload_file").attr("required", true);
+            {% else %}
+              document.getElementById("div_image").style.display = "none";
+              $("#id_upload_file").attr("required", false);
+            {% endif %}
+          }
+        {% endfor %}
+         // or $(this).val()
+        return false; // keeps the page from not refreshing
+      });
+    });
+
+    {% for q in regform.questions.all %}
+
+    $(document).ready(function(){
+      $('#id_type_{{ q.id }}').on('change', function(){
+
+        {% for t in types %}
+          if(this.value == {{ t.id }}){
+            {% if t.options ==  "Yes" %}
+              document.getElementById("div_many_one_choice_{{ q.id }}").style.display = "block";
+              $("#id_choice_{{ q.id }}").attr("required", true);
+            {% else %}
+              document.getElementById("div_many_one_choice_{{ q.id }}").style.display = "none";
+              $("#id_choice_{{ q.id }}").attr("required", false);
+            {% endif %}
+
+            {% if t.type == 'image' %}
+              document.getElementById("div_image_{{ q.id }}").style.display = "block";
+              $("#id_upload_file_{{ q.id }}").attr("required", true);
+            {% else %}
+              document.getElementById("div_image_{{ q.id }}").style.display = "none";
+              $("#id_upload_file_{{ q.id }}").attr("required", false);
+            {% endif %}
+
+          }
+        {% endfor %}
+         // or $(this).val()
+        return false; // keeps the page from not refreshing
+      });
+    });
+
+
+    {% endfor %}
+  </script>
+
+	<script type="text/javascript">
+
+	    $(document).ready(function() {
+	        $('.js-question-single').select2({
+	          placeholder: 'Select an option',
+	          width: '100%'
+	        });
+
+          {% for question in questions %}
+            {% if question.type.type == 'image' %}
+                $('#open-pdf_{{ question.id }}').lightGallery({
+                  selector: 'this'
+                });  
+
+                $('#open-pdf_view_{{ question.id }}').lightGallery({
+                  selector: 'this'
+                });     
+                 
+            {% endif %}
+          {% endfor %}
+
+
+	    });
+
+	</script>
+
+{% endblock %}

@@ -1,0 +1,88 @@
+{% extends 'base_tpl.html' %}
+
+{% block breadcrumb-content %}
+    <nav aria-label="breadcrumb" class="-intro-x mr-auto hidden sm:flex">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'administration:dashboard_lecturer' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'college:lecturer_learning_programme_cohorts' learning_programme.id %}">{{ learning_programme.programme_code }} Cohorts</a></li>
+            
+            <li class="breadcrumb-item active" aria-current="page">{{ learning_programme_cohort.title }} Students</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block main-content %}
+
+{% include 'messages.html' %}
+
+
+    <div class="intro-y flex flex-col sm:flex-row items-center mt-8">
+        <h2 class="text-lg font-medium mr-auto">
+            {{ learning_programme.programme_code }} - {{ learning_programme_cohort.title }} - {{ learning_programme_cohort_period.title }} Registered Students
+        </h2>
+        
+    </div>
+
+    <div class="intro-y p-5 mt-5">
+        
+        <div class="overflow-x-auto">
+            <table class="table table-report -mt-2">
+                <thead>
+                    <tr>
+                        <th><div class="flex items-center justify-center">Procedure</div></th> 
+                        <th><div class="flex items-center justify-center">Time</div></th>
+                        <th><div class="flex items-center justify-center">Hours</div></th>   
+                        <th><div class="flex items-center justify-center">Approved</div></th>  
+                        <th><div class="flex items-center justify-center">Competent</div></th>                 
+                        <th><div class="flex items-center justify-center">ACTIONS</div></th>
+                  
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for entry in logsheet %}
+                        <tr class="intro-x">
+                            <td>
+                                {{ entry.procedure.task }}
+                            </td>
+                            <td>
+                                {{ entry.date }} {{ entry.start }} to {{ entry.end_date }} {{ entry.end }}
+                            </td>
+                            <td>{{ entry.hours }}</td>                            
+                            <td>{{ entry.mentor_acknowledgment }}</td>
+                            <td>{{ entry.competent }}</td>
+                            <td class="table-report__action">
+                                <div class="flex justify-center items-center">
+
+                                    <div class="dropdown ml-auto sm:ml-0">
+                                        <button class="dropdown-toggle btn px-2 box" aria-expanded="false" data-tw-toggle="dropdown">
+                                            <span class="w-5 h-5 flex items-center justify-center"> <i class="w-4 h-4" data-lucide="plus"></i> </span>
+                                        </button>
+                                        <div class="dropdown-menu w-48">
+                                            <ul class="dropdown-content">
+                                                <li>
+                                                    <a class="dropdown-item" href="{% url 'students:lecturer_learning_programme_cohort_students_view_wil_procedures_assessment' student_registration.id entry.id  %}"> <i data-lucide="edit" class="w-4 h-4 mr-1"></i>Complete Assessment </a>
+                                                </li>                                                                                        
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    
+                                </div>
+                              
+                               
+                            </td>
+                     
+                        </tr>
+                    
+                    {% empty %}
+                        <tr class="intro-x">
+                            <td colspan="8">
+                                Nothing Added
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+{% endblock %}

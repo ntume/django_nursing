@@ -1,0 +1,101 @@
+{% extends 'base_vertical.html' %}
+
+{% block breadcrumb-content %}
+<nav aria-label="breadcrumb" class="-intro-x h-full mr-auto">
+    <ol class="breadcrumb breadcrumb-light">
+        <li class="breadcrumb-item"><a href="{% url 'students:student_dashboard' %}">Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'students:student_learning_programmes' %}">Learning Programmes</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'students:student_learning_programme_registrations' registration.student_learning_programme.id %}">{{ plan.registration..student_learning_programme.learning_programme.programme_code }} Registrations</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Weekly Timetable</li>
+    </ol>
+</nav>  
+{% endblock %}
+
+{% block main-content %}
+{% include 'messages.html' %}
+
+
+    <div class="intro-y flex flex-col sm:flex-row items-center mt-8">
+        <h2 class="text-lg font-medium mr-auto">
+            <b>Week:</b> {{ week.start_of_week }} to {{ week.end_of_week }}<br>
+            <b>Block:</b> {{ week.block.block_name }}<br>
+        </h2> 
+        <div class="w-full sm:w-auto flex mt-4 sm:mt-0">
+            {% if week.file %}
+                <a href="{{ week.file.url }}" class="btn btn-success shadow-md mr-2">Download File</a>
+            {% endif %}            
+        </div>   
+    </div>
+
+
+<div class="grid grid-cols-12 gap-6 mt-5">
+
+    {% for r in week.days.all %}
+
+        {% if r.timetable_sessions.count > 0 %}
+    
+            <!-- BEGIN: Data List -->
+            <div class="intro-y col-span-12 overflow-auto lg:overflow-visible">
+                <h1><b><u>{{ r.day }}</u></b></h1>
+                <table class="table table-report -mt-2">
+                    <thead>
+                        <tr>
+                            <th class="whitespace-nowrap">#</th>  
+                            <th class="whitespace-nowrap">Session</th>
+                            <th class="whitespace-nowrap">Time</th>
+                            {% if week.block.block_name == 'Theory Block' %}
+                                <th class="whitespace-nowrap">Module</th>
+                                <th class="whitespace-nowrap">Study Unit</th>                    
+                            {% elif week.block.block_name == 'Simulation' %}
+                                <th class="whitespace-nowrap">Type</th>
+                                <th class="whitespace-nowrap">Procedures</th>
+                            {% endif %}
+                            <th class="whitespace-nowrap">Lecturers</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for x in r.timetable_sessions.all %}
+                        <tr class="intro-x">
+                            <td>{{ forloop.counter }}</td>                            
+                            <td>{{ x.session.title }}</td>
+                            <td>{{ x.session.start_time }} to {{ x.session.end_time }}</td>
+                            {% if week.block.block_name == 'Theory Block' %}
+                                <td>{{ x.module.module.module_code }}</td>    
+                                <td>{{ x.study_unit.study_unit_name }}</td>  
+                            {% elif week.block.block_name == 'Simulation' %}   
+                                <td>{{ x.type_procedure }}</td>                     
+                                <td>
+                                    {% for p in x.procedures.all  %}
+                                        {{ p.procedure.task }}<br>
+                                    {% endfor %}
+                                </td> 
+                            {% endif %}
+                            <td>
+                                {% for p in x.lecturers.all  %}
+                                    {{ p.first_name }} {{ p.last_name }}<br>
+                                {% endfor %}
+                            </td>                     
+                        </tr>
+                        {% empty %}
+                        <tr class="intro-x"><td colspan='6'>No Sessions Added Yet</td></tr>
+                        {% endfor %}
+                        
+                    <tbody>
+                </table>
+            </div>
+
+        {% endif %}
+
+    {% endfor %}
+</div>
+
+
+{% endblock %}
+
+{% block js-content %}
+
+<script type="text/javascript">
+    
+</script>
+
+{% endblock %}

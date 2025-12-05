@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+{% load bootstrap3 %}
+{% load static %}
+
+{% block main-content %}
+      <div class="row">
+            <div class="col-12">
+              {% include 'messages.html' %}
+              <div class="card">
+                <div class="card-body">
+                  <p class="card-title">{{ event.title }}</p>
+                  <p class="card-description">{{ event.description }}</p>
+
+                  {% if completed == False %}
+
+                          <form class="forms-sample" action="{% url 'contact:event_registration_form_view_add' event.id %}" method="POST">
+                    {% csrf_token %}
+                    {% for question in questions %}
+                    {% if question.type.type == "note" %}
+                    <p>{{ question.question }}</p>
+                    {% elif question.type.type == "image" %}
+                        
+                          {% if question.upload_file %}
+                            <label for="exampleInputName1">{{ question.question }}</label>
+                            <br>
+                            <a data-iframe="true" id="open-pdf_view_{{ question.id }}" data-src="{{ question.upload_file.url }}"><i class="fa fa-file-pdf-o icon-lg text-primary"></i></a>
+                            <br><br>
+                          {% endif %}
+                    {% else %}
+                      <div class="form-group">
+                        <label for="exampleInputName1">{{ question.question }}</label>
+                        {% if question.type.options == 'No' %}
+                          {% if question.type.type == 'Large Text Input' %}
+                            <textarea class="form-control" id="{{ question.id }}" name="{{ question.id }}" rows="5" {% if question.required == 'Yes' %} required {% endif %}></textarea>
+                          {% else %}
+                            <input type="{{question.type.type}}" class="form-control" id="{{ question.id }}" name="{{ question.id }}" {% if question.required == 'Yes' %} required {% endif %}>
+                          {% endif %}
+                        {% elif question.type.options == 'Yes' %}
+                            {% if question.choice == 'many' %}
+
+                                <select id="{{ question.id }}" name="{{ question.id }}[]" class="js-question-single" multiple {% if question.required == 'Yes' %} required {% endif %}>
+                                  {% for o in question.type.type_options.all %}
+                                    <option value="{{o.option}}">{{o.option}}</option>
+                                  {% endfor %}
+                                </select>
+
+                            {% else %}
+
+                                <select id="{{ question.id }}" name="{{ question.id }}" class="form-control select" autocomplete="off" {% if question.required == 'Yes' %} required {% endif %}>
+                                  {% for o in question.type.type_options.all %}
+                                    <option value="{{o.option}}">{{o.option}}</option>
+                                  {% endfor %}
+                                </select>
+
+                            {% endif %}
+                        {% endif %}
+                      </div>
+                    {% endif %}
+                    {% empty %}
+                        <p class="text-primary mb-1">No questions added yet</p>
+                    {% endfor %}
+                    <button type="submit" class="btn btn-primary mr-2">Submit</button>
+                    <button class="btn btn-light">Cancel</button>
+                  </form>
+
+                  {% else %}
+
+                  <div class="row">
+                    <div class="col-md-10">
+                        <p class="card-description">Your registration form was submitted successfuly on: {{ check_reg_form.created_at }}</p>
+                    </div>
+                    <div class="col-md-2 pull-right">
+                        <a href="{% url 'contact:print_registration_form_pdf' check_reg_form.id %}" type="button" class="btn btn-primary btn-icon-text btn-rounded pull-right"> <i class="ti-printer btn-icon-prepend"></i>Print Registration Form</a>
+                    </div>
+                  </div>
+
+
+                  <br>
+                  {% for question in questions %}
+                    <label for="exampleInputName1">{{ question.question }}</label><br>
+                    {% for answer in check_reg_form.event_form_answers.all %}
+
+                      {% if question.id == answer.question.id  %}
+                        <p>{{ answer.answer }}</p><br><br>
+                      {% endif %}
+                    {% endfor %}
+                  {% endfor %}
+
+
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+
+{% endblock %}
+
+{% block js-content %}
+
+<script type="text/javascript">
+
+    $(document).ready(function() {
+        $('.js-question-single').select2({
+          placeholder: 'Select an option',
+          width: '100%'
+        });
+
+        {% for question in questions %}
+            {% if question.type.type == 'image' %}
+                
+                $('#open-pdf_view_{{ question.id }}').lightGallery({
+                  selector: 'this'
+                });     
+                 
+            {% endif %}
+          {% endfor %}
+
+    });
+
+</script>
+
+{% endblock %}

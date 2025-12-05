@@ -1,0 +1,336 @@
+{% extends 'base_tpl.html' %}
+
+{% block breadcrumb-content %}
+    <nav aria-label="breadcrumb" class="-intro-x mr-auto hidden sm:flex">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'administration:dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'college:health_care_facilities' %}">Healthcare Facilities</a></li>
+            
+            <li class="breadcrumb-item active" aria-current="page">{{ health_care_facility.name }} Unit Managers</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block main-content %}
+
+{% include 'messages.html' %}
+
+
+    <div class="intro-y flex flex-col sm:flex-row items-center mt-8">
+        <h2 class="text-lg font-medium mr-auto">
+            {{ health_care_facility.name }} Unit Managers
+        </h2>
+        <div class="w-full sm:w-auto flex mt-4 sm:mt-0">
+            <button data-tw-toggle="modal" data-tw-target="#add-modal"  class="btn btn-primary shadow-md mr-2">Add HODs</button>
+
+            <div id="add-modal" class="modal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <form action="{% url 'college:health_care_facility_hod_add' health_care_facility.id %}" method="POST">
+                            {% csrf_token %}
+                            <!-- BEGIN: Modal Header -->
+                            <div class="modal-header">
+                                <h2 class="font-medium text-base mr-auto">Add Unit Manager</h2>                                             
+                            </div> <!-- END: Modal Header -->
+                            <!-- BEGIN: Modal Body -->
+                            <div class="modal-body grid grid-cols-12 gap-4 gap-y-3">
+                                <div class="col-span-12 sm:col-span-12"> 
+                                    <label for="id_universal_code" class="form-label">Title</label> 
+                                    <select name='title' class='form-select' requried>
+                                        <option></option>
+                                        {% for title in titles %}
+                                            <option value='{{ title }}'>{{ title }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>                                
+                                <div class="col-span-12 sm:col-span-12"> 
+                                    <label for="modal-form-1" class="form-label">First Name*</label> 
+                                    <input id="id_first_name" name='first_name' type="text" class="form-control" placeholder="first name" required maxlength='15'> 
+                                </div>
+                                <div class="col-span-12 sm:col-span-12"> 
+                                    <label for="modal-form-1" class="form-label">Last Name*</label> 
+                                    <input id="id_slast_name" name='last_name' type="text" class="form-control" placeholder="last name" required maxlength='15'> 
+                                </div>
+                                <div class="col-span-12 sm:col-span-12"> 
+                                    <label for="modal-form-1" class="form-label">Email*</label> 
+                                    <input id="id_email" name='email' type="email" class="form-control" placeholder="email" required maxlength='50'> 
+                                </div>
+                                <div class="col-span-12 sm:col-span-12"> 
+                                    <label for="modal-form-1" class="form-label">Contact</label> 
+                                    <input id="id_contact" name='contact' type="text" class="form-control" placeholder="contact number" maxlength="15" required> 
+                                </div>
+                                                               
+                                <div class="col-span-12 sm:col-span-12"> 
+                                    <label for="modal-form-1" class="form-label">Race</label> 
+                                    <select name='race' class='form-select' required>
+                                        <option></option>
+                                        {% for r in races %}
+                                            <option value="{{ r.id }}">{{ r.race }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-span-12 sm:col-span-12"> 
+                                    <label for="modal-form-1" class="form-label">Gender</label> 
+                                    <select name='gender' class='form-select' required>
+                                        <option></option>
+                                        {% for g in genders %}
+                                            <option value="{{ g.id }}">{{ g.gender }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                
+                                
+                                                                            
+                            </div> <!-- END: Modal Body -->
+                            <!-- BEGIN: Modal Footer -->
+                            <div class="modal-footer"> 
+                                <button type="button" data-tw-dismiss="modal" class="btn btn-outline-secondary w-20 mr-1">Cancel</button> 
+                                <button type="submit" class="btn btn-primary w-60">Add Unit Manager</button> 
+                            </div> <!-- END: Modal Footer -->
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="intro-y p-5 mt-5">
+        
+        <div class="overflow-x-auto">
+            <table class="table table-report -mt-2">
+                <thead>
+                    <tr>
+                        <th class="whitespace-nowrap">#</th>                    
+                        <th class="whitespace-nowrap">Name</th>
+                        <th class="whitespace-nowrap">Contacts</th>
+                        <th class="whitespace-nowrap">Gender</th>
+                        <th class="whitespace-nowrap">Race</th>
+                        <th class="whitespace-nowrap">Wards</th>
+                        <th class="whitespace-nowrap">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in items %}
+                    <tr class="intro-x">
+                        <td>
+                            {{ forloop.counter }}
+                        </td>
+                        <td>
+                            {{ r.first_name }} {{ r.last_name }}
+                        </td>
+                        <td>
+                            {{ r.email }} <br>
+                            {{ r.contact }}
+                        </td>
+                        <td>    
+                            {{ r.gender.gender }}
+                        </td>
+                        <td>    
+                            {{ r.race.race }}
+                        </td>
+                        <td>
+                           
+                                {% for ward in r.wards.all %}
+                                    <b><a href="javascript:;" data-tw-toggle="modal" data-tw-target="#delete-ward-modal_{{ r.id }}_{{ ward.id }}">{{ ward.ward.ward }}</a></b><br><br>
+                                    <div id="delete-ward-modal_{{ r.id }}_{{ ward.id }}" class="modal" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-body p-0">
+                                                    <form action="{% url 'college:health_care_facility_hod_ward_remove' health_care_facility.id r.id ward.id %}" method="POST">
+                                                        {% csrf_token %}
+                                                        <div class="p-5 text-center">
+                                                            <i data-lucide="x-circle" class="w-16 h-16 text-danger mx-auto mt-3"></i> 
+                                                            <div class="text-3xl mt-5">Are you sure?</div>
+                                                            <div class="text-slate-500 mt-2">
+                                                                Do you really want to remove this ward? 
+                                                                <br>
+                                                                This process cannot be undone.
+                                                            </div>
+                                                        </div>
+                                                        <div class="px-5 pb-8 text-center">
+                                                            <button type="button" data-tw-dismiss="modal" class="btn btn-outline-secondary w-24 mr-1">Cancel</button>
+                                                            <button type="submit" class="btn btn-danger w-24">Remove</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                        
+                            <div class="flex justify-left items-left"><a href="javascript:;" data-tw-toggle="modal" data-tw-target="#add-ward_{{ r.id }}" class="btn btn-secondary mr-1 mb-2"> <i data-lucide="plus" class="w-5 h-5"></i> </a></div>
+                            <div id="add-ward_{{ r.id }}" class="modal" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <form action="{% url 'college:health_care_facility_hod_ward_add' health_care_facility.id r.id %}" method="POST">
+                                            {% csrf_token %}
+                                            <!-- BEGIN: Modal Header -->
+                                            <div class="modal-header">
+                                                <h2 class="font-medium text-base mr-auto">Add Ward</h2>                                             
+                                            </div> <!-- END: Modal Header -->
+                                            <!-- BEGIN: Modal Body -->
+                                            <div class="modal-body grid grid-cols-12 gap-4 gap-y-3">
+                                                <div class="col-span-12 sm:col-span-12"> 
+                                                    <label for="id_sic_code" class="form-label">Ward</label> 
+                                                    <select name='wards[]' id='id_ward' class='tom-select' multiple required>
+                                                        {% for r in health_care_facility.wards.all %}
+                                                            <option value="{{ r.id }}">{{ r.ward.ward }}</option>                                            
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>                                       
+                                            </div> <!-- END: Modal Body -->
+                                            <!-- BEGIN: Modal Footer -->
+                                            <div class="modal-footer"> 
+                                                <button type="button" data-tw-dismiss="modal" class="btn btn-outline-secondary w-20 mr-1">Cancel</button> 
+                                                <button type="submit" class="btn btn-primary w-48">Add Ward</button> 
+                                            </div> <!-- END: Modal Footer -->
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>       
+                        </td>
+                        <td class="table-report__action w-56">
+                            <div class="flex justify-center items-center">
+                                <a class="flex items-center mr-3" href="javascript:;" data-tw-toggle="modal" data-tw-target="#reset-modal_{{ r.id }}"> <i data-lucide="refresh-cw" class="w-4 h-4 mr-1"></i> Reset </a>
+                                <div id="reset-modal_{{ r.id }}" class="modal" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-body p-0">
+                                                <form action="{% url 'college:health_care_facility_hod_reset_password' health_care_facility.id r.id %}" method="POST">
+                                                    {% csrf_token %}
+                                                    <div class="p-5 text-center">
+                                                        <i data-lucide="help-circle" class="w-16 h-16 text-success mx-auto mt-3"></i> 
+                                                        <div class="text-3xl mt-5">Are you sure?</div>
+                                                        <div class="text-slate-500 mt-2">
+                                                            Do you really want to reset this user's password? 
+                                                            <br>
+                                                            This process cannot be undone.
+                                                        </div>
+                                                    </div>
+                                                    <div class="px-5 pb-8 text-center">
+                                                        <button type="button" data-tw-dismiss="modal" class="btn btn-outline-secondary w-24 mr-1">Cancel</button>
+                                                        <button type="submit" class="btn btn-success w-26">Reset Password</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a class="flex items-center mr-3" href="javascript:;" data-tw-toggle="modal" data-tw-target="#edit-modal_{{ r.id }}"> <i data-lucide="check-square" class="w-4 h-4 mr-1"></i> Edit </a>
+                                <div id="edit-modal_{{ r.id }}" class="modal" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <form action="{% url 'college:health_care_facility_hod_edit' health_care_facility.id r.id %}" method="POST">
+                                                {% csrf_token %}
+                                                <!-- BEGIN: Modal Header -->
+                                                <div class="modal-header">
+                                                    <h2 class="font-medium text-base mr-auto">Edit Unit Manager</h2>                                             
+                                                </div> <!-- END: Modal Header -->
+                                                <!-- BEGIN: Modal Body -->
+                                                <div class="modal-body grid grid-cols-12 gap-4 gap-y-3">
+                                                    <div class="col-span-12 sm:col-span-12"> 
+                                                        <label for="id_universal_code" class="form-label">Title</label> 
+                                                        <select name='title' class='form-select' requried>
+                                                            <option></option>
+                                                            {% for title in titles %}
+                                                                {% if r.title == title %}
+                                                                    <option value='{{ title }}' selected>{{ title }}</option>
+                                                                {% else %}
+                                                                    <option value='{{ title }}'>{{ title }}</option>
+                                                                {% endif %}                                                                
+                                                            {% endfor %}
+                                                        </select>
+                                                    </div>
+                                                    
+                                                    <div class="col-span-12 sm:col-span-12"> 
+                                                        <label for="modal-form-1" class="form-label">First Name*</label> 
+                                                        <input id="id_first_name" name='first_name' type="text" class="form-control" value="{{ r.first_name }}" required> 
+                                                    </div>
+                                                    <div class="col-span-12 sm:col-span-12"> 
+                                                        <label for="modal-form-1" class="form-label">Last Name*</label> 
+                                                        <input id="id_slast_name" name='last_name' type="text" class="form-control" value="{{ r.last_name }}" required> 
+                                                    </div>
+                                                    <div class="col-span-12 sm:col-span-12"> 
+                                                        <label for="modal-form-1" class="form-label">Email*</label> 
+                                                        <input id="id_email" name='email' type="email" class="form-control" value="{{ r.email }}" required> 
+                                                    </div>
+                                                    <div class="col-span-12 sm:col-span-12"> 
+                                                        <label for="modal-form-1" class="form-label">Contact</label> 
+                                                        <input id="id_contact" name='contact' type="text" class="form-control" value="{{ r.contact }}" maxlength="10" required> 
+                                                    </div>
+                                                      
+                                                    
+                                                    <div class="col-span-12 sm:col-span-12"> 
+                                                        <label for="modal-form-1" class="form-label">Race</label> 
+                                                        <select name='race' class='form-select' required>
+                                                            {% for c in races %}
+                                                                {% if r.race.id ==  c.id%}
+                                                                    <option value="{{ c.id }}" selected>{{ c.race }}</option>
+                                                                {% else %}
+                                                                    <option value="{{ c.id }}">{{ c.race }}</option>
+                                                                {% endif %}                                                            
+                                                            {% endfor %}
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-span-12 sm:col-span-12"> 
+                                                        <label for="modal-form-1" class="form-label">Gender</label> 
+                                                        <select name='gender' class='form-select' required>
+                                                            {% for g in genders %}
+                                                                {% if g.id == r.gender.id %}
+                                                                    <option value="{{ g.id }}" selected>{{ g.gender }}</option>
+                                                                {% else %}
+                                                                    <option value="{{ g.id }}">{{ g.gender }}</option>
+                                                                {% endif %}
+                                                            {% endfor %}
+                                                        </select>
+                                                    </div>
+                                                                          
+                                                </div> <!-- END: Modal Body -->
+                                                <!-- BEGIN: Modal Footer -->
+                                                <div class="modal-footer"> 
+                                                    <button type="button" data-tw-dismiss="modal" class="btn btn-outline-secondary w-20 mr-1">Cancel</button> 
+                                                    <button type="submit" class="btn btn-primary w-60">Edit Unit Manager</button> 
+                                                </div> <!-- END: Modal Footer -->
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a class="flex items-center text-danger" href="javascript:;" data-tw-toggle="modal" data-tw-target="#delete-confirmation-modal_{{ r.id }}"> <i data-lucide="trash-2" class="w-4 h-4 mr-1"></i> Delete </a>
+                                <div id="delete-confirmation-modal_{{ r.id }}" class="modal" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-body p-0">
+                                                <form action="{% url 'college:health_care_facility_hod_delete' health_care_facility.id r.id %}" method="POST">
+                                                    {% csrf_token %}
+                                                    <div class="p-5 text-center">
+                                                        <i data-lucide="x-circle" class="w-16 h-16 text-danger mx-auto mt-3"></i> 
+                                                        <div class="text-3xl mt-5">Are you sure?</div>
+                                                        <div class="text-slate-500 mt-2">
+                                                            Do you really want to delete this record? 
+                                                            <br>
+                                                            This process cannot be undone.
+                                                        </div>
+                                                    </div>
+                                                    <div class="px-5 pb-8 text-center">
+                                                        <button type="button" data-tw-dismiss="modal" class="btn btn-outline-secondary w-24 mr-1">Cancel</button>
+                                                        <button type="submit" class="btn btn-danger w-24">Delete</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr class="intro-x"><td colspan='8'>No Hods added yet</td></tr>
+                    {% endfor %}
+                    
+                <tbody>
+            </table>
+        </div>
+    </div>
+
+{% endblock %}

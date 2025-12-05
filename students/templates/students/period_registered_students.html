@@ -1,0 +1,156 @@
+{% extends 'base_tpl.html' %}
+
+{% block breadcrumb-content %}
+    <nav aria-label="breadcrumb" class="-intro-x mr-auto hidden sm:flex">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'administration:dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'college:learning_programme_cohorts' learning_programme.id %}">{{ learning_programme.programme_code }} Cohorts</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ learning_programme_cohort.title }} Students</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block main-content %}
+
+{% include 'messages.html' %}
+
+
+    <div class="intro-y flex flex-col sm:flex-row items-center mt-8">
+        <h2 class="text-lg font-medium mr-auto">
+            {{ learning_programme.programme_code }} - {{ learning_programme_cohort.title }} - {{ learning_programme_cohort_period.title }} Registered Students
+        </h2>
+        {% if user.logged_in_role_id == 6 or user.logged_in_role_id == 1 or user.logged_in_role_id == 10 %}
+            <div class="w-full sm:w-auto flex mt-4 sm:mt-0">
+                <a href="{% url 'students:students_wil_logsheet_hours' learning_programme_cohort.id learning_programme_cohort_period.id %}"  class="btn btn-success shadow-md mr-2">View WIL Hours</a>
+            </div>
+        {% endif %}
+        
+    </div>
+
+    <div class="intro-y p-5 mt-5">
+        
+        <div class="overflow-x-auto">
+            <table class="table table-report -mt-2">
+                <thead>
+                    <tr>
+                        <th class="whitespace-nowrap">#</th>
+                        <th class="whitespace-nowrap">ID Number</th>
+                        <th class="whitespace-nowrap">Full Name</th>                    
+                        <th class="whitespace-nowrap">Email</th>
+                        <th class="whitespace-nowrap">Registration Status</th>
+                        <th class="whitespace-nowrap">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for l in students %}
+                    <tr class="intro-x">
+                        <td class="w-40">
+                            {{ forloop.counter }}
+                        </td>
+                        <td>
+                            {{ l.student.student.id_number }}
+                        </td>
+                        <td>
+                            {{ l.student.student.first_name }} {{ l.student.student.last_name }}
+                        </td>
+                        <td>
+                            {{ l.student.student.email }}
+                        </td>
+                        <td>
+                            {% if l.registration_details%}
+                                {{ l.registration_details.status }}
+                            {% else %}
+                                Not Registered
+                            {% endif %}
+                        </td> 
+                        <td class="table-report__action">
+                           
+                            <div class="flex justify-center items-center">
+                                <div class="dropdown">
+                                    <button class="dropdown-toggle btn px-2 btn-warning" aria-expanded="false" data-tw-toggle="dropdown">
+                                        <span class="w-5 h-5 flex items-center justify-center text-white"> <i class="w-4 h-4" data-lucide="arrow-down"></i> </span>
+                                    </button>
+                                    <div class="dropdown-menu w-64">
+                                        <ul class="dropdown-content">
+                                            <li>
+                                                <a href="{% url 'students:view_learner_programme_registration' l.student.id learning_programme_cohort_period.id %}" class="dropdown-item tooltip" title="Click to View Learner Details"> <i data-lucide="view" class="w-4 h-4 mr-2"></i> View</a>
+                                            </li> 
+                                            {% if l.registration_details %}
+                                                {% if l.registration_details.pop %}
+                                                    <li>
+                                                        <a href="{{ l.registration_details.pop.url }}" class="dropdown-item tooltip" title="Click to View Proof of Registration"> <i data-lucide="files" class="w-4 h-4 mr-2"></i> Proof of Registration</a>
+                                                    </li>
+                                                {% endif %}
+                                                {% if user.logged_in_role_id == 6 or user.logged_in_role_id == 1 or user.logged_in_role_id == 10 %}
+                                                    <li>
+                                                        <a href="{% url 'students:view_learner_educational_plan' l.student.id l.registration_details.id %}" class="dropdown-item tooltip" title="Click to View Educational Plan"> <i data-lucide="files" class="w-4 h-4 mr-2"></i> Educational Plan</a>
+                                                    </li> 
+                                                    <li>
+                                                        <a href="{% url 'students:view_learner_educational_plan_sections' l.registration_details.id %}" class="dropdown-item tooltip" title="Click to View Discipline Hours"> <i data-lucide="clock" class="w-4 h-4 mr-2"></i> Discipline Hours</a>
+                                                    </li>
+                                                {% endif %}
+                                            {% endif %}                                          
+                                            
+                                        </ul>
+                                    </div>
+                                </div>        
+                            </div>
+                            
+                        </td>
+                    </tr>
+                    {% empty %}
+                        <tr class="intro-x"><td colspan="8">Nothing added yet</td></tr>
+                    {% endfor %}
+                    
+                <tbody>
+            </table>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block js-content %}
+
+<script type="text/javascript">
+    
+	$(document).ready(function(){
+
+        $('#id_learner_search').on('click', function(){
+            alert('innnn');
+            var id_number = $( "#id_id_number" ).val();
+   
+            $.ajax({ // ajax call starts
+              url: "{% url 'students:ajax_validate_id_number' %}", // JQuery loads serverside.php
+              data: 'id_number=' + id_number, // Send value of the clicked button
+              dataType: 'json', // Choosing a JSON datatype
+            })
+            .done(function(data) { // Variable data contains the data we get from serverside
+          
+                 if(data.valid == 1){     
+                      Toastify({text: 'Successfully selected learner, click the confirmation button to proceed',duration: 6000,className: "info",}).showToast();                   
+                      $( "#id_first_name" ).val( data.first_name );
+                      $( "#id_last_name" ).val( data.last_name );
+                      $( "#id_email" ).val( data.email );
+                      $("#id_confirm_learner").attr("disabled", false);
+                      $("#id_first_name").attr("readonly", true);
+                      $("#id_last_name").attr("readonly", true);
+                      $("#id_email").attr("readonly", true);
+                      document.getElementById("add_learner").style.display = "block";
+                  }
+                 else if(data.valid == 0){
+                      Toastify({text: 'Unfortunately ',duration: 6000,className: "info",}).showToast();   
+                      $( "#id_first_name" ).val( "" );
+                      $( "#id_last_name" ).val( "" );
+                      $( "#id_email" ).val( "" );
+                      $("#id_confirm_learner").attr("disabled", false);
+                      document.getElementById("add_learner").style.display = "block";
+                 }
+            });
+          return false;          
+        });
+
+    });
+
+</script>
+
+{% endblock %}

@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block main-content %}
+  {% include 'messages.html' %}
+  <div class="row">
+    {% for rsvp in student.rsvp_events.all %}
+      <div class="col-md-6 grid-margin grid-margin-md-0 stretch-card">
+    		<div class="card">
+    			<div class="card-body text-center">
+    				<div>
+    					<h4>{{rsvp.event.title}}</h4>
+    					<p class="text-muted mb-0">{{rsvp.event.type.type}}</p>
+    				</div>
+    				<p class="mt-2 card-text">
+    						{{rsvp.event.description}}
+    				</p>
+    				<a href="{% url 'student:removersvp' rsvp.id %}" class="btn btn-warning btn-sm mt-3 mb-4">Remove RSVP</a>
+    				<div class="border-top pt-3">
+    					<div class="row">
+    						<div class="col-4">
+    							<h6>{{rsvp.event.event_date}}</h6>
+    							<p>Date</p>
+    						</div>
+    						<div class="col-4">
+    							<h6>{{rsvp.event.event_time}}</h6>
+    							<p>Time</p>
+    						</div>
+    						<div class="col-4">
+    							<h6>{{rsvp.event.registration}}</h6>
+    							<p>Registration</p>
+    						</div>
+    					</div>
+    				</div>
+            <div class="border-top pt-3">
+    					<div class="row">
+    						<p>{{rsvp.event.location}}</p>
+    					</div>
+    				</div>
+            <div class="border-top pt-3">
+    					<div class="row">
+    						<p>{{rsvp.event.extra_information}}</p>
+    					</div>
+    				</div>
+    			</div>
+    		</div>
+    	</div>
+    {% empty %}
+    <div class="col-md-6 grid-margin grid-margin-md-0 stretch-card">
+      <div class="card">
+        <div class="card-body text-center">
+          <div>
+            <h4>No events RSVP yet</h4>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {% endfor %}
+  </div>
+{% endblock %}

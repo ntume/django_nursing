@@ -1,0 +1,70 @@
+{% extends 'base_admin_view.html' %}
+{% load bootstrap3 %}
+{% load static %}
+
+{% block main-content %}
+      <div class="row">
+            <div class="col-12">
+              {% include 'messages.html' %}
+              <div class="card">
+                <div class="card-body">
+                  <p class="card-title">{{ survey.title }}</p>
+                  <p class="card-description">{{ survey.description }}</p>
+
+                  <form class="forms-sample">
+                    {% for question in survey.questions.all %}
+                    <div class="form-group">
+                      <label for="exampleInputName1">{{ question.question }}</label>
+                      {% if question.type.options == 'No' %}
+                        {% if question.type == 'Large Text Input' %}
+                            <textarea class="form-control" id="{{ question.id }}" name="{{ question.id }}" required></textarea>
+                        {% else %}
+                            <input type="{{question.type}}" class="form-control" id="{{ question.id }}" name="{{ question.id }}" required>
+                        {% endif %}
+                      {% elif question.type.options == 'Yes' %}
+                          {% if question.choice == 'many' %}
+
+                              <select id="{{ question.id }}" name="{{ question.id }}[]" class="js-question-single" multiple required>
+                                {% for o in question.type.type_options.all %}
+                                  <option value="{{o.option}}">{{o.option}}</option>
+                                {% endfor %}
+                              </select>
+
+                          {% else %}
+
+                              <select id="{{ question.id }}" name="{{ question.id }}" class="form-control select" autocomplete="off" required>
+                                {% for o in question.type.type_options.all %}
+                                  <option value="{{o.option}}">{{o.option}}</option>
+                                {% endfor %}
+                              </select>
+
+                          {% endif %}
+                      {% endif %}
+                    </div>
+                    {% empty %}
+                        <p class="text-primary mb-1">No questions added yet</p>
+                    {% endfor %}
+                    <button type="submit" class="btn btn-primary mr-2">Submit</button>
+                    <button class="btn btn-light">Cancel</button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+
+{% endblock %}
+
+{% block js-content %}
+
+<script type="text/javascript">
+
+    $(document).ready(function() {
+        $('.js-question-single').select2({
+          placeholder: 'Select an option',
+          width: '100%'
+        });
+    });
+
+  </script>
+
+{% endblock %}

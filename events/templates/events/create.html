@@ -1,0 +1,338 @@
+{% extends 'base_vertical.html' %}
+
+{% load bootstrap3 %}
+
+{% block main-content %}
+
+<div class="row">
+  <div class="col-md-12 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          <nav aria-label="breadcrumb">
+              <ol class="breadcrumb bg-inverse-info">
+                {%  if user.is_authenticated and user.roles_id == 2  %}
+                  <li class="breadcrumb-item"><a href="{% url 'wil:dashboard' %}">Dashboard</a></li>
+                  <li class="breadcrumb-item"><a href="{% url 'wil:event_list' %}">Recruitment Programs</a></li>
+                  <li class="breadcrumb-item active" aria-current="page"><a>Add Recruitment Program</a></li>
+                {% elif user.is_authenticated and user.roles_id == 10 %}
+                  <li class="breadcrumb-item"><a href="{% url 'psycad:dashboard' %}">Dashboard</a></li>
+                  <li class="breadcrumb-item"><a href="{% url 'psycad:event_list' %}">Recruitment Programs</a></li>
+                  <li class="breadcrumb-item active" aria-current="page"><a>Add Recruitment Program</a></li>
+                  {% elif user.is_authenticated and user.roles_id == 11 %}
+                  <li class="breadcrumb-item"><a href="{% url 'psycad:dashboard' %}">Dashboard</a></li>
+                  <li class="breadcrumb-item"><a href="{% url 'psycad:event_list' %}">Recruitment Programs</a></li>
+                  <li class="breadcrumb-item active" aria-current="page"><a>Add Recruitment Program</a></li>
+                {% endif %}
+              </ol>
+            </nav>
+
+            {% include 'messages.html' %}
+
+        </div>
+      </div>
+  </div>
+</div>
+
+<div class="col-12 grid-margin stretch-card">
+              <div class="card">
+                <div class="card-body">
+                  <h4 class="card-title">Create Recruitment Program</h4>
+                  <p class="card-description">
+                    Please fill in the information below
+                  </p>
+                  {%  if user.is_authenticated and user.roles_id == 2  %}
+                    <form class="forms-sample" method="POST" action="{% url 'wil:add_event' %}">
+                  {% elif user.is_authenticated and user.roles_id == 10 %}
+                    <form class="forms-sample" method="POST" action="{% url 'psycad:add_event' %}">
+                  {% elif user.is_authenticated and user.roles_id == 11%}
+                      <form class="forms-sample" method="POST" action="{% url 'psycad:add_event' %}">                
+                  {% endif %}
+                    {% csrf_token %}
+                    <div class="row">
+                      <div class="col-md-12">
+                        <div class="form-group row">
+                          <label class="col-sm-2 col-form-label">Title</label>
+                          <div class="col-sm-10">
+                            {% bootstrap_field form.title show_label=False %}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-12">
+                        <div class="form-group row">
+                          <label class="col-sm-2 col-form-label">Description</label>
+                          <div class="col-sm-10">
+                            {% bootstrap_field form.description show_label=False %}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-12">
+                        <div class="form-group row">
+                          <label class="col-sm-2 col-form-label">Faculties</label>
+                          <div class="col-sm-10">
+                            <select class="js-example-basic-multiple w-100" multiple="multiple" name="faculties[]" required>
+                              {% for f in faculties %}
+                                <option value="{{f.id}}">{{f.faculty}}</option>
+                              {% endfor %}
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-12">
+                        <div class="form-group row">
+                          <label class="col-sm-2 col-form-label">Who to Invite</label>
+                          <div class="col-sm-10">
+                            {% bootstrap_field form.invitees show_label=False %}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-12">
+                        <div class="form-group row">
+                          <label class="col-sm-2 col-form-label">Recruitment Program Type</label>
+                          <div class="col-sm-10">
+                            {% bootstrap_field form.type show_label=False %}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-12">
+                        <div class="form-group row">
+                          <label class="col-sm-2 col-form-label">Registration</label>
+                          <div class="col-sm-10">
+                            {% bootstrap_field form.registration show_label=False %}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div style="display: none;" id = 'div_registration_form'>
+                      <div class="row">
+                        <div class="col-md-12">
+                          <div class="form-group row">
+                            <label class="col-sm-2 col-form-label">Registration Form for Companies</label>
+                            <div class="col-sm-10">
+
+                              <select name="registration_form" id="id_registration_form" class="form-control">
+                              </select>
+
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-12">
+                        <div class="form-group row">
+                          <label class="col-sm-2 col-form-label">Recruitment Program Date</label>
+                          <div class="col-sm-4">
+                            <input type="date" class="form-control" name="event_date" id="id_event_date" required>
+                          </div>
+                          <label class="col-sm-1 col-form-label">To</label>
+                          <div class="col-sm-5">
+                            <input type="date" class="form-control" name="event_date_end" id="id_event_date_end" required>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-12">
+                        <div class="form-group row">
+                          <label class="col-sm-2 col-form-label">Recruitment Program Time</label>
+                          <div class="col-sm-4">
+                            <input type="time" class="form-control" name="event_time" id="id_event_time" required>
+                          </div>
+                          <label class="col-sm-1 col-form-label">To</label>
+                          <div class="col-sm-5">
+                            <input type="time" class="form-control" name="event_time_end" id="id_event_time_end" required>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-12">
+                        <div class="form-group row">
+                          <label class="col-sm-2 col-form-label">Location</label>
+                          <div class="col-sm-10">
+                            {% bootstrap_field form.location show_label=False %}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div style="display: none;" id = 'div_extra_students'>
+                    <div class="row">
+                      <div class="col-md-12">
+                        <div class="form-group row">
+                          <label class="col-sm-2 col-form-label">Extra Information for Students</label>
+                          <div class="col-sm-10">
+                            <textarea name="extra_information" id="id_extra_information" class="form-control"></textarea>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div style="display: none;" id = 'div_extra_companies'>
+                    <div class="row">
+                      <div class="col-md-12">
+                        <div class="form-group row">
+                          <label class="col-sm-2 col-form-label">Extra Information for Companies</label>
+                          <div class="col-sm-10">
+                            <textarea name="extra_information_company" id="id_extra_information_company" class="form-control"></textarea>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                    <div class="row">
+                      <div class="col-md-12">
+                        <div class="form-group row">
+                          <label class="col-sm-2 col-form-label">Published</label>
+                          <div class="col-sm-10">
+                            <select name="published" id="id_published" class="form-control">
+                              <option value="Yes">Yes</option>
+                              <option value="No">No</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-12">
+                        <div class="form-group row">
+                          <label class="col-sm-2 col-form-label">Organized by a Company?</label>
+                          <div class="col-sm-10">
+                            <select name="company_organized" id="id_company_organized" class="form-control" placeholder="Select an Option" required>
+                              <option value="No" selected>No</option>
+                              <option value="Yes">Yes</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row"  style="display: none;" id="div_company_field">
+                      <div class="col-md-12">
+                        <div class="form-group row">
+                          <label class="col-sm-2 col-form-label">Company</label>
+                          <div class="col-sm-10">
+                            <select name="company" id="id_company" class="js-company-single">
+                              {% for c in companies %}
+                                <option value="{{ c.id }}">{{ c.company_name }}</option>
+                              {% endfor %}
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-12">
+                        <div class="form-group row">
+                          <label class="col-sm-2 col-form-label">Campus</label>
+                          <div class="col-sm-10">
+                            <select name="campus" id="id_campus" class="form-control">
+                              <option></option>
+                              {% for c in campuses %}
+                                <option value="{{ c.id }}">{{ c.campus }}</option>
+                              {% endfor %}
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary mr-2">Submit</button>
+                    <button class="btn btn-warning">Cancel</button>
+                  </form>
+                </div>
+              </div>
+            </div>
+
+{% endblock %}
+
+{% block js-content %}
+
+<script type="text/javascript">
+
+    $(document).ready(function() {
+        $('.js-company-single').select2({
+          placeholder: 'Select an option',
+          width: '100%'
+        });
+    });
+
+    $(document).ready(function(){
+      $('#id_company_organized').on('change', function(){
+        if(this.value == "Yes"){
+          document.getElementById("div_company_field").style.display = "block";
+          $("#id_company").attr("required", true);
+        }
+        else{
+          document.getElementById("div_company_field").style.display = "none";
+          $("#id_company").attr("required", false);
+        }
+         // or $(this).val()
+        return false; // keeps the page from not refreshing
+      });
+    });
+
+      $(document).ready(function(){
+        $('#id_type').on('change', function(){
+          var invitee = $('#id_invitees').val();
+          if(invitee == 2 || invitee == 3){
+          if(this.value > 0){
+            $.ajax({ // ajax call starts
+              url: "{% url 'events:ajax_fetch_reg_forms' %}",
+              data: 'type_id=' + this.value, // Send value of the clicked button
+              dataType: 'json', // Choosing a JSON datatype
+            })
+            .done(function(data) { // Variable data contains the data we get from serversid
+              var len = data.length;
+              if(len > 0){
+                document.getElementById("div_registration_form").style.display = "block";
+                $("#id_registration_form").empty();
+                $("#id_registration_form").append("<option value=''>Select Form</option>");
+                for( var i = 0; i<len; i++){
+                  var id = data[i]['id'];
+                  var title = data[i]['title'];
+
+                  $("#id_registration_form").append("<option value='"+id+"'>"+title+"</option>");
+
+                }
+                return false; // keeps the page from not refreshing
+              }
+              else{
+                document.getElementById("div_registration_form").style.display = "none";
+              }
+            });
+          }
+        }
+      });
+    });
+
+    $(document).ready(function(){
+      $('#id_invitees').on('change', function(){
+        if(this.value == 1){
+          document.getElementById("div_extra_students").style.display = "block";
+          document.getElementById("div_extra_companies").style.display = "none";
+          document.getElementById("div_registration_form").style.display = "none";
+        }
+        else if(this.value == 2) {
+          document.getElementById("div_extra_students").style.display = "none";
+          document.getElementById("div_extra_companies").style.display = "block";
+        }
+        else if(this.value == 3) {
+          document.getElementById("div_extra_students").style.display = "block";
+          document.getElementById("div_extra_companies").style.display = "block";
+        }
+         // or $(this).val()
+        return false; // keeps the page from not refreshing
+      });
+    });
+
+  </script>
+
+{% endblock %}

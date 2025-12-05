@@ -1,0 +1,473 @@
+{% extends 'base_tpl.html' %}
+
+{% block breadcrumb-content %}
+    <nav aria-label="breadcrumb" class="-intro-x mr-auto hidden sm:flex">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'administration:dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item active" aria-current="page">My Appointments</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block css-content %}
+
+
+
+
+{% endblock %}
+
+{% block main-content %}
+
+<div class="pos intro-y grid grid-cols-12 gap-5 mt-5">
+  <!-- BEGIN: Post Content -->
+
+  <div class="intro-y col-span-12 lg:col-span-12">
+    <!-- BEGIN: Form Layout -->
+    <div class="intro-y box p-5">
+        <form action="{% url 'appointments:appointments_my_list_filter' %}" method="POST">
+            {% csrf_token %}
+            <div class="grid grid-cols-3 gap-2">
+                <div>
+                    <select data-placeholder="Select Province" class="tom-select w-full" id="crud-form-2" name="category">
+                        <option value="0">Select Category</option>
+                        {% for p in categories %}
+                            <option value="{{ p.id }}">{{ p.category }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <select data-placeholder="Select Status" class="tom-select w-full" id="crud-form-2" name="status">
+                        <option value="0">Select Status</option>
+                        <option value="Assigned">Assigned</option>
+                        <option value="Approved">Approved</option>
+                        <option value="Declined">Declined</option>
+                        <option value="NewTime">New Time Requested</option>
+                        <option value="Completed">Completed</option>
+                    </select>
+                </div>
+                <div class="text-right">
+                  <button type="submit" class="btn btn-success w-24 text-white"><i data-lucide="filter" class="w-4 h-4 mr-2"></i>Filter</button>             
+              </div>
+            </div>         
+            
+          </form>
+        
+    </div>
+    <!-- END: Form Layout -->
+</div>
+
+  <div class="intro-y col-span-12 lg:col-span-12">
+      {% include 'messages.html' %}
+      <div class="post intro-y overflow-hidden box mt-5">
+          <ul class="post__tabs nav nav-tabs flex-col sm:flex-row bg-slate-200 dark:bg-darkmode-800" role="tablist">
+              <li class="nav-item">
+                  <button title="My Appointments" data-tw-toggle="tab" data-tw-target="#content" class="nav-link tooltip w-full sm:w-48 py-4 active" id="content-tab" role="tab" aria-controls="content" aria-selected="true"> <i data-lucide="user" class="w-4 h-4 mr-2"></i> My Appointments </button>
+              </li>    
+              <li class="nav-item">
+                  <button title="My SIMS Calendar" data-tw-toggle="tab" data-tw-target="#address" class="nav-link tooltip w-full sm:w-48 py-4" id="address-tab" role="tab" aria-selected="false"> <i data-lucide="map" class="w-4 h-4 mr-2"></i> My Calendar </button>
+              </li>            
+              
+          </ul>
+          <div class="post__content tab-content ">
+              <div id="content" class="tab-pane p-5 active" role="tabpanel" aria-labelledby="content-tab">
+                <div class="intro-y col-span-12 overflow-auto lg:overflow-visible">
+                  <table class="table table-report -mt-2">
+                    <thead>
+                      <tr>
+                        <th>#</th>
+                        <th>Student</th>
+                        <th>Description</th>
+                        <th>Details</th>
+                        <th>Category</th>
+                        <th>Status</th>
+                        <th>Notes</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for a in my_appointments %}
+                        <tr>
+                          <td>{{ forloop.counter }}</td>
+                          <td>
+                            {{ a.student.name }} {{ a.student.surname }}
+                            <br>
+                            {{ a.student.student_number }}
+                            <br>
+                            {{ a.student.email }}
+                            <br>
+                            {{ a.student.cellphone }}
+                          </td>
+                          <td>{{ a.description }}</td>
+                          <td>
+                            {{ a.appointment_date }}<br>
+                            {{ a.appointment_time_start }} to {{ a.appointment_time_end }}<br><br>
+                            <b>Contact Method:</b> {{ a.contact.contact }}
+                          </td>
+                          <td>{{ a.category.category }}</td>
+                          <td>
+
+                            
+        
+                            <div class="badge badge-{% if a.status == 'Completed' %}success{% else %}danger{% endif %} badge-pill">{{ a.status }}</div>
+        
+                            <br><br>
+        
+                            {% if a.status == 'Completed' %}
+        
+                            <p>The following were recommended to the student <br>in order of importance: </p>
+        
+                              {% for outcome in a.outcome.all %}
+        
+                                {{ outcome.recommendation.recommendation }}<br>
+        
+                              {% endfor %}
+        
+        
+                            {% endif %}
+                            <br>
+                            <a class="btn btn-warning btn-rounded btn-icon" href="javascript:;" data-tw-toggle="modal" data-tw-target="#update_status_{{ forloop.counter }}"> <i data-lucide="check-square" class="w-4 h-4 mr-1"></i> Update </a>
+                            <div id="update_status_{{ forloop.counter }}" class="modal" tabindex="-1" aria-hidden="true">
+                              <div class="modal-dialog">
+                                  <div class="modal-content">
+                                      <form action="{% url 'appointments:appointment_edit_status' a.id %}" method="POST" enctype="multipart/form-data">
+                                          {% csrf_token %}
+                                          <!-- BEGIN: Modal Header -->
+                                          <div class="modal-header">
+                                              <h2 class="font-medium text-base mr-auto">Edit Status</h2>                                             
+                                          </div> <!-- END: Modal Header -->
+                                          <!-- BEGIN: Modal Body -->
+                                          <div class="modal-body ">
+                                              
+                                            <div class="col-span-12 sm:col-span-12">
+                                              <label for="id_status">Status (required)</label>
+                                              <select name="status" id="id_status_{{ a.id }}" class="form-control" onchange="change_status({{a.id}})" required>
+                                                <option></option>
+                                                {% if a.status == 'Approved' %}
+                                                  <option value="Approved" selected>Approved</option>
+                                                  <option value="Declined">Declined</option>
+                                                  <option value="NewTime">NewTime</option>
+                                                  <option value="Completed">Completed</option>
+                                                {% elif a.status == 'Declined' %}
+                                                  <option value="Approved">Approved</option>
+                                                  <option value="Declined" selected>Declined</option>
+                                                  <option value="NewTime">NewTime</option>
+                                                  <option value="Completed">Completed</option>
+                                                {% elif a.status == 'NewTime' %}
+                                                  <option value="Approved">Approved</option>
+                                                  <option value="Declined">Declined</option>
+                                                  <option value="NewTime" selected>NewTime</option>
+                                                  <option value="Completed">Completed</option>
+                                                {% elif a.status == 'Completed' %}
+                                                  <option value="Approved">Approved</option>
+                                                  <option value="Declined">Declined</option>
+                                                  <option value="NewTime">NewTime</option>
+                                                  <option value="Completed" selected>Completed</option>
+                                                {% else %}
+                                                  <option value="Approved">Approved</option>
+                                                  <option value="Declined">Declined</option>
+                                                  <option value="NewTime">NewTime</option>
+                                                  <option value="Completed">Completed</option>
+                                                {% endif %}
+                                              </select>
+                                            </div>
+              
+                                            <div  style="display: none;" id="div_newtime_field_{{ a.id }}">
+              
+                                                <div class="col-span-12 sm:col-span-12 mt-5">
+                                                  <label for="period">Date (required)</label>
+                                                  <input type="date" class="form-control" value="{{ a.appointment_date|date:'Y-m-d' }}" id="id_appointment_date_{{ a.id }}" name="appointment_date">
+                                                </div>
+              
+                                                <div class="col-span-12 sm:col-span-12 mt-5">
+                                                  <label for="period">Time Start (required)</label>
+                                                  <input type="time" class="form-control" value="{{ a.appointment_time_start|date:'h:i:s' }}" id="id_appointment_time_start_{{ a.id }}" name="appointment_time_start">
+                                                </div>
+
+                                                <div class="col-span-12 sm:col-span-12 mt-5">
+                                                  <label for="period">Time End (required)</label>
+                                                  <input type="time" class="form-control" value="{{ a.appointment_time_end|date:'h:i:s' }}" id="id_appointment_time_end_{{ a.id }}" name="appointment_time_end">
+                                                </div>
+              
+                                            </div>
+              
+                                            <div style="display: none;" id="div_feedback_field_{{ a.id }}">
+              
+                                                <div class="col-span-12 sm:col-span-12 mt-5">
+                                                  <label for="id_appointment_acceptance_feedback">Feedback to Student (required)</label>
+                                                  <textarea name="appointment_acceptance_feedback" id="id_appointment_acceptance_feedback_{{ a.id }}" class="form-control">{{ a.appointment_acceptance_feedback }}</textarea>
+                                                </div>
+              
+                                            </div>
+              
+                                            <div  style="display: none;" id="div_completed_field_{{ a.id }}">
+                                                <p>Please select the outcome (recommendation) of the session. Select the main recommendation first and if other recommendations were made please select them aswell according to order of importance</p>
+              
+                                                <div class="col-span-12 sm:col-span-12 mt-5">
+                                                  <label for="recommendations">Appointment Ouctcome / Recommendations (required)</label>
+                                                  <select name="recommendations[]" id="id_recommendations" class="tom-select" multiple>
+                                                    {% for r in recommendations %}
+                                                      <option value="{{ r.id }}">{{ r.recommendation }}</option>
+                                                    {% endfor %}
+                                                  </select>
+                                                </div>
+
+                                                <div class="col-span-12 sm:col-span-12 mt-5">
+                                                  <label for="recommendations">Upload a File/Consent Form</label>
+                                                  <input type='file' name='file' class='form-control'>
+                                                </div>
+                                            </div>
+                                                                                              
+                                          </div> <!-- END: Modal Body -->
+                                          <!-- BEGIN: Modal Footer -->
+                                          <div class="modal-footer"> 
+                                              <button type="button" data-tw-dismiss="modal" class="btn btn-outline-secondary w-20 mr-1">Cancel</button> 
+                                              <button type="submit" class="btn btn-primary w-40">Update Status</button> 
+                                          </div> <!-- END: Modal Footer -->
+                                      </form>
+                                  </div>
+                              </div>
+                          </div>
+                           
+        
+                          </td>
+                          
+                          <td>
+                            <a class="btn btn-success btn-rounded btn-icon" data-tw-toggle="modal" data-tw-target="#notes_{{ forloop.counter }}"><i data-lucide="file" class="w-4 h-4 mr-1"></i></a>
+        
+                            <div class="modal fade" id="notes_{{ forloop.counter }}" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true">
+                              <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                  <div class="modal-header">
+                                    <h5 class="modal-title" id="ModalLabel">Notes</h5>
+                                    <button type="button" class="close" data-tw-dismiss="modal" aria-label="Close">
+                                      <span aria-hidden="true">&times;</span>
+                                    </button>
+                                  </div>
+                                  <form action="{% url 'appointments:appointment_add_notes' a.id %}" method="POST">
+                                    {% csrf_token %}
+                                  <div class="modal-body">
+        
+                                        <table>
+                                          {% for note in a.notes.all %}
+                                            <tr><td>{{ note.notes }}<br><a href="{% url 'appointments:appointment_delete_notes' note.id %}">--Delete Note--</a></td></tr>
+                                          {% endfor %}
+                                        </table>
+        
+                                          <div class="form-group">
+                                            <label for="id_note">Add Note (required)</label>
+                                           <textarea name="note" id="id_note" class="form-control" required></textarea>
+                                          </div>
+                                     
+                                  </div>
+                                  <div class="modal-footer">
+                                    <button type="submit" class="btn btn-success">Add Note</button>
+                                    <button type="button" class="btn btn-light" data-tw-dismiss="modal">Close</button>
+                                  </div>
+                                  </form>
+                                </div>
+                              </div>
+                            </div>
+        
+                          </td>
+                        
+                        </tr>
+        
+                      {% empty %}
+                        <tr><td colspan="7">Sorry you do not have any assigned appointments</td></tr>
+                      {% endfor %}
+        
+                    </tbody>
+                  </table>
+                </div>                  
+              </div>
+
+              <div id="address" class="tab-pane p-5" role="tabpanel" aria-labelledby="address-tab">
+                <div class="row">
+                  
+                  <div class="col-md-12">
+                    <div class="card">
+                      <div class="card-body">
+                        <h4 class="card-title">Fullcalendar</h4>
+                        <div id='appointment_calendar'>
+              
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>                    
+              </div>
+
+             
+              
+          </div>
+      </div>
+  </div>
+
+  <!-- END: Post Content -->
+
+{% endblock %}
+
+
+{% block js-content  %}
+
+<script type="text/javascript">
+
+
+		function change_status(pk){
+			status = $('#id_status_'+pk).val()
+
+			if(status== "Approved"){
+					document.getElementById("div_feedback_field_"+pk).style.display = "block";
+					$("#id_appointment_acceptance_feedback_"+pk).attr("required", true);
+
+					$("#id_recommendations_"+pk).attr("required", false);
+					document.getElementById("div_completed_field_"+pk).style.display = "none";
+					document.getElementById("div_newtime_field_"+pk).style.display = "none";
+					$("#id_appointment_date_"+pk).attr("required", false);
+					$("#id_appointment_time_start_"+pk).attr("required", false);
+					$("#id_appointment_time_end_"+pk).attr("required", false);
+					$("#id_recommendations_"+pk).attr("required", false);
+			}
+			else if(status == "Declined"){
+					document.getElementById("div_feedback_field_"+pk).style.display = "block";
+					$("#id_appointment_acceptance_feedback_"+pk).attr("required", true);
+
+					$("#id_recommendations_"+pk).attr("required", false);
+					document.getElementById("div_completed_field_"+pk).style.display = "none";
+					document.getElementById("div_newtime_field_"+pk).style.display = "none";
+					$("#id_appointment_date_"+pk).attr("required", false);
+					$("#id_appointment_time_start_"+pk).attr("required", false);
+					$("#id_appointment_time_end_"+pk).attr("required", false);
+					$("#id_recommendations_"+pk).attr("required", false);
+			}
+			else if(status == "NewTime"){
+					document.getElementById("div_newtime_field_"+pk).style.display = "block";
+					document.getElementById("div_feedback_field_"+pk).style.display = "block";
+					$("#id_appointment_date_"+pk).attr("required", true);
+					$("#id_appointment_time_start_"+pk).attr("required", true);
+					$("#id_appointment_time_end_"+pk).attr("required", true);
+
+					$("#id_recommendations_"+pk).attr("required", false);
+					document.getElementById("div_completed_field_"+pk).style.display = "none";
+					$("#id_recommendations_"+pk).attr("required", false);
+			}
+			else if(status == "Completed"){
+					document.getElementById("div_completed_field_"+pk).style.display = "block";
+					$("#id_recommendations_"+pk).attr("required", true);
+
+					$("#id_appointment_date_"+pk).attr("required", false);
+					$("#id_appointment_time_start_"+pk).attr("required", false);
+					$("#id_appointment_time_end_"+pk).attr("required", false);
+					$("#id_appointment_acceptance_feedback_"+pk).attr("required", false);
+					document.getElementById("div_newtime_field_"+pk).style.display = "none";
+					document.getElementById("div_feedback_field_"+pk).style.display = "none";
+					$("#id_appointment_acceptance_feedback_"+pk).attr("required", false);
+			}
+			else if(status == "Assigned"){
+					document.getElementById("div_completed_field_"+pk).style.display = "none";
+					$("#id_recommendations_"+pk).attr("required", false);
+
+					$("#id_appointment_date_"+pk).attr("required", false);
+					$("#id_appointment_time_start_"+pk).attr("required", false);
+					$("#id_appointment_time_end_"+pk).attr("required", false);
+					$("#id_appointment_acceptance_feedback_"+pk).attr("required", false);
+					document.getElementById("div_newtime_field_"+pk).style.display = "none";
+					document.getElementById("div_feedback_field_"+pk).style.display = "none";
+					$("#id_appointment_acceptance_feedback_"+pk).attr("required", false);
+			}
+		}
+
+    $(document).ready(function(){
+      $('#id_status').on('change', function(){
+
+          if(this.value == "Approved"){
+              document.getElementById("div_feedback_field").style.display = "block";
+              $("#id_appointment_acceptance_feedback").attr("required", true);
+
+              $("#id_recommendations").attr("required", false);
+              document.getElementById("div_completed_field").style.display = "none";
+              document.getElementById("div_newtime_field").style.display = "none";
+              $("#id_appointment_date").attr("required", false);
+              $("#id_appointment_time_start").attr("required", false);
+              $("#id_appointment_time_end").attr("required", false);
+              $("#id_recommendations").attr("required", false);
+          }
+          else if(this.value == "Declined"){
+              document.getElementById("div_feedback_field").style.display = "block";
+              $("#id_appointment_acceptance_feedback").attr("required", true);
+
+              $("#id_recommendations").attr("required", false);
+              document.getElementById("div_completed_field").style.display = "none";
+              document.getElementById("div_newtime_field").style.display = "none";
+              $("#id_appointment_date").attr("required", false);
+              $("#id_appointment_time_start").attr("required", false);
+              $("#id_appointment_time_end").attr("required", false);
+              $("#id_recommendations").attr("required", false);
+          }
+          else if(this.value == "NewTime"){
+              document.getElementById("div_newtime_field").style.display = "block";
+              document.getElementById("div_feedback_field").style.display = "block";
+              $("#id_appointment_date").attr("required", true);
+              $("#id_appointment_time_start").attr("required", true);
+              $("#id_appointment_time_end").attr("required", true);
+
+              $("#id_recommendations").attr("required", false);
+              document.getElementById("div_completed_field").style.display = "none";
+              $("#id_recommendations").attr("required", false);
+          }
+          else if(this.value == "Completed"){
+              document.getElementById("div_completed_field").style.display = "block";
+              $("#id_recommendations").attr("required", true);
+
+              $("#id_appointment_date").attr("required", false);
+              $("#id_appointment_time_start").attr("required", false);
+              $("#id_appointment_time_end").attr("required", false);
+              $("#id_appointment_acceptance_feedback").attr("required", false);
+              document.getElementById("div_newtime_field").style.display = "none";
+              document.getElementById("div_feedback_field").style.display = "none";
+              $("#id_appointment_acceptance_feedback").attr("required", false);
+          }
+
+         // or $(this).val()
+        return false; // keeps the page from not refreshing
+      });
+    });
+  </script>
+
+  <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
+
+  <script type="text/javascript">
+
+    document.addEventListener('DOMContentLoaded', function() {
+      var calendarEl = document.getElementById('appointment_calendar');
+      var calendar = new FullCalendar.Calendar(calendarEl, {
+        initialDate: "{{ today|date:'Y-m-d' }}",
+        headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek,timeGridDay,listMonth'
+        },
+        views: {
+            dayGridMonth: { buttonText: 'month' },
+            timeGridWeek: { buttonText: 'week' },
+            timeGridDay: { buttonText: 'day' }
+        },
+        initialView: 'dayGridMonth',
+        events: [
+               
+          {% for a in my_appointments %}
+                {
+                  title: '{{ a.category.category }}\n{{ a.status }}',
+                  start: '{{ a.appointment_date|date:"Y-m-d" }}T{{ a.appointment_time_start|date:"h:i:s" }}',
+                  color: {% if a.status == 'Completed' %} '#40316E' {% elif a.status == "Declined" %} 'red' {% else %} 'orange' {% endif %}
+                },
+          {% endfor %}    
+        ]
+      });
+      calendar.render();
+    });
+
+  </script>
+
+
+
+{% endblock %}

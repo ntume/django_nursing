@@ -1,0 +1,36 @@
+{% extends 'base_admin_view.html' %}
+
+{% load static %}
+
+{% block main-content %}
+      <div class="row">
+            <div class="col-12">
+              {% include 'messages.html' %}
+              <div class="card">
+                <div class="card-body">
+                  <p class="card-title">Surveys</p>
+                  <ul class="icon-data-list">
+
+                    {% for survey in surveys %}
+
+                        <li>
+                          <p class="text-primary mb-1"><a href="{% url 'psycad:view_as_survey_view' survey.id %}">{{ survey.title }}</a></p>
+                          <p class="text-muted">{{ survey.description }}</p>
+                          <small class="text-muted"><b>Added:</b> {{ survey.created_at }}</small>
+                        </li>
+
+                    {% empty %}
+
+                        <li>
+                          <p class="text-primary mb-1">No surveys added yet</p>
+                        </li>
+
+                    {% endfor %}
+
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+
+{% endblock %}

@@ -1,0 +1,243 @@
+{% extends 'base.html' %}
+
+{% block main-content %}
+<div class="row">
+  <div class="col-md-12 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          <nav aria-label="breadcrumb">
+              <ol class="breadcrumb bg-inverse-info">
+
+                  <li class="breadcrumb-item"><a href="{% url 'mentor:dashboard' %}">Dashboard</a></li>
+                  <li class="breadcrumb-item active" aria-current="page"><a>{{department.department}} Students</a></li>
+
+              </ol>
+            </nav>
+
+            {% include 'messages.html' %}
+
+        </div>
+      </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-lg-12 grid-margin stretch-card">
+              <div class="card">
+                <div class="card-body">
+                  <h4 class="card-title">List of Students - {{department.department}}</h4>
+                  <p class="card-description">
+                    <div class="row">
+                      <div class="col-md-5">
+                      </div>
+                      <div class="col-md-7 pull-right">
+                        {%  if user.is_authenticated and user.roles_id == 12  %}
+                          <form method="GET" action="{% url 'mentor:student_cv_list' department.department %}"><input type="hidden" name="filter" value="{{filter}}"><button type="submit" class="btn btn-primary btn-icon-text btn-rounded pull-right"> <i class="ti-printer btn-icon-prepend"></i>Student CV List </button></form>
+                        {%  elif user.is_authenticated and user.roles_id == 3  %}
+                          <form method="GET" action="{% url 'contact:student_cv_list' department.department %}"><input type="hidden" name="filter" value="{{filter}}"><button type="submit" class="btn btn-primary btn-icon-text btn-rounded pull-right"> <i class="ti-printer btn-icon-prepend"></i>Student CV List </button></form>
+                        {% endif %}
+                      </div>
+                    </div>
+                  <br><br><br>
+                  <div class="table-responsive">
+                    <table class="table table-bordered">
+                      <thead>
+                        <tr>
+                          <th>Student Details</th>
+                          <th>Contacts</th>
+                          <th>Gender</th>
+                          <th>Race</th>
+                          <th>Employed</th>
+                          <th>PDF</th>
+                          <th>WEB</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for student in students %}
+
+                            <tr>
+                              <td class="py-1">
+                                <b>{{student.student_number}}</b><br><br>
+                                {{student.name}} {{student.surname}}
+                              </td>
+                              <td>
+                                <b>Email:</b> {{student.email}}<br><br>
+                                <b>Cellphone:</b> {{student.contact_number}}
+                              </td>
+                              <td>
+
+                                  {% if student.gender == 1 %}
+                                    Male
+                                  {% else %}
+                                    Female
+                                  {% endif %}
+
+                              </td>
+                              <td>
+                                {% if student.race == 1 %}
+                                  BLACK
+                                {% elif student.race == 2 %}
+                                  COLOURED
+                                {% elif student.race == 3 %}
+                                  ASIAN
+                                {% elif student.race == 4 %}
+                                  WHITE
+                                {% endif %}
+                              </td>
+                              <td>
+                                  {% if student.employed == 1 %}
+                                      <button type="button" class="btn btn-outline-success btn-rounded btn-icon">
+                                        <i class="ti-check"></i>
+                                      </button>
+                                  {% else %}
+                                      <button type="button" class="btn btn-outline-danger btn-rounded btn-icon">
+                                        <i class="ti-close"></i>
+                                      </button>
+                                  {% endif %}
+                              </td>
+                              <td>
+                                <form action="{% url 'mentor:print_cv' student.id %}" method="POST">
+                                  {% csrf_token %}
+                                  <button type="submit" class="btn btn-outline-primary btn-rounded btn-icon">
+                                    <i class="fa fa-file-pdf-o"></i>
+                                  </button>
+                                </form>
+                              </td>
+                              <td>
+                                <a class="btn btn-outline-success  btn-rounded btn-icon" href="{% url 'cv:view_resume' student.id student.name %}" target="_blank" style="target-new: tab;">
+                                  <br><i class="ti-world"></i>
+                                </a>
+                              </td>
+                            </tr>
+
+                        {% empty %}
+                            <tr><td colspan="10">Sorry no students to display at the moment</td></tr>
+                        {% endfor %}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-lg-12 grid-margin stretch-card">
+                <div class="card">
+                  <div class="card-body">
+                    <nav>
+                    {% if is_paginated %}
+                      <ul class="pagination flex-wrap pagination-rounded">
+                        <li class="page-item"><a class="page-link" href="#"><i class="ti-angle-left"></i></a></li>
+                        {% if page_obj.has_previous %}
+                          <li class="page-item"><a  class="page-link" href="?page={{ page_obj.previous_page_number }}">&laquo;</a></li>
+                        {% else %}
+                          <li class="disabled page-link"><span>&laquo;</span></li>
+                        {% endif %}
+                        {% for i in paginator.page_range %}
+                          {% if page_obj.number == i %}
+                            <li class="active page-link"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+                          {% else %}
+                            <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+                          {% endif %}
+                        {% endfor %}
+                        {% if page_obj.has_next %}
+                          <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">&raquo;</a></li>
+                        {% else %}
+                          <li class="disabled page-link"><span>&raquo;</span></li>
+                        {% endif %}
+                        <li class="page-item"><a class="page-link" href="#"><i class="ti-angle-right"></i></a></li>
+                      </ul>
+                    {% endif %}
+                    </nav>
+
+                    <nav>
+                    {% if students.has_other_pages %}
+                      <ul class="pagination flex-wrap pagination-rounded">
+                        <li class="page-item"><a class="page-link" href="#"><i class="ti-angle-left"></i></a></li>
+                        {% if students.has_previous %}
+                          <li class="page-item"><a  class="page-link" href="?page={{ students.previous_page_number }}&department={{department.department}}&filter={{filter}}">&laquo;</a></li>
+                        {% else %}
+                          <li class="disabled page-link"><span>&laquo;</span></li>
+                        {% endif %}
+                        {% for i in students.paginator.page_range %}
+                          {% if students.number == i %}
+                            <li class="active page-link"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+                          {% else %}
+                            <li class="page-item"><a class="page-link" href="?page={{ i }}&department={{department.department}}&filter={{filter}}">{{ i }}</a></li>
+                          {% endif %}
+                        {% endfor %}
+                        {% if students.has_next %}
+                          <li class="page-item"><a class="page-link" href="?page={{ students.next_page_number }}&department={{department.department}}&filter={{filter}}">&raquo;</a></li>
+                        {% else %}
+                          <li class="disabled page-link"><span>&raquo;</span></li>
+                        {% endif %}
+                        <li class="page-item"><a class="page-link" href="#"><i class="ti-angle-right"></i></a></li>
+                      </ul>
+                    {% endif %}
+                    </nav>
+
+                  </div>
+                </div>
+            </div>
+          </div>
+
+        <div class="row">
+          <div class="col-lg-12 grid-margin stretch-card">
+              <div class="card">
+                <div class="card-body">
+                  <h4 class="card-title">Filter App</h4>
+
+                      <form action="{% url 'mentor:students_filter' department.department %}" method="POST">
+
+                        {% csrf_token %}
+                        <div class="form-group">
+                          <div class="input-group">
+
+                            <select name="gender" class="form-control">
+                              <option value="0" selected>Gender</option>
+                              <option value="1">Male</option>
+                              <option value="2">Female</option>
+                            </select>
+                            <select name="race" class="form-control">
+                              <option value="0" selected>Race</option>
+                              <option value="3">Asian</option>
+                              <option value="1">Black</option>
+                              <option value="2">Coloured</option>
+                              <option value="4">White</option>
+                            </select>
+                            <select name="disability" class="form-control">
+                              <option value="0" selected>Disability</option>
+                              <option value="1">Yes</option>
+                              <option value="2">No</option>
+                            </select>
+                            <select name="level" class="form-control">
+                              <option value="0" selected>Level</option>
+                              {% for level in levels %}
+                                <option value="{{level.id}}">{{level.level}}</option>
+                              {% endfor %}
+                            </select>
+                            <select name="region" class="form-control">
+                              <option value="0" selected>Region</option>
+                              {% for region in regions %}
+                                <option value="{{region.id}}">{{region.region}}</option>
+                              {% endfor %}
+                            </select>
+
+                            <select name="employed" class="form-control">
+                              <option value="0" selected>Employed</option>
+                              <option value="1">Yes</option>
+                              <option value="2">No</option>
+                            </select>
+
+                          </div>
+                          <br>
+                          <input type='hidden' name='status' value='1'>
+                          <input type='hidden' name='year' value='0'>
+                          <button type="submit" class="btn btn-success btn-icon-text btn-rounded pull-right"> <i class="ti-filter btn-icon-prepend"></i>Filter Students</button>
+                        </div>
+                      </form>
+                </div>
+              </div>
+          </div>
+        </div>
+{% endblock %}

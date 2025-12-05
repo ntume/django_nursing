@@ -1,0 +1,46 @@
+{% extends 'accounts/accounts_base.html' %}
+{% load static %}
+
+{% block main-content %}
+<div>
+  <img class ="mt-10" src="{% static 'images/NURSING-LOGO.png' %}" width='400px'/>
+
+  <div class="h-screen xl:h-auto flex py-5 xl:py-0 my-10 xl:my-0">
+    
+    <div class="mt-20 my-auto mx-auto xl:ml-20 bg-white dark:bg-darkmode-600 xl:bg-transparent px-5 sm:px-8 py-8 xl:p-0 rounded-md shadow-md xl:shadow-none w-full sm:w-3/4 lg:w-2/4 xl:w-auto">
+        <h2 class="intro-x font-bold text-2xl xl:text-3xl text-center xl:text-left">
+            Sign In
+        </h2>
+        {% include 'messages.html' %}
+        {% if next %}
+          <form action="?next={{ next }}" method="POST" onsubmit="loginButton.disabled = true; return true;">
+        {%else%}
+          <form action="" method="POST" >
+        {% endif %}
+            {% csrf_token %}
+          <div class="mt-8">
+              <input name="username" type="text" class="intro-x login__input form-control py-3 px-4 block" placeholder="Email" required>
+              
+              <div class="input-group">
+                  <input class="pass1 h-12 w-full border mt-6 outline-none p-2" type="password" placeholder="Password" name="password" required>
+                  <div id="input-group-email" class="input-group-text h-12 border mt-6 rounded-lg outline-none p-2"><i class="fa fa-eye-slash eye_1"></i></div>
+              </div>
+              <br>
+      
+          <div class="intro-x flex text-slate-600 dark:text-slate-500 text-xs sm:text-sm mt-4">
+              <div class="flex items-center mr-auto">
+                  <input id="remember-me" type="checkbox" class="form-check-input border mr-2">
+                  <label class="cursor-pointer select-none" for="remember-me">Remember me</label>
+              </div>
+              <a href="{% url 'accounts:forgot_password' %}">Forgot Password?</a> 
+          </div>
+          <div class="intro-x mt-5 xl:mt-8 text-center xl:text-left">
+              <button type='submit' name="loginButton" class="btn btn-primary py-3 px-4 w-full xl:w-32 xl:mr-3 align-top">Login</button>
+              <!--<a href="{% url 'accounts:register' %}" class="btn btn-outline-secondary py-3 px-4 w-full xl:w-32 mt-3 xl:mt-0 align-top">Register</a>-->
+          </div>
+      </form>
+        <div class="intro-x mt-10 xl:mt-24 text-slate-600 dark:text-slate-500 text-center xl:text-left"> By signin up, you agree to our <a class="text-primary dark:text-slate-200" href="">Terms and Conditions</a> & <a class="text-primary dark:text-slate-200" href="{% static 'disclaimer/MICT_SETA_POPIA_Disclaimer.pdf' %}">Privacy Policy</a> </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

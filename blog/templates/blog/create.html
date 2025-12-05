@@ -1,0 +1,81 @@
+{% extends 'base_vertical.html' %}
+
+{% load bootstrap3 %}
+
+{% block main-content %}
+
+<div class="row">
+  <div class="col-md-12 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          <nav aria-label="breadcrumb">
+              <ol class="breadcrumb bg-inverse-info">
+                {% if user.is_authenticated and user.roles_id == 10 or user.is_authenticated and user.roles_id == 11 %}
+                  <li class="breadcrumb-item"><a href="{% url 'psycad:dashboard' %}">Dashboard</a></li>
+                  <li class="breadcrumb-item"><a href="{% url 'psycad:blog_list' %}">Blog Entries</a></li>
+                  <li class="breadcrumb-item active" aria-current="page"><a>Add Blog</a></li>
+                {% elif user.is_authenticated and user.roles_id == 1 or user.is_authenticated and user.roles_id == 9 %}
+                  <li class="breadcrumb-item"><a href="{% url 'administrator:dashboard' %}">Dashboard</a></li>
+                  <li class="breadcrumb-item"><a href="{% url 'psycad:blog_list' %}">Blog Entries</a></li>
+                  <li class="breadcrumb-item active" aria-current="page"><a>Add Blog</a></li>
+                {% endif %}
+              </ol>
+            </nav>
+
+            {% include 'messages.html' %}
+
+        </div>
+      </div>
+  </div>
+</div>
+
+  <div class="col-12 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          <h4 class="card-title">Create Blog Post</h4>
+          <p class="card-description">
+            Please fill in the information below
+          </p>
+          <form class="forms-sample" method="POST" enctype="multipart/form-data" action="{% url 'psycad:blog_create_add' %}">
+            {% csrf_token %}
+            {% bootstrap_form form %}
+
+            <div class="form-group">
+              <label>Blog Article</label>
+              <textarea id="summernote" name="article"></textarea>
+            </div>
+            <div class="form-group">
+              <label>Link</label>
+              <input type="text" name="link" id="link" class="form-control">
+            </div>
+            <div class="form-group">
+              <div class="col-md-6">
+                <label>File Attachment</label>
+                {% bootstrap_field form_attachment.file_attachment show_label=False %}
+              </div>
+
+              <div class="col-md-6">
+                <label>Cover Image (please upload an image file: img / png / jpg)</label>
+                {% bootstrap_field form_coverimage.cover_image show_label=False %}
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary mr-2">Submit</button>
+            <button class="btn btn-light">Cancel</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+{% endblock %}
+
+{% block js-content %}
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.12/summernote.js"></script>
+
+<script>
+    $(document).ready(function() {
+        $('#summernote').summernote();
+    });
+  </script>
+
+{% endblock %}

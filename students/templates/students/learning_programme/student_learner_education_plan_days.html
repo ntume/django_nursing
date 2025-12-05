@@ -1,0 +1,84 @@
+{% extends 'base_vertical.html' %}
+
+{% block breadcrumb-content %}
+<nav aria-label="breadcrumb" class="-intro-x h-full mr-auto">
+    <ol class="breadcrumb breadcrumb-light">
+        <li class="breadcrumb-item"><a href="{% url 'students:student_dashboard' %}">Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'students:student_learning_programmes' %}">Learning Programmes</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'students:student_learning_programme_registrations' plan.registration.student_learning_programme.id %}">{{ plan.registration..student_learning_programme.learning_programme.programme_code }} Registrations</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Education Plan Days</li>
+    </ol>
+</nav>  
+{% endblock %}
+
+{% block main-content %}
+{% include 'messages.html' %}
+
+    <div class="intro-y flex flex-col sm:flex-row items-center mt-8">
+        <h2 class="text-lg font-medium mr-auto">
+            {{ registration.student_learning_programme.student.first_name }} {{ registration.student_learning_programme.student.last_name }}<br>
+            <b>Week:</b> {{ plan.education_plan_section_week.start_of_week }} to {{ plan.education_plan_section_week.end_of_week }}<br>
+            <b>Facility:</b> {{ plan.facility.name }}<br>
+            <b>Discipline:</b> {{ plan.discipline.discipline }}
+        </h2>
+    
+    </div>
+
+
+
+<div class="grid grid-cols-12 gap-6 mt-5">
+    
+    <!-- BEGIN: Data List -->
+    <div class="intro-y col-span-12 overflow-auto lg:overflow-visible">
+        <table class="table table-report -mt-2">
+            <thead>
+                <tr>
+                    <th class="whitespace-nowrap">#</th>                                   
+                    <th class="whitespace-nowrap">Day</th>
+                    <th class="whitespace-nowrap">Ward</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in plan.days.all %}
+                <tr class="intro-x">
+                    <td class="w-40">
+                        {{ forloop.counter }}
+                    </td>
+                    <td>
+                        {{ r.day }} 
+                    </td>
+                    
+                    <td>
+                        {{ r.ward.ward }}
+                    </td>                            
+                </tr>
+                {% empty %}
+                <tr class="intro-x"><td colspan='3'>Nothing added yet</td></tr>
+                {% endfor %}
+                
+            <tbody>
+        </table>
+    </div>
+</div>
+
+</form>
+
+{% endblock %}
+
+{% block js-content %}
+
+<script type="text/javascript">
+    
+    function checkall(source){
+        var loop = document.frmnotify.userscustomLoop.value;
+        
+        checkboxes = document.getElementsByName('days_selected[]');
+        for(var i=0, n=checkboxes.length;i<n;i++) {
+            checkboxes[i].checked = source.checked;
+        }
+
+      }
+
+</script>
+
+{% endblock %}

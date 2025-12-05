@@ -1,0 +1,239 @@
+{% extends 'base_tpl.html' %}
+
+{% block breadcrumb-content %}
+    <nav aria-label="breadcrumb" class="-intro-x mr-auto hidden sm:flex">
+        <ol class="breadcrumb">
+            {% if user.logged_in_role.id == 1 %}
+                <li class="breadcrumb-item"><a href="{% url 'administration:dashboard' %}">Dashboard</a></li>
+            {% elif user.logged_in_role.id == 6 %}
+                <li class="breadcrumb-item"><a href="{% url 'administration:dashboard_programme_coordinator' %}">Dashboard</a></li>
+            {% endif %}
+            <li class="breadcrumb-item active" aria-current="page">Requested Leave</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block main-content %}
+
+{% include 'messages.html' %}
+
+
+    <div class="intro-y flex flex-col sm:flex-row items-center mt-8">
+        <h2 class="text-lg font-medium mr-auto">
+            Requested Leave
+        </h2>
+        
+    </div>
+
+    <div class="intro-y p-5 mt-5">
+
+        <div class="intro-y col-span-12 lg:col-span-12">
+            <!-- BEGIN: Form Layout -->
+            <div class="intro-y box p-5">
+                <form action="{% url 'students:requested_leave_cohorts_registrations_leave_filter' learning_programme_cohort_registration.id %}" method="POST">
+                    {% csrf_token %}
+                    <div class="grid grid-cols-3 gap-2">
+                        <div>
+                            <select data-placeholder="Select Type of Leave" class="form-select" id="crud-form-2" name="type_of_leave">
+                                <option value="0">Select Type of Leave</option>
+                                {% for p in type_of_leave %}
+                                    <option value="{{ p.id }}">{{ p.type_of_leave }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div>
+                            <select data-placeholder="Select Status" class="form-select" id="crud-form-2" name="approved">
+                                <option value="0">Select Status</option>
+                                <option value="Approved">Approved</option>
+                                <option value="Rejected">Rejected</option>
+                            </select>
+                        </div>
+                        <div class="text-right">
+                            <button type="submit" class="btn btn-success w-24 text-white"><i data-lucide="filter" class="w-4 h-4 mr-2"></i>Filter</button>
+                        </div>
+                    </div>         
+                    
+                </form>
+            </div>
+            <!-- END: Form Layout -->
+        </div>
+        
+        <div class="overflow-x-auto">
+            <table class="table table-report -mt-2">
+                <thead>
+                    <tr>
+                        <th class="whitespace-nowrap">#</th>
+                        <th class="whitespace-nowrap">ID Number</th>
+                        <th class="whitespace-nowrap">Full Name</th>                    
+                        <th class="whitespace-nowrap">Email</th>
+                        <th class="whitespace-nowrap">Leave Dates</th>
+                        <th class="whitespace-nowrap">Status</th>
+                        <th class="whitespace-nowrap">File</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for l in learners %}
+                    <tr class="intro-x">
+                        <td class="w-40">
+                            {{ l.type_of_leave.type_of_leave }}
+                        </td>
+                        <td>
+                            {{ l.registration.student_learning_programme.student.id_number }}
+                        </td>
+                        <td>
+                            {{ l.registration.student_learning_programme.student.first_name }} {{ l.registration.student_learning_programme.student.last_name }}
+                        </td>
+                        <td>
+                            {{ l.registration.student_learning_programme.student.email }}
+                        </td>
+                        <td>
+                            {{ l.from_date }} - {{ l.to_date }}<br><br>
+                             Days Requested: {{ l.number_of_days }}<br>
+                             Leave Days Approved: {{ l.requested_approved_days }}
+                        </td>  
+                        <td>
+                            {% if l.approved == 'Pending' %}
+                                <a class="flex items-center mr-3" href="javascript:;" data-tw-toggle="modal" data-tw-target="#edit-modal_{{ l.id }}"> <i data-lucide="check-square" class="w-4 h-4 mr-1"></i> {{ l.approved }} </a>
+                                <div id="edit-modal_{{ l.id }}" class="modal" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <form action="{% url 'students:requested_leave_edit' learning_programme_cohort_registration.id l.id %}" method="POST">
+                                                {% csrf_token %}
+                                                <!-- BEGIN: Modal Header -->
+                                                <div class="modal-header">
+                                                    <h2 class="font-medium text-base mr-auto">Approve/Reject Leave</h2>                                             
+                                                </div> <!-- END: Modal Header -->
+                                                <!-- BEGIN: Modal Body -->
+                                                <div class="modal-body grid grid-cols-12 gap-4 gap-y-3">
+                                                    <div class="col-span-12 sm:col-span-12"> 
+                                                        <label for="modal-form-1" class="form-label">Type of Leave</label> 
+                                                        <select name='type_of_leave' class='form-select' required>
+                                                            <option></option>
+                                                            {% for leave in leave_types  %}
+                                                                {% if l.type_of_leave == leave %}
+                                                                    <option value='{{ leave.id }}' selected>{{ leave.type_of_leave }}</option>
+                                                                {% else %}
+                                                                    <option value='{{ leave.id }}'>{{ leave.type_of_leave }}</option>
+                                                                {% endif %}
+                                                                
+                                                            {% endfor %}
+                                                        </select>
+                                                    </div> 
+
+                                                    <div class="col-span-12 sm:col-span-12"> 
+                                                        <label for="modal-form-1" class="form-label">Leave Approval</label> 
+                                                        <select name='approved' class='form-select' required>
+                                                            <option></option>
+                                                            <option value='Approved'>Approved</option>
+                                                            <option value='Rejected'>Rejected</option>
+                                                        </select>
+                                                    </div>        
+                                                    <div class="col-span-12 sm:col-span-12"> 
+                                                        <label for="modal-form-1" class="form-label">Comment</label> 
+                                                        <input id="approval_comment" name='approval_comment' type="text" class="form-control" value="{{ l.approval_comment }}"> 
+                                                    </div> 
+                                                    <div class="col-span-12 sm:col-span-12">
+                                                        <label for="modal-form-1" class="form-label">Leave Stats</label>
+                                                        <table class='table table-bordered'>
+                                                            <tr>
+                                                                <th>Type of Leave</th>
+                                                                <th>Total Days</th>
+                                                                <th>Days Approved</th>
+                                                                <th>Days Remaining</th>
+                                                            </tr>
+                                                            {% for breakdown in l.remaining_leave_days %}
+                                                                <tr>
+                                                                    <td>{{ breakdown.leave_type }}</td>
+                                                                    <td>{{ breakdown.total_days }}</td>
+                                                                    <td>{{ breakdown.count_requested }}</td>
+                                                                    <td>{{ breakdown.count_remainder }}</td>
+                                                                </tr>
+                                                            {% endfor %}
+                                                        </table>    
+                                                    </div>
+                                                </div> <!-- END: Modal Body -->
+                                                <!-- BEGIN: Modal Footer -->
+                                                <div class="modal-footer"> 
+                                                    <button type="button" data-tw-dismiss="modal" class="btn btn-outline-secondary w-20 mr-1">Cancel</button> 
+                                                    <button type="submit" class="btn btn-primary w-60">Approve/Reject</button> 
+                                                </div> <!-- END: Modal Footer -->
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% else %}
+                                {{ l.approved }}
+                            {% endif %}
+                            
+                        </td>                 
+                        <td>
+                            {% if l.file %}
+                                <a class="btn px-2 btn-warning" aria-expanded="false" href='{{ l.file.url }}'>
+                                    <span class="w-5 h-5 flex items-center justify-center text-white"> <i class="w-4 h-4" data-lucide="arrow-down"></i> </span>
+                                </a>
+                            {% endif %}
+                        </td>
+                               
+                    </tr>
+                    {% empty %}
+                        <tr class="intro-x"><td colspan="8">Nothing added yet</td></tr>
+                    {% endfor %}
+                    
+                <tbody>
+            </table>
+        </div>
+
+        <!-- BEGIN: Pagination -->
+    <div class="intro-y col-span-12 overflow-x-auto scrollbar-hidden items-center">
+        <nav class="w-full sm:w-auto sm:mr-auto">
+            {% if is_paginated %}
+                <ul class="pagination">
+                    <li class="page-item"><a class="page-link" href="#"> <i class="w-4 h-4" data-lucide="chevrons-left"></i> </a></li>
+                    {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}"> <i class="w-4 h-4" data-lucide="chevron-left"></i> </a>
+                        </li>
+                    {% endif %}
+                    {% for i in paginator.page_range %}
+                        {% if page_obj.number == i %}
+                        <li class="active page-item"> <a class="page-link" href="#">{{ i }}</a> </li>
+                        {% else %}
+                        <li class="active page-item"> <a href="?page={{ i }}" class="page-link">{{ i }}</a> </li>
+                        {% endif %}
+                    {% endfor %}
+                    {% if page_obj.has_next %}               
+                        <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}"> <i class="w-4 h-4" data-lucide="chevron-right"></i> </a></li>
+                    {% endif %}
+                </ul>
+            {% endif %}           
+        </nav>  
+        
+        <nav class="w-full sm:w-auto sm:mr-auto">
+            {% if learners.has_other_pages %}
+                <ul class="pagination">
+                    {% if learners.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ learners.previous_page_number }}&pk={{period.id}}&filter={{filter}}"> <i class="w-4 h-4" data-lucide="chevron-left"></i> </a>
+                        </li>
+                  
+                    {% endif %}
+                    {% for i in learners.paginator.page_range %}
+                        {% if learners.number == i %}
+                        <li class="active page-item"> <a class="page-link" href="#">{{ i }}</a> </li>
+                        {% else %}
+                        <li class="page-item"> <a href="?filter={{filter}}" class="page-link">{{ i }}</a> </li>
+                        {% endif %}
+                    {% endfor %}
+                    {% if learners.has_next %}               
+                        <li class="page-item"><a class="page-link" href="?page={{ learners.next_page_number }}&pk={{period.id}}&filter={{filter}}"> <i class="w-4 h-4" data-lucide="chevron-right"></i> </a></li>
+                   
+                    {% endif %}
+                </ul>
+            {% endif %}           
+        </nav>
+    </div>
+    <!-- END: Pagination -->
+
+    </div>
+
+{% endblock %}

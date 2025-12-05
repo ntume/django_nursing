@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+{% load static %}
+
+<html lang="en" class="light">
+    <!-- BEGIN: Head -->
+    <head>
+        <meta charset="utf-8">
+        <link href="{% static 'images/NURSING-Favicon.png' %}" rel="shortcut icon">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="Student Information Management System.">
+        <meta name="keywords" content="Student Information Management System, Nursing, SIMS">
+        <meta name="author" content="MYTECH">
+        <title>NURSING SIMS</title>
+        <!-- BEGIN: CSS Assets-->
+        <link rel="stylesheet" href="{% static 'dist/css/app.css' %}" />
+        <link rel="stylesheet" href="{% static 'dist/css/lightgallery-bundle.min.css' %}" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+        <link rel="stylesheet" href="{% static 'dist/css/jquery.passwordRequirements.css' %}">
+        <style>
+            input[type="text"] {
+
+                padding-right: 35px
+            }
+            
+            input[type="password"] {
+            
+                padding-right: 35px
+            }
+            
+          </style>
+
+        <!-- END: CSS Assets-->
+    </head>
+    <!-- END: Head -->
+    <body class="login">
+        <div class="container sm:px-10">
+            <div class="block xl:grid grid-cols-2 gap-4">
+                <!-- BEGIN: Register Info -->
+                <div class="hidden xl:flex flex-col min-h-screen">
+                    <a href="" class="-intro-x flex items-center pt-5 mt-10">
+                        <span class="text-white text-lg ml-3">Nursing Student Information Management System </span> 
+                    </a>
+                    <div class="my-auto">
+                        <img alt="" class="-intro-x w-1 -mt-16" src="{% static 'images/students.png' %}" width='80%'>
+                        <div class="-intro-x text-white font-medium text-4xl leading-tight mt-10">
+                            Already have an account? <br>Login
+                            <br>
+                            To sign up, click Register
+                        </div>
+                        <div class="-intro-x mt-5 text-lg text-white text-opacity-70 dark:text-slate-400">Welcome to NURSING SIMS</div>
+                    </div>
+                </div>
+                <!-- END: Register/Lpogin Info -->
+                <!-- BEGIN: Register/Login Form -->
+                {% block main-content %}
+
+
+                {% endblock %}
+                <!-- END: Register/Login Form -->
+            </div>
+        </div>
+       
+        
+        <!-- BEGIN: JS Assets-->
+        <script src="{% static 'dist/js/app.js' %}"></script>
+        <script src="{% static 'dist/js/south-african-id-parser.js' %}"></script>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.8.2/dist/alpine.min.js" defer></script>
+        <!-- END: JS Assets-->
+        <script src="{% static 'dist/js/jquery.passwordRequirements.min.js' %}"></script>
+        <script src="{% static 'dist/js/htmx.min.js' %}"></script>
+
+        <script type="text/javascript">
+            
+            $(document).ready(function(){
+
+                $(".pr-password").passwordRequirements();
+
+                $('#btn_register').on('click', function(){
+                    
+                    var type_of_id = $('#type_of_id').val();
+                    var id_num = $('#id_number').val();
+                    var first_name = $('#first_name').val();
+                    var last_name = $('#last_name').val();
+                    var email = $('#email').val();
+                    var password = $('#password').val();
+                    var password2 = $('#password2').val();
+                    var form_valid = true;
+                    var error_msg = "The following errors have occurred: "
+                    const modal_error_check = tailwind.Modal.getInstance(document.querySelector("#modal_error_check"));
+
+                    if(id_num == "" || first_name == "" || last_name =="" || email == ""){
+                        form_valid = false;
+                        error_msg = error_msg + "Please make sure all fields are complete.<br><br>"
+                    }
+                    if(type_of_id == "SA ID"){                        
+                        var isValid = saIdParser.validate(id_num);
+                        if(isValid == false){
+                            form_valid = false;
+                            error_msg = error_msg + " Please input a valid SA ID Number.<br><br>";
+                        }
+                    }
+                    if( !$('#popia').is(':checked') ){
+                        form_valid = false;
+                        error_msg = error_msg + " Please make sure to agree with the terms and conditions of the Privacy Policy";
+                    }
+                    if( password != password2 ){
+                        form_valid = false;
+                        error_msg = error_msg + " Please make sure that the passwords are the same";
+                    }
+
+                    if(form_valid){
+                        $('#id_form_register').submit();
+                    }
+                    else{
+                        $('#div_error_message').html(error_msg);
+                        modal_error_check.show();
+                        return false;
+                    }
+
+                });
+
+            });
+        </script>
+
+        <script>
+            var eye_1=document.querySelector(".eye_1");
+            var pass1=document.querySelector(".pass1");
+            var seteye_1=document.querySelector(".eye_1");
+
+            eye_1.addEventListener('click',function(){
+                if(pass1.type=="password"){
+                    pass1.type="text";
+                    seteye_1.classList.remove('fa-eye-slash');
+                    seteye_1.classList.add('fa-eye');
+                }
+                else{
+                    pass1.type="password";
+                    seteye_1.classList.add('fa-eye-slash');
+                    seteye_1.classList.remove('fa-eye');
+                }
+            });
+
+            var eye_2=document.querySelector(".eye_2");
+            var pass2=document.querySelector(".pass2");
+            var seteye_2=document.querySelector(".eye_2");
+
+            eye_2.addEventListener('click',function(){
+                if(pass2.type=="password"){
+                    pass2.type="text";
+                    seteye_2.classList.remove('fa-eye-slash');
+                    seteye_2.classList.add('fa-eye');
+                }
+                else{
+                    pass2.type="password";
+                    seteye_2.classList.add('fa-eye-slash');
+                    seteye_2.classList.remove('fa-eye');
+                }
+
+            });
+
+
+            var eye_3=document.querySelector(".eye_3");
+            var pass3=document.querySelector(".pass3");
+            var seteye_3=document.querySelector(".eye_3");
+
+            eye_3.addEventListener('click',function(){
+                if(pass3.type=="password"){
+                    pass3.type="text";
+                    seteye_3.classList.remove('fa-eye-slash');
+                    seteye_3.classList.add('fa-eye');
+                }
+                else{
+                    pass3.type="password";
+                    seteye_3.classList.add('fa-eye-slash');
+                    seteye_3.classList.remove('fa-eye');
+                }
+
+            });
+          </script>
+
+          {% block js-content %}
+
+
+          {% endblock %}
+
+    </body>
+</html>

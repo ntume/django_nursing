@@ -1,0 +1,414 @@
+{% extends 'base_tpl.html' %}
+
+{% block breadcrumb-content %}
+    <nav aria-label="breadcrumb" class="-intro-x mr-auto hidden sm:flex">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'administration:dashboard_librarian' %}">Dashboard</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Books</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block main-content %}
+
+{% include 'messages.html' %}
+
+
+    <div class="intro-y flex flex-col sm:flex-row items-center mt-8">
+        <h2 class="text-lg font-medium mr-auto">
+            Books
+        </h2>
+        <div class="w-full sm:w-auto flex mt-4 sm:mt-0">
+            <button data-tw-toggle="modal" data-tw-target="#add-modal"  class="btn btn-primary shadow-md mr-2">Add Book</button>
+
+            <div id="add-modal" class="modal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <form action="{% url 'library:book_add' %}" method="POST" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <!-- BEGIN: Modal Header -->
+                            <div class="modal-header">
+                                <h2 class="font-medium text-base mr-auto">Add Book</h2>                                             
+                            </div> <!-- END: Modal Header -->
+                            <!-- BEGIN: Modal Body -->
+                            <div class="modal-body grid grid-cols-12 gap-4 gap-y-3">
+                                <div class="col-span-12 sm:col-span-12"> 
+                                    <label for="modal-form-1" class="form-label">Title*</label> 
+                                    <input id="title" name='title' type="text" class="form-control" placeholder="Title" required maxlength='100'> 
+                                </div>
+                                <div class="col-span-12 sm:col-span-12"> 
+                                    <label for="modal-form-1" class="form-label">Category*</label> 
+                                    <select id="category" name='category' class="form-select" required>
+                                        <option></option>
+                                        {% for c in categories %}
+                                            <option value='{{ c.id }}'>{{ c.category }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-span-12 sm:col-span-12"> 
+                                    <label for="modal-form-1" class="form-label">Authors*</label> 
+                                    <select id="authors" name='authors[]' multiple class="tom-select" required>
+                                        <option></option>
+                                        {% for c in authors %}
+                                            <option value='{{ c.id }}'>{{ c.last_name }} {{ c.first_name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>                                
+                                <div class="col-span-12 sm:col-span-12"> 
+                                    <label for="modal-form-1" class="form-label">ISBN</label> 
+                                    <input id="isbn" name='isbn' type="text" class="form-control" placeholder="ISBN"> 
+                                </div>     
+                                <div class="col-span-12 sm:col-span-12"> 
+                                    <label for="modal-form-1" class="form-label">Thumbnail</label> 
+                                    <input id="thumbnail" name='thumbnail' type="file" class="form-control"> 
+                                </div> 
+                                <div class="col-span-12 sm:col-span-12"> 
+                                    <label for="modal-form-1" class="form-label">Maximum Duration of Borrowing (days)</label> 
+                                    <input id="borrow_days" name='borrow_days' type="number" class="form-control" min="0" required> 
+                                </div> 
+                                <div class="col-span-12 sm:col-span-12"> 
+                                    <label for="modal-form-1" class="form-label">Maximum Duration of Reserving (days)</label> 
+                                    <input id="reserver_days" name='reserver_days' type="number" class="form-control" min="0" required> 
+                                </div>
+                                <div class="col-span-12 sm:col-span-12"> 
+                                    <label for="modal-form-1" class="form-label">Can be borrowed*</label> 
+                                    <select id="is_lendable" name='is_lendable' class="form-select" required>
+                                        <option></option>
+                                        <option value='Yes'>Yes</option>
+                                        <option value='No'>No</option>
+                                    </select>
+                                </div>                             
+                                                                                                   
+                            </div> <!-- END: Modal Body -->
+                            <!-- BEGIN: Modal Footer -->
+                            <div class="modal-footer"> 
+                                <button type="button" data-tw-dismiss="modal" class="btn btn-outline-secondary w-20 mr-1">Cancel</button> 
+                                <button type="submit" class="btn btn-primary w-60">Add Book</button> 
+                            </div> <!-- END: Modal Footer -->
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            
+        </div>
+    </div>
+
+    <div class="intro-y col-span-12 lg:col-span-12 mt-5">
+        <!-- BEGIN: Form Layout -->
+        <div class="intro-y box p-5">
+            <form action="{% url 'library:admin_book_list_filter' %}" method="POST">
+                {% csrf_token %}
+                <div class="grid grid-cols-4 gap-2">
+                    <div>
+                        <select data-placeholder="Select Category" class="tom-select w-full" id="crud-form-2" name="category">
+                            <option value="0">Select Category</option>
+                            {% for p in categories %}
+                                <option value="{{ p.id }}">{{ p.category }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div>
+                        <select data-placeholder="Select Author" class="tom-select w-full" id="crud-form-2" name="author">
+                            <option value="0">Select Author</option>
+                            {% for p in authors %}
+                                <option value="{{ p.id }}">{{ p.last_name }} {{ p.first_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div><input id="title" name="title" type="text" class="form-control" placeholder="Book Title"></div>
+                    <div class="">
+                        <button type="submit" class="btn btn-success w-24 text-white"><i data-lucide="filter" class="w-4 h-4 mr-2"></i>Filter</button>
+                    </div>
+                </div>         
+                
+            </form>
+                    
+                
+            
+        </div>
+        <!-- END: Form Layout -->
+    </div>
+
+    <div class="intro-y p-5 mt-5">
+        
+        <div class="overflow-x-auto">
+            <table class="table table-report -mt-2">
+                <thead>
+                    <tr>
+                        <th class="whitespace-nowrap">#</th>     
+                        <th class="whitespace-nowrap">Thumbnail</th>                
+                        <th class="whitespace-nowrap">Title</th>
+                        <th class="whitespace-nowrap">Category</th>
+                        <th class="whitespace-nowrap">Authors</th>
+                        <th class="whitespace-nowrap">ISBN</th>
+                        <th class="whitespace-nowrap">Is Lendable</th>
+                        <th class="whitespace-nowrap">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in items %}
+                    <tr class="intro-x">
+                        <td class="w-40">
+                            {{ forloop.counter }}
+                        </td>
+                        <td class="w-40">
+                            {% if r.thumbnail %}
+                                <img alt="{{ book.title }}" src="{{ r.thumbnail.url }}" data-action="zoom" class="w-full rounded-md">
+                            {% endif %}
+                        </td>
+                        <td>
+                            {{ r.title }}
+                        </td>
+                        <td>
+                            {{ r.category.category }}
+                        </td>
+                        <td>  
+                            {% for author in r.authors.all %}
+                                <b> {{ author.last_name }} {{ author.first_name }} </b>
+                                <br>
+                                <a data-tw-toggle="modal" data-tw-target="#delete_author_{{ r.id }}_{{ author.id }}" class='text-danger'>Delete</a><br>
+                                <br><hr><br>
+                                <div id="delete_author_{{ r.id }}_{{ author.id }}" class="modal" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-body p-0">
+                                                <form action="{% url 'library:book_author_delete' r.id author.id %}" method="POST">
+                                                    {% csrf_token %}
+                                                    <div class="p-5 text-center">
+                                                        <i data-lucide="x-circle" class="w-16 h-16 text-danger mx-auto mt-3"></i> 
+                                                        <div class="text-3xl mt-5">Are you sure?</div>
+                                                        <div class="text-slate-500 mt-2">
+                                                            Do you really want to remove this author? 
+                                                            <br>
+                                                            This process cannot be undone.
+                                                        </div>
+                                                    </div>
+                                                    <div class="px-5 pb-8 text-center">
+                                                        <button type="button" data-tw-dismiss="modal" class="btn btn-outline-secondary w-24 mr-1">Cancel</button>
+                                                        <button type="submit" class="btn btn-danger w-48">Remove Author</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}  
+                            <a class="btn btn-success w-60 ml-2 text-white mb-5" data-tw-toggle="modal" data-tw-target="#add_author_{{ r.id }}"> <i data-lucide="plus" class="w-4 h-4 mr-1"></i> Add Author</a>
+                            <div id="add_author_{{ r.id }}" class="modal" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog modal-xl">
+                                    <form action="{% url 'library:book_authors' r.id %}" method="POST" enctype="multipart/form-data">       
+                                        {% csrf_token %}                                  
+                                        <div class="modal-content">
+                                            <div class="modal-body p-5">
+                                                <div class="mt-5 col-span-12 sm:col-span-12"> 
+                                                    <label for="id_beginning" class="form-label">Authors</label> 
+                                                    <select id="authors" name='authors[]' multiple class="tom-select" required>
+                                                        <option></option>
+                                                        {% for c in authors %}
+                                                            <option value={{ c.id }}>{{ c.last_name }} {{ c.first_name }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>                                                    
+                                                <br><br>
+                                                <div class="px-5 pb-8 text-center"> 
+                                                    <button type="button" data-tw-dismiss="modal" class="btn btn-outline-secondary w-24 mr-1">Cancel</button> 
+                                                    <button type="submit" class="btn btn-success w-60 text-white">Add Authors</button> 
+                                                </div>
+                                                
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </td>
+                        <td>    
+                            {{ r.isbn }}                            
+                        </td>
+                        <td>    
+                            {{ r.is_lendable }}                            
+                        </td>
+                                              
+                        <td class="table-report__action w-56">
+                            <div class="flex justify-center items-center">
+
+                                <div class="dropdown ml-auto sm:ml-0">
+                                    <button class="dropdown-toggle btn px-2 box" aria-expanded="false" data-tw-toggle="dropdown">
+                                        <span class="w-5 h-5 flex items-center justify-center"> <i class="w-4 h-4" data-lucide="plus"></i> </span>
+                                    </button>
+                                    <div class="dropdown-menu w-40">
+                                        <ul class="dropdown-content">
+                                            <li>
+                                                <a class="dropdown-item" href="javascript:;" data-tw-toggle="modal" data-tw-target="#edit-modal_{{ r.id }}"> <i data-lucide="check-square" class="w-4 h-4 mr-1"></i> Edit </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item" href="javascript:;" data-tw-toggle="modal" data-tw-target="#delete-modal_{{ r.id }}"> <i data-lucide="trash-2" class="w-4 h-4 mr-1"></i> Delete </a>
+                                            </li>
+                                            <li>
+                                                <a href="{% url 'library:book_copies' r.id %}" class="dropdown-item"> <i data-lucide="files" class="w-4 h-4 mr-2"></i> Book Copies </a>
+                                            </li>
+                                            
+                                        </ul>
+                                    </div>
+                                </div>
+                                
+                                <div id="edit-modal_{{ r.id }}" class="modal" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <form action="{% url 'library:book_edit' r.id %}" method="POST"  enctype="multipart/form-data">
+                                                {% csrf_token %}
+                                                <!-- BEGIN: Modal Header -->
+                                                <div class="modal-header">
+                                                    <h2 class="font-medium text-base mr-auto">Edit Book</h2>                                             
+                                                </div> <!-- END: Modal Header -->
+                                                <!-- BEGIN: Modal Body -->
+                                                <div class="modal-body grid grid-cols-12 gap-4 gap-y-3">
+                                                    <div class="col-span-12 sm:col-span-12"> 
+                                                        <label for="modal-form-1" class="form-label">Title*</label> 
+                                                        <input id="title" name='title' type="text" class="form-control" value="{{ r.title }}" required maxlength='100'> 
+                                                    </div>
+                                                    <div class="col-span-12 sm:col-span-12"> 
+                                                        <label for="modal-form-1" class="form-label">Category*</label> 
+                                                        <select id="category" name='category' class="form-select" required>
+                                                            <option></option>
+                                                            {% for c in categories %}
+                                                                {% if c.id == r.category_id %}
+                                                                    <option value='{{ c.id }}' selected>{{ c.category }}</option>
+                                                                {% else %}
+                                                                    <option value='{{ c.id }}'>{{ c.category }}</option>
+                                                                {% endif %}
+                                                                
+                                                            {% endfor %}
+                                                        </select>
+                                                    </div>                             
+                                                    <div class="col-span-12 sm:col-span-12"> 
+                                                        <label for="modal-form-1" class="form-label">ISBN</label> 
+                                                        <input id="isbn" name='isbn' type="text" class="form-control" value="{{ r.isbn|default_if_none:"" }}"> 
+                                                    </div>  
+                                                    <div class="col-span-12 sm:col-span-12"> 
+                                                        <label for="modal-form-1" class="form-label">Maximum Duration of Borrowing (days)</label> 
+                                                        <input id="borrow_days" name='borrow_days' type="number" class="form-control" min="0" value="{{ r.borrow_days|default_if_none:"0" }}" required> 
+                                                    </div> 
+                                                    <div class="col-span-12 sm:col-span-12"> 
+                                                        <label for="modal-form-1" class="form-label">Maximum Duration of Reserving (days)</label> 
+                                                        <input id="reserver_days" name='reserver_days' type="number" class="form-control" min="0" value="{{ r.reserver_days|default_if_none:"0" }}" required> 
+                                                    </div>   
+                                                    <div class="col-span-12 sm:col-span-12"> 
+                                                        <label for="modal-form-1" class="form-label">Thumbnail</label> 
+                                                        <input id="thumbnail" name='thumbnail' type="file" class="form-control"> 
+                                                    </div>    
+                                                    <div class="col-span-12 sm:col-span-12"> 
+                                                        <label for="modal-form-1" class="form-label">Can be borrowed*</label> 
+                                                        <select id="is_lendable" name='is_lendable' class="form-select" required>
+                                                            <option></option>
+                                                            {% if r.is_lendable == 'Yes' %}
+                                                                <option value='Yes' selected>Yes</option>
+                                                                <option value='No'>No</option>
+                                                            {% elif r.is_lendable == 'Yes' %}
+                                                                <option value='Yes'>Yes</option>
+                                                                <option value='No' selected>No</option>
+                                                            {% else %}
+                                                                <option value='Yes'>Yes</option>
+                                                                <option value='No'>No</option>
+                                                            {% endif %}                                                            
+                                                        </select>
+                                                    </div>                                                            
+                                                </div> <!-- END: Modal Body -->
+                                                <!-- BEGIN: Modal Footer -->
+                                                <div class="modal-footer"> 
+                                                    <button type="button" data-tw-dismiss="modal" class="btn btn-outline-secondary w-20 mr-1">Cancel</button> 
+                                                    <button type="submit" class="btn btn-primary w-60">Edit Book</button> 
+                                                </div> <!-- END: Modal Footer -->
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div id="delete-modal_{{ r.id }}" class="modal" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-body p-0">
+                                                <form action="{% url 'library:book_delete' r.id %}" method="POST">
+                                                    {% csrf_token %}
+                                                    <div class="p-5 text-center">
+                                                        <i data-lucide="x-circle" class="w-16 h-16 text-danger mx-auto mt-3"></i> 
+                                                        <div class="text-3xl mt-5">Are you sure?</div>
+                                                        <div class="text-slate-500 mt-2">
+                                                            Do you really want to delete this record? 
+                                                            <br>
+                                                            This process cannot be undone.
+                                                        </div>
+                                                    </div>
+                                                    <div class="px-5 pb-8 text-center">
+                                                        <button type="button" data-tw-dismiss="modal" class="btn btn-outline-secondary w-24 mr-1">Cancel</button>
+                                                        <button type="submit" class="btn btn-danger w-24">Delete</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr class="intro-x"><td colspan='6'>Nothing added yet</td></tr>
+                    {% endfor %}
+                    
+                <tbody>
+            </table>
+        </div>
+
+        <!-- BEGIN: Pagination -->
+    <div class="intro-y col-span-12 overflow-x-auto scrollbar-hidden items-center">
+        <nav class="w-full sm:w-auto sm:mr-auto">
+            {% if is_paginated %}
+                <ul class="pagination">
+                    <li class="page-item"><a class="page-link" href="#"> <i class="w-4 h-4" data-lucide="chevrons-left"></i> </a></li>
+                    {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}"> <i class="w-4 h-4" data-lucide="chevron-left"></i> </a>
+                        </li>
+                    {% endif %}
+                    {% for i in paginator.page_range %}
+                        {% if page_obj.number == i %}
+                        <li class="active page-item"> <a class="page-link" href="#">{{ i }}</a> </li>
+                        {% else %}
+                        <li class="active page-item"> <a href="?page={{ i }}" class="page-link">{{ i }}</a> </li>
+                        {% endif %}
+                    {% endfor %}
+                    {% if page_obj.has_next %}               
+                        <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}"> <i class="w-4 h-4" data-lucide="chevron-right"></i> </a></li>
+                    {% endif %}
+                </ul>
+            {% endif %}           
+        </nav>  
+        
+        <nav class="w-full sm:w-auto sm:mr-auto">
+            {% if items.has_other_pages %}
+                <ul class="pagination">
+                    {% if items.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ items.previous_page_number }}&pk={{period.id}}&filter={{filter}}"> <i class="w-4 h-4" data-lucide="chevron-left"></i> </a>
+                        </li>
+                  
+                    {% endif %}
+                    {% for i in items.paginator.page_range %}
+                        {% if items.number == i %}
+                        <li class="active page-item"> <a class="page-link" href="#">{{ i }}</a> </li>
+                        {% else %}
+                        <li class="page-item"> <a href="?page={{ i }}&pk={{ period.id }}&filter={{filter}}" class="page-link">{{ i }}</a> </li>
+                        {% endif %}
+                    {% endfor %}
+                    {% if items.has_next %}               
+                        <li class="page-item"><a class="page-link" href="?page={{ items.next_page_number }}&pk={{period.id}}&filter={{filter}}"> <i class="w-4 h-4" data-lucide="chevron-right"></i> </a></li>
+                   
+                    {% endif %}
+                </ul>
+            {% endif %}           
+        </nav>
+    </div>
+    <!-- END: Pagination -->
+    </div>
+
+{% endblock %}

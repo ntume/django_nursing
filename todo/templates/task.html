@@ -1,0 +1,76 @@
+{% extends 'base_vertical.html' %}
+
+{% block main-content %}
+<div class="row">
+  <div class="col-md-12 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          <nav aria-label="breadcrumb">
+              <ol class="breadcrumb bg-inverse-info">
+                {%  if user.is_authenticated and user.roles_id == 2  %}
+                  <li class="breadcrumb-item"><a href="{% url 'wil:dashboard' %}">Dashboard</a></li>
+                  <li class="breadcrumb-item active" aria-current="page"><a>User Tasks</a></li>
+                {% elif user.is_authenticated and user.roles_id == 10 or user.is_authenticated and user.roles_id == 11 %}
+                  <li class="breadcrumb-item"><a href="{% url 'psycad:dashboard' %}">Dashboard</a></li>
+                  <li class="breadcrumb-item active" aria-current="page"><a>User Tasks</a></li>
+                {% endif %}
+              </ol>
+            </nav>
+
+            {% include 'messages.html' %}
+
+        </div>
+      </div>
+  </div>
+</div>
+
+<div class="row">
+	<div class="col-lg-12">
+		<div class="card px-3">
+			<div class="card-body">
+				<h4 class="card-title">Todo list</h4>
+				<div class="list-wrapper">
+					<ul class="d-flex flex-column-reverse todo-list">
+
+              {% for t in tasks %}
+    						<li>
+    							<div class="form-check">
+    								<label class="form-check-label">
+    									<input class="checkbox" type="checkbox" class="form-check-primary">
+    									{{t.task}}
+    								</label>
+    							</div>
+    							<button class="remove btn btn-inverse-primary btn-rounded btn-icon" value="{{t.id}}" onclick="removetask({{t.id}})"><i class="ti-close"></i></button>
+    						</li>
+              {% empty %}
+                <li>
+                  Sorry No Tasks added yet
+                </li>
+              {% endfor %}
+
+					</ul>
+				</div>
+        <div class="add-items d-flex">
+          <form action="" method="POST">
+  					<input type="text" class="form-control todo-list-input"  placeholder="Add new task">
+  					<button class="add btn btn-icon text-primary todo-list-add-btn bg-transparent"><i class="ti-location-arrow"></i></button>
+          </form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+{% endblock %}
+
+{% block js-content %}
+
+<script language="JavaScript" type="text/javascript">
+
+
+
+</script>
+
+
+{% endblock %}

@@ -1,0 +1,336 @@
+{% extends 'base_vertical.html' %}
+{% load bootstrap3 %}
+{% block main-content %}
+<div class="row">
+  <div class="col-md-12 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          <nav aria-label="breadcrumb">
+              <ol class="breadcrumb bg-inverse-info">
+                <li class="breadcrumb-item"><a href="{% url 'psycad:dashboard' %}">Dashboard</a></li>
+                <li class="breadcrumb-item active" aria-current="page"><a>Surveys</a></li>
+              </ol>
+            </nav>
+
+            {% include 'messages.html' %}
+
+        </div>
+      </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-lg-12 grid-margin stretch-card">
+              <div class="card">
+                <div class="card-body">
+                  <h4 class="card-title">List of Surveys</h4>
+                  <p class="card-description">
+                    <button type="button" class="btn btn-success btn-icon-text btn-rounded pull-right" data-toggle="modal" data-target="#addsection"> <i class="ti-clipboard btn-icon-prepend"></i>Add Survey </button>
+                    <div class="modal fade" id="addsection" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true">
+                      <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="ModalLabel">Add Survey</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                              <span aria-hidden="true">&times;</span>
+                            </button>
+                          </div>
+                          <form action="{% url 'psycad:add_survey' %}" method="POST">
+                            {% csrf_token %}
+                          <div class="modal-body">
+
+                              <div class="form-group">
+                                <label for="title">Title (required)</label>
+                                {% bootstrap_field form_survey.title show_label=False %}
+                              </div>
+                              <div class="form-group">
+                                <label for="description">Short Description (required)</label>
+                                {% bootstrap_field form_survey.description show_label=False %}
+                              </div>
+                              <div class="form-group">
+                                <label for="category">Category (required)</label>
+                                {% bootstrap_field form_survey.category show_label=False %}
+                              </div>
+                          </div>
+                          <div class="modal-footer">
+                            <button type="submit" class="btn btn-success">Add Survey</button>
+                            <button type="button" class="btn btn-light" data-dismiss="modal">Close</button>
+                          </div>
+                          </form>
+                        </div>
+                      </div>
+                    </div>
+
+                  </p><br><br><br>
+
+                  <div class="mt-4">
+                    <div class="accordion accordion-solid-header" id="accordion-4" role="tablist">
+                      {% for survey in surveys %}
+                          <div class="card">
+
+                            <div class="card-header" role="tab" id="heading-11">
+                              <h6 class="mb-0">
+                                <a class="collapsed" data-toggle="collapse" href="#collapse-{{ survey.id }}" aria-expanded="false" aria-controls="collapse-{{ survey.id }}">
+                                  {{ survey.title }}
+                                </a>
+                              </h6>
+                            </div>
+
+                            <div id="collapse-{{ survey.id }}" class="collapse" role="tabpanel" aria-labelledby="heading-11" data-parent="#accordion-4">
+                              <div class="card-body">
+                                <div class="row">
+                                  <div class="col-md-10">
+                                    {{ survey.description }}
+                                  </div>
+                                  <div class="col-md-2 pull-right">
+                                    {% if survey.published == 'Yes' %}
+                                      <form method="GET" action="{% url 'psycad:update_status' survey.id %}"><button type="submit" class="btn btn-inverse-success btn-icon-text btn-sm"><i class="fa fa-check btn-icon-prepend"></i>Published</button></form>
+                                    {% else %}
+                                      <form method="GET" action="{% url 'psycad:update_status' survey.id %}"><button type="submit" class="btn btn-inverse-danger btn-icon-text btn-sm"><i class="fa fa-times btn-icon-prepend"></i>Unpublished</button></form>
+                                    {% endif %}
+                                  </div>
+                                </div>
+
+                                  <div class="row">
+                                    <div class="col-md-12">
+                                      <ol class="pl-3 mt-4">
+                                        {% for question in  survey.questions.all %}
+                                          <li>{{ question.question }} - [{{ question.type }}] [Tone Analyzer: {{ question.tone_analyzer }}]
+                                            <form action="{% url 'psycad:delete_surveyquestion' question.id %}" method="POST">{% csrf_token %}<button type="submit" class="btn btn-outline-danger btn-sm">Remove Question</button></form>
+                                          </li>
+                                        {% empty %}
+                                          <li>No questions added yet</li>
+                                        {% endfor %}
+                                      </ol>
+                                    </div>
+                                  </div>
+
+                                  <button class="btn btn-default btn-rounded btn-icon" data-toggle="modal" data-target="#questions{{ survey.id }}"><i class="fa fa-plus-circle"></i></button>
+
+                                  <div class="modal fade" id="questions{{ survey.id }}" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog" role="document">
+                                      <div class="modal-content">
+                                        <div class="modal-header">
+                                          <h5 class="modal-title" id="ModalLabel">Add Question to survey: {{ survey.title }}</h5>
+                                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                          </button>
+                                        </div>
+                                        <form action="{% url 'psycad:add_surveyquestion' survey.id  %}" method="POST" name="form_questions">
+                                          {% csrf_token %}
+                                        <div class="modal-body">
+                                          <div class="form-group">
+                                            <label for="question">Question</label>
+                                            {% bootstrap_field form_questions.question show_label=False %}
+                                          </div>
+
+                                          <div class="form-group">
+                                            <label for="time_visit">Question Type</label>
+                                            <select name="form_questions-type" class="form-control" title="" required id="id_form_questions-type_{{ survey.id }}" onchange="toneanalyzer({{ survey.id }})">
+                                              {% for type in types %}
+                                                <option value="{{ type.id }}">{{ type.type }}</option>
+                                              {% endfor %}
+                                            </select>
+                                          </div>
+
+                                          <div class="form-group">Tone Analyzer</label>
+                                            <select name="tone_analyzer" id="tone_analyzer_{{ survey.id }}" class="select form-control" disabled>
+                                                <option value="No" selected>No</option>
+                                                <option value="Yes">Yes</option>
+                                            </select>
+                                          </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                          <button type="submit" class="btn btn-success">Add Question</button>
+                                          <button type="button" class="btn btn-light" data-dismiss="modal">Close</button>
+                                        </div>
+                                        </form>
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                  <hr>
+                                  <div class="row">
+                                    <div class="col-md-9">
+
+                                      <div class="badge badge-outline-primary badge-pill">{{survey.category.category}}</div>
+                                    </div>
+                                    <div class="col-md-3 pull-right">
+                                      <button type="button" class="btn btn-warning btn-rounded btn-icon" data-toggle="modal" data-target="#answers{{ survey.id }}"> <i class="fa fa-comments"></i></button>
+                                      <button type="button" class="btn btn-success btn-rounded btn-icon" data-toggle="modal" data-target="#edit{{ survey.id }}"> <i class="fa fa-edit"></i></button>
+                                      <button type="button" class="btn btn-danger btn-rounded btn-icon" data-toggle="modal" data-target="#del{{ survey.id }}" > <i class="fa fa-trash-o"></i> </button>
+
+                                      <div class="modal fade" id="answers{{ survey.id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel-3" aria-hidden="true">
+                                        <div class="modal-dialog" role="document">
+                                          <div class="modal-content">
+                                            <div class="modal-header">
+                                              <h5 class="modal-title" id="exampleModalLabel-3">Answers Submitted for this Survey: {{ survey.title }}</h5>
+                                              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                              </button>
+                                            </div>
+                                            <table class="table table-bordered">
+                                              <thead>
+                                                <tr>
+                                                  <th>#</th>
+                                                  <th>User</th>
+                                                  <th>Date Added</th>
+                                                </tr>
+                                              </thead>
+                                              <tbody>
+                                                {% for s in survey.survey_answers.all %}
+                                                  <tr>
+                                                    <td>{{ forloop.counter }}</td>
+                                                    <td><a href="">{{ s.user.first_name }} {{ s.user.last_name }}</a></td>
+                                                    <td>{{ s.created_at }}</td>
+                                                  </tr>
+                                                {% empty %}
+                                                  <tr><td colspan="3">No answers submitted</td></tr>
+                                                {% endfor %}
+                                              </tbody>
+
+                                            </table>
+                                          </div>
+                                        </div>
+                                      </div>
+
+                                        <div class="modal fade" id="edit{{ survey.id }}" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true">
+                                          <div class="modal-dialog" role="document">
+                                            <div class="modal-content">
+                                              <div class="modal-header">
+                                                <h5 class="modal-title" id="ModalLabel">Edit Survey</h5>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                  <span aria-hidden="true">&times;</span>
+                                                </button>
+                                              </div>
+                                              <form action="{% url 'psycad:edit_survey' survey.id %}" method="POST">
+                                                {% csrf_token %}
+                                              <div class="modal-body">
+
+                                                  <div class="form-group">
+                                                    <label for="section">Title (required)</label>
+                                                    <input type="text" name="title" id="title" class="form-control" value="{{ survey.title }}">
+                                                  </div>
+                                                  <div class="form-group">
+                                                    <label for="description">Short Description (required)</label>
+                                                    <textarea name="description" id="description" class="form-control">{{ survey.description }}</textarea>
+                                                  </div>
+                                                  <div class="form-group">
+                                                    <label for="category">Catgeory (required)</label>
+                                                    <select name="category" id="category" class="form-control select">
+                                                      {% for cat in categories %}
+                                                        {% if cat.id == survey.category.id %}
+                                                          <option value="{{cat.id}}" selected>{{cat.category}}</option>
+                                                        {% else %}
+                                                          <option value="{{cat.id}}">{{cat.category}}</option>
+                                                        {% endif %}
+                                                      {% endfor %}
+                                                    </select>
+                                                  </div>
+                                              </div>
+                                              <div class="modal-footer">
+                                                <button type="submit" class="btn btn-success">Edit Survey</button>
+                                                <button type="button" class="btn btn-light" data-dismiss="modal">Close</button>
+                                              </div>
+                                              </form>
+                                            </div>
+                                          </div>
+                                        </div>
+
+                                        <div class="modal fade" id="del{{ survey.id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel-3" aria-hidden="true">
+                                          <div class="modal-dialog" role="document">
+                                            <div class="modal-content">
+                                              <div class="modal-header">
+                                                <h5 class="modal-title" id="exampleModalLabel-3">Remove this Survey: {{ survey.title }}</h5>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                  <span aria-hidden="true">&times;</span>
+                                                </button>
+                                              </div>
+                                              <form action="{% url 'psycad:delete_survey' survey.id %}" method="POST">
+                                                {% csrf_token %}
+                                              <div class="modal-body">
+                                                <p>Are you sure you want to remove <b>{{ survey.title }}</b> and all its questions?</p>
+                                              </div>
+                                              <div class="modal-footer">
+                                                <input type="hidden" name="task" value="school">
+                                                <button type="submit" class="btn btn-success">Yes</button>
+                                                <button type="button" class="btn btn-light" data-dismiss="modal">No</button>
+                                              </div>
+                                              </form>
+                                            </div>
+                                          </div>
+                                        </div>
+                                    </div>
+                                  </div>
+
+
+                              </div>
+                            </div>
+
+                          </div>
+
+                      {% empty %}
+                          <div class="card">
+                            <div class="card-header" role="tab" id="heading-11">
+                              <h6 class="mb-0">
+                                <a class="collapsed" data-toggle="collapse" href="#collapse-11" aria-expanded="false" aria-controls="collapse-11">
+                                  No surveys added yet
+                                </a>
+                              </h6>
+                            </div>
+                          </div>
+                      {% endfor %}
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+</div>
+{% endblock %}
+
+{% block js-content %}
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.min.js"></script>
+
+<script>
+var ctxbar = document.getElementById('myChartbar');
+var ctxpie = document.getElementById('myChartpie');
+
+var myChart = new Chart(ctxbar, {
+    type: 'bar',
+    data: {
+        labels: ['{{years.0}}', '{{years.1}}', '{{years.2}}', '{{years.3}}', '{{years.4}}'],
+        datasets: [{
+            label: '# of Registered Students',
+            data: [{{total_students.0}}, {{total_students.1}}, {{total_students.2}}, {{total_students.3}}, {{total_students.4}}],
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(54, 162, 235, 0.2)',
+                'rgba(255, 206, 86, 0.2)',
+                'rgba(75, 192, 192, 0.2)',
+                'rgba(153, 102, 255, 0.2)'
+            ],
+            borderColor: [
+                'rgba(255, 99, 132, 1)',
+                'rgba(54, 162, 235, 1)',
+                'rgba(255, 206, 86, 1)',
+                'rgba(75, 192, 192, 1)',
+                'rgba(153, 102, 255, 1)'
+            ],
+            borderWidth: 1
+        }]
+    },
+    options: {
+        scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero: true
+                }
+            }]
+        }
+    }
+});
+
+</script>
+
+{% endblock %}

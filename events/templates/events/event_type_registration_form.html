@@ -1,0 +1,322 @@
+{% extends 'base_vertical.html' %}
+{% load bootstrap3 %}
+
+{% block css-content %}
+
+<style type="text/css">
+
+table.timecard {
+	margin: auto;
+	width: 100%;
+	border-collapse: collapse;
+	border: 1px solid #fff; /*for older IE*/
+	border-style: solid;
+}
+
+table.timecard caption {
+	background-color: #f79646;
+	color: #fff;
+  font-size: 0.875rem;
+	font-weight: normal;
+	letter-spacing: .4em;
+}
+
+table.timecard thead th {
+	padding: 8px;
+	background-color: #ffffff;
+	font-size: 0.875rem;
+  font-weight: bold;
+}
+
+table.timecard thead th#thDay {
+	width: 40%;
+}
+
+table.timecard thead th#thRegular, table.timecard thead th#thOvertime, table.timecard thead th#thTotal {
+	width: 20%;
+}
+
+table.timecard th, table.timecard td {
+	padding: 10px;
+	border-width: 1px;
+	border-style: solid;
+}
+
+table.timecard td {
+	text-align: left;
+  font-size: 0.875rem;
+}
+
+table.timecard tbody th {
+	text-align: left;
+	font-weight: normal;
+}
+
+table.timecard tfoot {
+	font-weight: bold;
+	font-size: 0.875rem;
+	background-color: #687886;
+	color: #fff;
+}
+
+table.timecard tr.even {
+	background-color: #008080;
+}
+</style>
+
+
+{% endblock %}
+
+{% block main-content %}
+
+<div class="row">
+  <div class="col-md-12 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          <nav aria-label="breadcrumb">
+              <ol class="breadcrumb bg-inverse-info">
+                {%  if user.is_authenticated and user.roles_id == 2  %}
+                  <li class="breadcrumb-item"><a href="{% url 'wil:dashboard' %}">Dashboard</a></li>
+                  <li class="breadcrumb-item"><a href="{% url 'wil:event_list' %}">Recruitment Programs</a></li>
+                  <li class="breadcrumb-item active" aria-current="page"><a>>Recruitment Program Types</a></li>
+                {% elif user.is_authenticated and user.roles_id == 10 %}
+                  <li class="breadcrumb-item"><a href="{% url 'psycad:dashboard' %}">Dashboard</a></li>
+                  <li class="breadcrumb-item"><a href="{% url 'psycad:event_list' %}">Recruitment Programs</a></li>
+                  <li class="breadcrumb-item"><a href="{% url 'psycad:config_eventtypes' %}">Recruitment Program Types</a></li>
+                  <li class="breadcrumb-item active" aria-current="page"><a>{{ event_type.type }}</a></li>
+                {% endif %}
+              </ol>
+            </nav>
+
+            {% include 'messages.html' %}
+
+        </div>
+      </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-lg-12 grid-margin stretch-card">
+              <div class="card">
+                <div class="card-body">
+                  <h4 class="card-title">List of Registration Forms</h4>
+                  <p class="card-description">
+                    <button type="button" class="btn btn-primary btn-icon-text btn-rounded pull-right" data-toggle="modal" data-target="#new_type"> <i class="ti-plus btn-icon-prepend"></i>Add New Form </button><br><br>
+                    <div class="modal fade" id="new_type" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true">
+                      <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="ModalLabel">Add New Registration Form</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                              <span aria-hidden="true">&times;</span>
+                            </button>
+                          </div>
+                          <form action="{% url 'psycad:event_types_registration_form' event_type.id %}" method="POST">
+                            {% csrf_token %}
+                          <div class="modal-body">
+
+                              <div class="form-group">
+                                <label for="period">Title (required)</label>
+                                {% bootstrap_field form.title show_label=False %}
+                              </div>
+
+                              <div class="form-group">
+                                <label for="period">Description (required)</label>
+                                {% bootstrap_field form.description show_label=False %}
+                              </div>
+
+                          </div>
+                          <div class="modal-footer">
+                            <button type="submit" class="btn btn-success">Add Registration Form</button>
+                            <button type="button" class="btn btn-light" data-dismiss="modal">Close</button>
+                          </div>
+                          </form>
+                        </div>
+                      </div>
+                    </div>
+                  </p>
+                  <div class="table-responsive">
+                    <table class="timecard table-bordered">
+                      <thead>
+                        <tr>
+                          <th>#</th>
+                          <th>Title</th>
+                          <th>Description</th>
+                          <th>Questions</th>
+                          <th>Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for regform in event_type.registration_forms.all %}
+                            <tr>
+                              <td class="py-1">{{ forloop.counter }}</td>
+                              <td>{{regform.title}}</td>
+                              <td>{{regform.description}}</td>
+                              <td>
+                                {{ regform.questions.count }} Questions Added
+                                <br><br>
+                                <a href="{% url 'psycad:registration_form_questions' event_type.id regform.id %}" type="button" class="btn btn-primary btn-icon-text btn-rounded"> <i class="ti-plus btn-icon-prepend"></i>Add Questions</a><br><br>
+                              </td>
+                              <td>
+
+
+
+                                <button type="button" class="btn btn-primary btn-rounded btn-icon" data-toggle="modal" data-target="#duplicate{{ regform.id }}" > <i class="fa fa-copy"></i></button>
+
+                                <button type="button" class="btn btn-success btn-rounded btn-icon" data-toggle="modal" data-target="#edit{{ regform.id }}" > <i class="fa fa-edit"></i></button>
+
+                                <button type="button" class="btn btn-danger btn-rounded btn-icon" data-toggle="modal" data-target="#del{{ regform.id }}" > <i class="fa fa-trash-o"></i> </button>
+
+                                <div class="modal fade" id="duplicate{{ regform.id }}" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true">
+                                  <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                      <div class="modal-header">
+                                        <h5 class="modal-title" id="ModalLabel">Duplicate Registration Form: {{ regform.title }}</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                          <span aria-hidden="true">&times;</span>
+                                        </button>
+                                      </div>
+                                      <form action="{% url 'psycad:duplicate_event_type_registration_form' event_type.id regform.id %}" method="POST">
+                                        {% csrf_token %}
+                                      <div class="modal-body">
+
+                                          <div class="form-group">
+                                            <label for="period">New Title (required)</label>
+                                            {% bootstrap_field form.title show_label=False %}
+                                          </div>
+
+                                          <div class="form-group">
+                                            <label for="period">New Description (required)</label>
+                                            {% bootstrap_field form.description show_label=False %}
+                                          </div>
+
+																					<div class="form-group">
+                                            <label for="period">Event Type (required)</label>
+                                            <select name="event_type" id="id_event_type" class="form-control">
+																							{% for type in types %}
+																								{% if type.id == event_type.id %}
+																									<option value="{{ type.id }}" selected>{{ type.type }}</option>
+																								{% else %}
+																									<option value="{{ type.id }}">{{ type.type }}</option>
+																								{% endif %}
+																							{% endfor %}
+																						</select>
+                                          </div>
+
+
+
+                                      </div>
+                                      <div class="modal-footer">
+                                        <button type="submit" class="btn btn-success">Add Registration Form</button>
+                                        <button type="button" class="btn btn-light" data-dismiss="modal">Close</button>
+                                      </div>
+                                      </form>
+                                    </div>
+                                  </div>
+                                </div>
+
+
+                                <div class="modal fade" id="edit{{ regform.id }}" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true">
+                                  <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                      <div class="modal-header">
+                                        <h5 class="modal-title" id="ModalLabel">Edit Type</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                          <span aria-hidden="true">&times;</span>
+                                        </button>
+                                      </div>
+                                      <form action="{% url 'psycad:edit_event_types_registration_form' event_type.id regform.id %}" method="POST">
+                                        {% csrf_token %}
+                                      <div class="modal-body">
+
+                                          <div class="form-group">
+                                            <label for="period">Title (required)</label>
+                                            <input id="type" class="form-control" name="title" minlength="2" type="text" value="{{ regform.title }}" required>
+                                          </div>
+
+                                          <div class="form-group">
+                                            <label for="period">Description (required)</label>
+                                            <textarea id="id_description" class="form-control" name="description" required>{{ regform.description }}</textarea>
+                                          </div>
+
+                                      </div>
+                                      <div class="modal-footer">
+                                        <input type="hidden" name="task" value="edit">
+                                        <button type="submit" class="btn btn-success">Edit Type</button>
+                                        <button type="button" class="btn btn-light" data-dismiss="modal">Close</button>
+                                      </div>
+                                      </form>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                <div class="modal fade" id="del{{ regform.id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel-3" aria-hidden="true">
+                                  <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                      <div class="modal-header">
+                                        <h5 class="modal-title" id="exampleModalLabel-3">Delete Registration Form</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                          <span aria-hidden="true">&times;</span>
+                                        </button>
+                                      </div>
+                                      <form action="{% url 'psycad:delete_event_types_registration_form' event_type.id regform.id %}" method="POST">
+                                        {% csrf_token %}
+                                      <div class="modal-body">
+                                        <p>Are you sure you want to delete {{ regform.title }}?</p>
+                                      </div>
+                                      <div class="modal-footer">
+                                        <input type="hidden" name="task" value="delete">
+                                        <button type="submit" class="btn btn-success">Yes</button>
+                                        <button type="button" class="btn btn-light" data-dismiss="modal">No</button>
+                                      </div>
+                                      </form>
+                                    </div>
+                                  </div>
+                                </div>
+
+                              </td>
+                            </tr>
+                        {% empty %}
+                            <tr><td colspan="8">Sorry no registration forms added</td></tr>
+                        {% endfor %}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+</div>
+{% endblock %}
+
+{% block js-content %}
+
+<script type="text/javascript">
+
+    $(document).ready(function() {
+        $('.js-company-single').select2({
+          placeholder: 'Select an option',
+          width: '100%'
+        });
+    });
+
+    $(document).ready(function(){
+      $('#id_type').on('change', function(){
+
+        {% for t in types %}
+          if(this.value == {{ t.id }}){
+            {% if t.options ==  "Yes" %}
+              document.getElementById("div_many_one_choice").style.display = "block";
+              $("#id_choice").attr("required", true);
+            {% else %}
+              document.getElementById("div_many_one_choice").style.display = "none";
+              $("#id_choice").attr("required", false);
+            {% endif %}
+          }
+        {% endfor %}
+         // or $(this).val()
+        return false; // keeps the page from not refreshing
+      });
+    });
+  </script>
+
+{% endblock %}

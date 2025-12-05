@@ -1,0 +1,178 @@
+{% extends 'base_tpl.html' %}
+
+
+{% block breadcrumb-content %}
+    <nav aria-label="breadcrumb" class="-intro-x mr-auto hidden sm:flex">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'administration:dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'college:learning_programme_cohorts' period.learning_programme_cohort.learning_programme.id %}">{{ period.learning_programme_cohort.learning_programme.programme_code }} Cohorts</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'college:education_plans' period.id %}">Educational Plans</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ section.education_plan_year.year }} {{ section.section }} WIL Requirments</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block main-content %}
+
+{% include 'messages.html' %}
+
+
+    <div class="intro-y flex flex-col sm:flex-row items-center mt-8">
+        <h2 class="text-lg font-medium mr-auto">
+            {{ section.education_plan_year.year }} {{ section.section }} WIL Requirements
+        </h2>
+        <div class="w-full sm:w-auto flex mt-4 sm:mt-0">
+            <a href="javascript:;" data-tw-toggle="modal" data-tw-target="#add-modal" class="btn btn-success shadow-md mr-2">Add WIL Requirement</a>
+            <div id="add-modal" class="modal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <form action="{% url 'college:education_plan_year_section_wil_requirement_add' plan.id section.id %}" method="POST">
+                            {% csrf_token %}
+                            <!-- BEGIN: Modal Header -->
+                            <div class="modal-header">
+                                <h2 class="font-medium text-base mr-auto">Specify WIL Requirement Hours</h2>                                             
+                            </div> <!-- END: Modal Header -->
+                            <!-- BEGIN: Modal Body -->
+                            <div class="modal-body grid grid-cols-12 gap-4 gap-y-3">
+                                <div class="col-span-12 sm:col-span-12"> 
+                                    <label for="modal-form-1" class="form-label">Discipline*</label> 
+                                    <select name='period_wil_requirement' class='form-select' required>
+                                        <option></option>
+                                        {% for b in period_wil_requirements %}
+                                            <option value='{{ b.id }}'>{{ b.discipline.discipline }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                
+                                <div class="col-span-12 sm:col-span-12"> 
+                                    <label for="modal-form-1" class="form-label">Hours*</label> 
+                                    <input id="module_code" name='hours' type="number" class="form-control" step='0.1' required min='0'> 
+                                </div>
+
+                                <div class="col-span-12 sm:col-span-12"> 
+                                    <label for="modal-form-1" class="form-label">Credits*</label> 
+                                    <input id="module_code" name='credits' type="number" class="form-control" min='0' required> 
+                                </div>
+                                                                                           
+                            </div> <!-- END: Modal Body -->
+                            <!-- BEGIN: Modal Footer -->
+                            <div class="modal-footer"> 
+                                <button type="button" data-tw-dismiss="modal" class="btn btn-outline-secondary w-20 mr-1">Cancel</button> 
+                                <button type="submit" class="btn btn-primary w-60">Add WIL Requirement Specification</button> 
+                            </div> <!-- END: Modal Footer -->
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+    
+        </div>
+        
+    </div>
+
+    <div class="intro-y box p-5 mt-5">
+        
+        <div class="overflow-x-auto">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th class="whitespace-nowrap">#</th>
+                        <th class="whitespace-nowrap">Discipline</th>
+                        <th class="whitespace-nowrap">Hours</th>
+                        <th class="whitespace-nowrap">Credits</th>
+                        <th class="whitespace-nowrap">Actions</th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in items %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ r.period_wil_requirement.discipline.discipline }}</td>
+                            <td>{{ r.hours }}</td>
+                            <td>{{ r.credits }}</td>     
+                            <td class="table-report__action w-56">
+                                <div class="flex justify-center items-center">
+                                    <a class="flex items-center mr-3" href="javascript:;" data-tw-toggle="modal" data-tw-target="#edit-modal_{{ r.id }}"> <i data-lucide="check-square" class="w-4 h-4 mr-1"></i> Edit </a>
+                                    <div id="edit-modal_{{ r.id }}" class="modal" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <form action="{% url 'college:education_plan_year_section_wil_requirement_edit' plan.id section.id r.id %}" method="POST">
+                                                    {% csrf_token %}
+                                                    <!-- BEGIN: Modal Header -->
+                                                    <div class="modal-header">
+                                                        <h2 class="font-medium text-base mr-auto">Programme Block</h2>                                             
+                                                    </div> <!-- END: Modal Header -->
+                                                    <!-- BEGIN: Modal Body -->
+                                                    <div class="modal-body grid grid-cols-12 gap-4 gap-y-3">
+                                                        <div class="col-span-12 sm:col-span-12"> 
+                                                            <label for="modal-form-1" class="form-label">Discipline*</label> 
+                                                            <select name='period_wil_requirement' class='form-select' required>
+                                                                <option></option>
+                                                                {% for b in period_wil_requirements %}
+                                                                    {% if r.period_wil_requirement == b %}
+                                                                        <option value='{{ b.id }}' selected>{{ b.discipline.discipline }}</option>
+                                                                    {% else %}
+                                                                        <option value='{{ b.id }}'>{{ b.discipline.discipline }}</option>
+                                                                    {% endif %}
+                                                                    
+                                                                {% endfor %}
+                                                            </select>
+                                                        </div>
+                                                        
+                                                        <div class="col-span-12 sm:col-span-12"> 
+                                                            <label for="modal-form-1" class="form-label">Hours*</label> 
+                                                            <input id="module_code" name='hours' type="number" class="form-control" step='0.1' required min='0' value='{{ r.hours }}'> 
+                                                        </div>
+                        
+                                                        <div class="col-span-12 sm:col-span-12"> 
+                                                            <label for="modal-form-1" class="form-label">Credits*</label> 
+                                                            <input id="module_code" name='credits' type="number" class="form-control" min='0' required value='{{ r.credits }}'> 
+                                                        </div>                                   
+                                                    </div> <!-- END: Modal Body -->
+                                                    <!-- BEGIN: Modal Footer -->
+                                                    <div class="modal-footer"> 
+                                                        <button type="button" data-tw-dismiss="modal" class="btn btn-outline-secondary w-20 mr-1">Cancel</button> 
+                                                        <button type="submit" class="btn btn-primary w-60">Edit WIL Requirement</button> 
+                                                    </div> <!-- END: Modal Footer -->
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <a class="flex items-center text-danger" href="javascript:;" data-tw-toggle="modal" data-tw-target="#delete-confirmation-modal_{{ r.id }}"> <i data-lucide="trash-2" class="w-4 h-4 mr-1"></i> Delete </a>
+                                    <div id="delete-confirmation-modal_{{ r.id }}" class="modal" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-body p-0">
+                                                    <form action="{% url 'college:education_plan_year_section_wil_requirement_delete' plan.id section.id r.id %}" method="POST">
+                                                        {% csrf_token %}
+                                                        <div class="p-5 text-center">
+                                                            <i data-lucide="x-circle" class="w-16 h-16 text-danger mx-auto mt-3"></i> 
+                                                            <div class="text-3xl mt-5">Are you sure?</div>
+                                                            <div class="text-slate-500 mt-2">
+                                                                Do you really want to delete this record? 
+                                                                <br>
+                                                                This process cannot be undone.
+                                                            </div>
+                                                        </div>
+                                                        <div class="px-5 pb-8 text-center">
+                                                            <button type="button" data-tw-dismiss="modal" class="btn btn-outline-secondary w-24 mr-1">Cancel</button>
+                                                            <button type="submit" class="btn btn-danger w-24">Delete</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>                      
+                        </tr>
+                    {% empty %}
+                    <tr><td colspan = '6'>No WIL Requirements added</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+{% endblock %}

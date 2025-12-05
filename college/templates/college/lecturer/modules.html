@@ -1,0 +1,94 @@
+{% extends 'base_tpl.html' %}
+
+{% block breadcrumb-content %}
+    <nav aria-label="breadcrumb" class="-intro-x mr-auto hidden sm:flex">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'administration:dashboard_lecturer' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'college:lecturer_learning_programme_cohorts' learning_programme.id %}">{{ learning_programme.programme_code }} Cohorts</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'college:lecturer_learning_programme_cohort_registration_periods' learning_programme_cohort.id %}">{{ learning_programme_cohort.title }} Registrations</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Modules</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block main-content %}
+
+{% include 'messages.html' %}
+
+
+    <div class="intro-y flex flex-col sm:flex-row items-center mt-8">
+        <h2 class="text-lg font-medium mr-auto">
+            {{ learning_programme_cohort_registration_period.title }} Modules
+        </h2>
+        
+    </div>
+
+    <div class="intro-y p-5 mt-5">
+        
+        <div class="overflow-x-auto">
+            <table class="table table-report -mt-2">
+                <thead>
+                    <tr>
+                        <th class="whitespace-nowrap">#</th>                    
+                        <th class="whitespace-nowrap">Module</th>
+                        <th class="whitespace-nowrap">Summative<br> Weight</th>
+                        <th class="whitespace-nowrap">Formative<br> Weights</th>
+                        <th class="whitespace-nowrap">Assessment<br> Marks</th>
+                        <th class="whitespace-nowrap">Students</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in items %}
+                    <tr class="intro-x">
+                        <td class="w-40">
+                            {{ forloop.counter }}
+                        </td>
+                        <td>
+                            {{ r.module.module_code }} {{ r.module.module_name }}
+                        </td>
+                        <td>
+                            <b>Year Mark:</b> {{ r.entrance_year_mark }}%<br>
+                            <b>Exam weight:</b> {{ r.summative_weight }}%
+                        </td>                                              
+                        <td>
+                            <b>Assignments:</b> {{ r.assignment_weight }}%<br>
+                            <b>Tests:</b> {{ r.test_weight }}%
+                        </td>
+                    
+                        <td class="">
+                            <div class="flex justify-center items-center">
+
+                                <div class="dropdown ml-auto sm:ml-0">
+                                    <button class="dropdown-toggle btn px-2 box" aria-expanded="false" data-tw-toggle="dropdown">
+                                        <span class="w-5 h-5 flex items-center justify-center"> <i class=" h-4" data-lucide="arrow-down"></i> <b>{{ p.period }}</b></span>
+                                    </button>
+                                    <div class="dropdown-menu w-60">
+                                        <ul class="dropdown-content">
+                                            {% for p in r.formative.all %}
+                                                <li>
+                                                    <a href="{% url 'students:lecturer_learning_programme_cohort_module_student_assessment_list' learning_programme_cohort_registration_period.id r.id p.id %}" class="dropdown-item"> <i data-lucide="calendar" class="w-4 h-4 mr-2"></i> {{ p.title }} {{ p.weight }}% </a>
+                                                </li> 
+                                            {% endfor %}                                   
+                                        </ul>
+                                    </div>
+                                </div>
+                                
+                            </div>
+                        </td>
+                        <td>
+                            <a class="flex items-center mr-3" href="{% url 'students:lecturer_learning_programme_cohort_module_students' learning_programme_cohort_registration_period.id r.id %}"> 
+                                <i data-lucide="users" class="w-4 h-4 mr-1"></i> {{ r.logsheets.count }} Students 
+                            </a>                                
+                        </td>
+                      
+                    </tr>
+                    {% empty %}
+                    <tr class="intro-x"><td colspan='6'>Nothing added yet</td></tr>
+                    {% endfor %}
+                    
+                <tbody>
+            </table>
+        </div>
+    </div>
+
+{% endblock %}

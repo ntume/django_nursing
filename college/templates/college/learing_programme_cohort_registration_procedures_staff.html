@@ -1,0 +1,126 @@
+{% extends 'base_tpl.html' %}
+
+{% block breadcrumb-content %}
+    <nav aria-label="breadcrumb" class="-intro-x mr-auto hidden sm:flex">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'administration:dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'college:learning_programme_cohorts' learning_programme.id %}">{{ learning_programme.programme_code }} Cohorts</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'college:learning_programme_cohort_registration_periods' learning_programme_cohort.id %}">{{ learning_programme_cohort.title }} Registrations</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Procedures Staff</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block main-content %}
+
+{% include 'messages.html' %}
+
+<form method = "POST" action="{% url 'college:assign_procedure_staff' learning_programme_cohort_registration_period.id %}" name="frmnotify" class="mt-5">
+    <div class="intro-y flex flex-col sm:flex-row items-center mt-8">
+        <h2 class="text-lg font-medium mr-auto">
+            {{ learning_programme_cohort_registration_period.title }} Procedure Staff Assignment
+        </h2>
+    </div>
+    <div class="intro-y flex flex-col sm:flex-row items-center mt-8">
+        <div class="w-full sm:w-auto flex mt-4 sm:mt-0">
+            
+                {% csrf_token %}
+                <input  type = "hidden" name = "userscustomLoop" value = "{{ items|length }}">
+        
+                <div class="intro-y col-span-12 overflow-auto lg:overflow-visible">
+                    <div class="form-inline col-span-12">
+                        <label for="id_admin" class="form-label w-32">Select Type</label>
+                        <select name="facilitator_type" id="facilitator_type" class="form-control" required>
+                            <option></option>
+                            <option value="Demonstration">Demonstration</option>
+                            <option value="Assessment">Assessment</option>
+                        </select>
+                        <label for="id_admin" class="form-label w-32">Select Lecturer</label>
+                        <select name="lecturer" id="id_lecturer" class="form-control">
+                            <option></option>
+                            {% for admin in lecturers  %}
+                                <option value="{{ admin.id }}">{{ admin.first_name }} {{ admin.last_name }}</option>
+                            {% endfor %}
+                        </select>
+                        <label for="id_admin" class="form-label w-48">Select Clinical Facilitator</label>
+                        <select name="clinical_facilitator" id="id_clinical_facilitator" class="form-control">
+                            <option></option>
+                            {% for admin in facilitators  %}
+                                <option value="{{ admin.id }}">{{ admin.first_name }} {{ admin.last_name }}</option>
+                            {% endfor %}
+                        </select>
+                        <label for="id_admin" class="form-label w-4"></label>
+                        
+                        <button type="submit" class="btn btn-primary w-48 text-white">Assign Staff</button>
+                    </div>  
+                </div>  
+
+        </div>
+    </div>
+
+    <div class="intro-y p-5 mt-5">
+        
+        <div class="overflow-x-auto">
+            <table class="table table-report -mt-2">
+                <thead>
+                    <tr>
+                        <th class="whitespace-nowrap"><input type="checkbox" name="toggle" value="all" class="form-check-input" onclick = "checkall(this)"></th>                  
+                        <th class="whitespace-nowrap">Procedure</th>
+                        <th class="whitespace-nowrap">Lecturer</th>
+                        <th class="whitespace-nowrap">Clinical Facilitator</th>
+                        <th class="whitespace-nowrap">Lecturer-Demonstration</th>
+                        <th class="whitespace-nowrap">Clinical Facilitator-Demonstration</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in items %}
+                    <tr class="intro-x">
+                        <td class="w-40">
+                            <input type="checkbox" name="procedures_selected[]" value="{{ r.id }}" class="form-check-input">
+                        </td>
+                        <td>
+                            {{ r.procedure.task }}
+                        </td>
+                        <td>
+                            {{ r.lecturer.first_name }} {{ r.lecturer.last_name }}
+                        </td>
+                        <td>
+                            {{ r.clinical_facilitator.first_name }} {{ r.clinical_facilitator.last_name }}
+                        </td>
+                        <td>
+                            {{ r.lecturer_demonstration.first_name }} {{ r.lecturer_demonstration.last_name }}
+                        </td>
+                        <td>
+                            {{ r.clinical_facilitator_demonstration.first_name }} {{ r.clinical_facilitator_demonstration.last_name }}
+                        </td>
+                      
+                    </tr>
+                    {% empty %}
+                    <tr class="intro-x"><td colspan='6'>Nothing added yet</td></tr>
+                    {% endfor %}
+                    
+                <tbody>
+            </table>
+        </div>
+    </div>
+</form>
+{% endblock %}
+
+
+{% block js-content %}
+
+<script type="text/javascript">
+    
+    function checkall(source){
+        var loop = document.frmnotify.userscustomLoop.value;
+        
+        checkboxes = document.getElementsByName('procedures_selected[]');
+        for(var i=0, n=checkboxes.length;i<n;i++) {
+            checkboxes[i].checked = source.checked;
+        }
+
+      }
+
+</script>
+
+{% endblock %}

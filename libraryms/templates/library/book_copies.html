@@ -1,0 +1,265 @@
+{% extends 'base_tpl.html' %}
+
+{% block breadcrumb-content %}
+    <nav aria-label="breadcrumb" class="-intro-x mr-auto hidden sm:flex">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'administration:dashboard_librarian' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'library:books' %}">Books</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ book.title }} Copies</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block main-content %}
+
+{% include 'messages.html' %}
+
+
+    <div class="intro-y flex flex-col sm:flex-row items-center mt-8">
+        <h2 class="text-lg font-medium mr-auto">
+            {{ book.title }} Copies
+        </h2>
+        <div class="w-full sm:w-auto flex mt-4 sm:mt-0">
+            <a href="{% url 'library:print_book_copies_qr_codes' book.id %}"  class="btn btn-success shadow-md mr-2">Create QRCode File</a>
+            {% if book.book_copy_qr_codes %}
+                <a href="{{ book.book_copy_qr_codes.url }}"  class="btn btn-danger shadow-md mr-2">Download QRCode File</a>            
+            {% endif %}
+
+            <button data-tw-toggle="modal" data-tw-target="#add-modal"  class="btn btn-primary shadow-md mr-2">Add Book Copy</button>
+
+            <div id="add-modal" class="modal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <form action="{% url 'library:book_copy_add' book.id %}" method="POST">
+                            {% csrf_token %}
+                            <!-- BEGIN: Modal Header -->
+                            <div class="modal-header">
+                                <h2 class="font-medium text-base mr-auto">Add Copy</h2>                                             
+                            </div> <!-- END: Modal Header -->
+                            <!-- BEGIN: Modal Body -->
+                            <div class="modal-body grid grid-cols-12 gap-4 gap-y-3">
+                                <div class="col-span-12 sm:col-span-12"> 
+                                    <label for="modal-form-1" class="form-label">Publisher</label> 
+                                    <select id="publisher" name='publisher' class="form-select" required> 
+                                        <option></option>
+                                        {% for p in publishers %}
+                                            <option value='{{ p.id }}'>{{ p.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>   
+                                <div class="col-span-12 sm:col-span-12"> 
+                                    <label for="modal-form-1" class="form-label">Year Published</label> 
+                                    <input id="year_published" name='year_published' type="number" class="form-control" placeholder="Year Published" min='1900' max='2024' required> 
+                                </div>                                                              
+                                
+                                <div class="col-span-12 sm:col-span-12"> 
+                                    <label for="modal-form-1" class="form-label">Available</label> 
+                                    <select id="available" name='available' class="form-select" required> 
+                                        <option></option>
+                                        <option value='Yes'>Yes</option>
+                                        <option value='No'>No</option>
+                                        <option value='On Hold'>On Hold</option>                                     
+                                    </select>
+                                </div> 
+                                <div class="col-span-12 sm:col-span-12"> 
+                                    <label for="modal-form-1" class="form-label">Edition</label> 
+                                    <input id="edition" name='edition' type="text" class="form-control" placeholder="Edition" maxlength='50'> 
+                                </div> 
+                            </div> <!-- END: Modal Body -->
+                            <!-- BEGIN: Modal Footer -->
+                            <div class="modal-footer"> 
+                                <button type="button" data-tw-dismiss="modal" class="btn btn-outline-secondary w-20 mr-1">Cancel</button> 
+                                <button type="submit" class="btn btn-primary w-40">Add Copy</button> 
+                            </div> <!-- END: Modal Footer -->
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="intro-y box p-5 mt-5">
+        
+        <div class="overflow-x-auto">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th class="whitespace-nowrap">#</th>
+                        <th class="whitespace-nowrap">QR Code</th>
+                        <th class="whitespace-nowrap">Dewey Code</th>
+                        <th class="whitespace-nowrap">Publisher</th>
+                        <th class="whitespace-nowrap">Year Published</th>                        
+                        <th class="whitespace-nowrap">Edition</th>
+                        <th class="whitespace-nowrap">Available</th>
+                        <th class="whitespace-nowrap">CheckOut</th>
+                        <th class="flex justify-center items-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in items %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>
+                                {% if item.qr_code %}                         
+                                    <img alt="{{ item.book.title }}" src="{{ item.qr_code.url }}" data-action="zoom" class="w-full rounded-md">                     
+                                {% endif %}
+                                <br><a href="{% url 'library:book_copy_print_qr_code' book.id item.id %}" class="btn btn-success mr-1 mb-2"> <i data-lucide="printer" class="w-5 h-5"></i> </a> 
+                            </td>
+                            <td>{{ item.barcode }}</td>
+                            <td>{{ item.publisher.name }}</td>
+                            <td>{{ item.year_published }}</td>
+                            <td>{{ item.edition }}</td>
+                            <td>{{ item.available }}</td>
+                            <td>
+                                {% if item.available == 'Yes' %}
+                                    <a href="javascript:;" data-tw-toggle="modal" data-tw-target="#check_out-modal_{{ item.id }}" class="btn btn-pending mr-1 mb-2"> <i data-lucide="download" class="w-5 h-5"></i> </a> 
+                                    <div id="check_out-modal_{{ item.id }}" class="modal" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-body p-0">
+                                                    <form action="{% url 'library:book_copy_check_out' item.id %}" method="POST">
+                                                        {% csrf_token %}
+                                                        <div class="p-5 text-center">
+                                                            <i data-lucide="x-circle" class="w-16 h-16 text-pending mx-auto mt-3"></i> 
+                                                            <div class="text-3xl mt-5">Check Out Copy?</div>
+                                                            <div class="text-slate-500 mt-2">
+                                                                Do you really want to check out this copy? 
+                                                                <br>
+                                                                This process cannot be undone.
+                                                            </div>
+                                                            <div class="col-span-12 sm:col-span-12 mt-10"> 
+                                                                <label for="modal-form-1" class="form-label">Patron</label> 
+                                                                <select name='user' class='tom-select' required>
+                                                                    <option></option>
+                                                                    {% for u in users %}
+                                                                        <option value="{{ u.id }}">{{ u.first_name }} {{ u.last_name }}</option>
+                                                                    {% endfor %}
+                                                                </select>
+                                                            </div>
+                                                            <div class="col-span-12 sm:col-span-12 mt-10"> 
+                                                                <label for="modal-form-1" class="form-label">Check Out date</label> 
+                                                                <input id="checkout_date" name='checkout_date' type="date" class="form-control" value="{{ today|date:'Y-m-d' }}" required> 
+                                                            </div>
+                                                            
+                                                        </div>
+                                                        <div class="px-5 pb-8 text-center">
+                                                            <button type="button" data-tw-dismiss="modal" class="btn btn-outline-secondary w-24 mr-1">Cancel</button>
+                                                            <button type="submit" class="btn btn-pending w-24">Checkout</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="flex justify-center items-center">
+                                    <a class="flex items-center mr-3" href="javascript:;" data-tw-toggle="modal" data-tw-target="#edit-modal_{{ item.id }}"> <i data-lucide="check-square" class="w-4 h-4 mr-1"></i> Edit </a>
+                                    <div id="edit-modal_{{ item.id }}" class="modal" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <form action="{% url 'library:book_copy_edit' book.id item.id %}" method="POST">
+                                                    {% csrf_token %}
+                                                    <!-- BEGIN: Modal Header -->
+                                                    <div class="modal-header">
+                                                        <h2 class="font-medium text-base mr-auto">Edit Copy</h2>                                             
+                                                    </div> <!-- END: Modal Header -->
+                                                    <!-- BEGIN: Modal Body -->
+                                                    <div class="modal-body grid grid-cols-12 gap-4 gap-y-3">
+                                                        <div class="col-span-12 sm:col-span-12"> 
+                                                            <label for="modal-form-1" class="form-label">Publisher</label> 
+                                                            <select id="publisher" name='publisher' class="form-select" required> 
+                                                                <option></option>
+                                                                {% for p in publishers %}
+                                                                    {% if p.id == item.publisher_id %}
+                                                                        <option value='{{ p.id }}' selected>{{ p.name }}</option>
+                                                                    {% else %}
+                                                                        <option value='{{ p.id }}'>{{ p.name }}</option>
+                                                                    {% endif %}
+                                                                   
+                                                                {% endfor %}
+                                                            </select>
+                                                        </div>   
+                                                        <div class="col-span-12 sm:col-span-12"> 
+                                                            <label for="modal-form-1" class="form-label">Year Published</label> 
+                                                            <input id="year_published" name='year_published' type="number" class="form-control" value="{{ item.year_published }}" min='1900' max='2024' required> 
+                                                        </div>                                                              
+                                                         
+                                                        <div class="col-span-12 sm:col-span-12"> 
+                                                            <label for="modal-form-1" class="form-label">Available</label> 
+                                                            <select id="available" name='available' class="form-select" required> 
+                                                                <option></option>
+                                                                {% if item.available == 'Yes' %}
+                                                                    <option value='Yes' selected>Yes</option>
+                                                                    <option value='No'>No</option>
+                                                                    <option value='On Hold'>On Hold</option>
+                                                                {% elif item.available == 'No' %}
+                                                                    <option value='Yes'>Yes</option>
+                                                                    <option value='No' selected>No</option>
+                                                                    <option value='On Hold'>On Hold</option>
+                                                                {% elif item.available == 'On Hold' %}
+                                                                    <option value='Yes'>Yes</option>
+                                                                    <option value='No'>No</option>
+                                                                    <option value='On Hold' selected>On Hold</option>
+                                                                {% else %}
+                                                                    <option value='Yes'>Yes</option>
+                                                                    <option value='No'>No</option>
+                                                                    <option value='On Hold'>On Hold</option>
+                                                                {% endif %}
+                                                                                                     
+                                                            </select>
+                                                        </div> 
+                                                        <div class="col-span-12 sm:col-span-12"> 
+                                                            <label for="modal-form-1" class="form-label">Edition</label> 
+                                                            <input id="edition" name='edition' type="text" class="form-control" value="{{ item.edition }}" maxlength='50'> 
+                                                        </div>
+                                                                                           
+                                                    </div> <!-- END: Modal Body -->
+                                                    <!-- BEGIN: Modal Footer -->
+                                                    <div class="modal-footer"> 
+                                                        <button type="button" data-tw-dismiss="modal" class="btn btn-outline-secondary w-20 mr-1">Cancel</button> 
+                                                        <button type="submit" class="btn btn-primary w-40">Edit Copy</button> 
+                                                    </div> <!-- END: Modal Footer -->
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <a class="flex items-center text-danger" href="javascript:;" data-tw-toggle="modal" data-tw-target="#delete-confirmation-modal_{{ item.id }}"> <i data-lucide="trash-2" class="w-4 h-4 mr-1"></i> Delete </a>
+                                    <div id="delete-confirmation-modal_{{ item.id }}" class="modal" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-body p-0">
+                                                    <form action="{% url 'library:book_copy_delete' book.id item.id %}" method="POST">
+                                                        {% csrf_token %}
+                                                        <div class="p-5 text-center">
+                                                            <i data-lucide="x-circle" class="w-16 h-16 text-danger mx-auto mt-3"></i> 
+                                                            <div class="text-3xl mt-5">Are you sure?</div>
+                                                            <div class="text-slate-500 mt-2">
+                                                                Do you really want to delete this record? 
+                                                                <br>
+                                                                This process cannot be undone.
+                                                            </div>
+                                                        </div>
+                                                        <div class="px-5 pb-8 text-center">
+                                                            <button type="button" data-tw-dismiss="modal" class="btn btn-outline-secondary w-24 mr-1">Cancel</button>
+                                                            <button type="submit" class="btn btn-danger w-24">Delete</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    {% empty %}
+                    <tr><td colspan = '6'>No publisher added, please add at least one publisher</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+{% endblock %}

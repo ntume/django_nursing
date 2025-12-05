@@ -1,0 +1,243 @@
+{% extends 'base_vertical.html' %}
+
+{% block breadcrumb-content %}
+    <nav aria-label="breadcrumb" class="-intro-x h-full mr-auto">
+        <ol class="breadcrumb breadcrumb-light">
+            <li class="breadcrumb-item"><a href="{% url 'students:student_dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Facility Booking</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block main-content %}
+
+{% include 'messages.html' %}
+
+<div class="intro-y mt-8 flex flex-col items-center sm:flex-row">
+    <h2 class="mr-auto text-lg font-medium">Facility Booking</h2>
+    
+</div>
+<div class="mt-5 grid grid-cols-12 gap-5">
+    <!-- BEGIN: Calendar Side Menu -->
+    <div class="col-span-12 xl:col-span-4 2xl:col-span-3">
+        <div class="box intro-y p-5">
+            <form action="{% url 'facilities:student_request_facility_booking' %}" method="POST">
+                {% csrf_token %}
+                <div data-tw-merge="" id="calendar-events" class="full-calendar-draggable mb-5 mt-6 border-b border-t border-slate-200/60 py-3 dark:border-darkmode-400">
+                  <div>
+                    <label data-tw-merge for="regular-form-1" class="inline-block mb-2 group-[.form-inline]:mb-2 group-[.form-inline]:sm:mb-0 group-[.form-inline]:sm:mr-5 group-[.form-inline]:sm:text-right">
+                      What Facility and Activity do you want to book for yourself? (required)
+                    </label>
+                    <select name='facility_activity' id='id_facility_activity' class='form-control' required>
+                        <option></option>
+                        {% for facility in facilities %}
+                          <optgroup label="{{ facility.facility }}">
+                          {% for fa in facility.facilityactivity_set.all %}
+                              <option value="{{ fa.id }}">
+                                {{ fa.activity.activity }}
+                              </option>
+                            {% endfor %}
+                          </optgroup>
+                        {% endfor %}
+                    </select>
+                  </div>
+
+                                    
+                    <div>
+                        <label data-tw-merge for="regular-form-1" class="inline-block mb-2 group-[.form-inline]:mb-2 group-[.form-inline]:sm:mb-0 group-[.form-inline]:sm:mr-5 group-[.form-inline]:sm:text-right">
+                          Additional Information? (required)
+                        </label>
+                        <textarea required name='booking_description' class='form-control'></textarea>
+                    </div>
+                    <div class="mt-3">
+                        <label data-tw-merge for="regular-form-2" class="inline-block mb-2 group-[.form-inline]:mb-2 group-[.form-inline]:sm:mb-0 group-[.form-inline]:sm:mr-5 group-[.form-inline]:sm:text-right">
+                          Date (Monday to Friday)
+                        </label>
+                        <input required data-tw-merge name="booking_date" type="date" placeholder="Booking Date" required class="disabled:bg-slate-100 disabled:cursor-not-allowed dark:disabled:bg-darkmode-800/50 dark:disabled:border-transparent [&[readonly]]:bg-slate-100 [&[readonly]]:cursor-not-allowed [&[readonly]]:dark:bg-darkmode-800/50 [&[readonly]]:dark:border-transparent transition duration-200 ease-in-out w-full text-sm border-slate-200 shadow-sm rounded-md placeholder:text-slate-400/90 focus:ring-4 focus:ring-primary focus:ring-opacity-20 focus:border-primary focus:border-opacity-40 dark:bg-darkmode-800 dark:border-transparent dark:focus:ring-slate-700 dark:focus:ring-opacity-50 dark:placeholder:text-slate-500/80 group-[.form-inline]:flex-1 group-[.input-group]:rounded-none group-[.input-group]:[&:not(:first-child)]:border-l-transparent group-[.input-group]:first:rounded-l group-[.input-group]:last:rounded-r group-[.input-group]:z-10 rounded-full" />
+                    </div>
+                    <div class="mt-3">
+                        <label data-tw-merge for="regular-form-2" class="inline-block mb-2 group-[.form-inline]:mb-2 group-[.form-inline]:sm:mb-0 group-[.form-inline]:sm:mr-5 group-[.form-inline]:sm:text-right">
+                          Start Time (09:00 - 13h00)
+                        </label>
+                        <input data-tw-merge name="booking_time_start" type="time" placeholder="" required class="disabled:bg-slate-100 disabled:cursor-not-allowed dark:disabled:bg-darkmode-800/50 dark:disabled:border-transparent [&[readonly]]:bg-slate-100 [&[readonly]]:cursor-not-allowed [&[readonly]]:dark:bg-darkmode-800/50 [&[readonly]]:dark:border-transparent transition duration-200 ease-in-out w-full text-sm border-slate-200 shadow-sm rounded-md placeholder:text-slate-400/90 focus:ring-4 focus:ring-primary focus:ring-opacity-20 focus:border-primary focus:border-opacity-40 dark:bg-darkmode-800 dark:border-transparent dark:focus:ring-slate-700 dark:focus:ring-opacity-50 dark:placeholder:text-slate-500/80 group-[.form-inline]:flex-1 group-[.input-group]:rounded-none group-[.input-group]:[&:not(:first-child)]:border-l-transparent group-[.input-group]:first:rounded-l group-[.input-group]:last:rounded-r group-[.input-group]:z-10 rounded-full" />
+                    </div>
+                    <div class="mt-3">
+                      <label data-tw-merge for="regular-form-2" class="inline-block mb-2 group-[.form-inline]:mb-2 group-[.form-inline]:sm:mb-0 group-[.form-inline]:sm:mr-5 group-[.form-inline]:sm:text-right">
+                          End Time (09:00 - 13h00)
+                      </label>
+                      <input data-tw-merge name="booking_time_end" type="time" placeholder="" required class="disabled:bg-slate-100 disabled:cursor-not-allowed dark:disabled:bg-darkmode-800/50 dark:disabled:border-transparent [&[readonly]]:bg-slate-100 [&[readonly]]:cursor-not-allowed [&[readonly]]:dark:bg-darkmode-800/50 [&[readonly]]:dark:border-transparent transition duration-200 ease-in-out w-full text-sm border-slate-200 shadow-sm rounded-md placeholder:text-slate-400/90 focus:ring-4 focus:ring-primary focus:ring-opacity-20 focus:border-primary focus:border-opacity-40 dark:bg-darkmode-800 dark:border-transparent dark:focus:ring-slate-700 dark:focus:ring-opacity-50 dark:placeholder:text-slate-500/80 group-[.form-inline]:flex-1 group-[.input-group]:rounded-none group-[.input-group]:[&:not(:first-child)]:border-l-transparent group-[.input-group]:first:rounded-l group-[.input-group]:last:rounded-r group-[.input-group]:z-10 rounded-full" />
+                  </div>
+                  
+                </div>
+                <div data-tw-merge="" class="flex items-center">
+                    <button data-tw-merge="" type="submit" class="transition duration-200 border shadow-sm inline-flex items-center justify-center py-2 px-3 rounded-md font-medium cursor-pointer focus:ring-4 focus:ring-primary focus:ring-opacity-20 focus-visible:outline-none dark:focus:ring-slate-700 dark:focus:ring-opacity-50 [&:hover:not(:disabled)]:bg-opacity-90 [&:hover:not(:disabled)]:border-opacity-90 [&:not(button)]:text-center disabled:opacity-70 disabled:cursor-not-allowed bg-primary border-primary text-white dark:border-primary mt-2 w-full"><i data-tw-merge="" data-lucide="edit" class="stroke-1.5 mr-2 h-4 w-4"></i>
+                      Submit Facility Booking Request Form
+                    </button>
+                </div>
+            </form>
+        </div>
+        <div class="box intro-y mt-5 p-5">
+            <div data-tw-merge="" id="calendar-events" class="full-calendar-draggable mb-5 mt-6 border-b border-t border-slate-200/60 py-3 dark:border-darkmode-400">
+              {% for a in facility_bookings %}
+                    <div class="relative">
+                        <div class="event -mx-3 flex cursor-pointer items-center rounded-md p-3 transition duration-300 ease-in-out hover:bg-slate-100 dark:hover:bg-darkmode-400">
+                            <div class="mr-3 h-2 w-2 rounded-full {% if breakdown.count_remainder > 0 %}bg-success{% else %}bg-danger{% endif %} "></div>
+                            <div class="pr-10">
+                                <div class="event__title truncate">{{ a.facility_activity.facility.facility }} - {{ a.facility_activity.activity.activity }}</div>
+                                <div class="mt-0.5 text-xs text-slate-500">
+                                    <span class="event__days">{{ a.booking_date }} at {{ a.booking_time_start }}</span>                                  
+                                </div>
+                                <div class="mt-0.5 text-xs text-slate-500">
+                                  <button class="btn btn-primary mr-1 mb-2" data-tw-toggle="modal" data-tw-target="#edit{{ a.id }}"> <i data-lucide="edit" class="w-5 h-5"></i> </button> 
+                                  
+                              </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+
+                    <div class="modal fade" id="edit{{ a.id }}" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true">
+                      <div class="modal-dialog">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="ModalLabel">Edit Facility Booking</h5>
+                           
+                          </div>
+
+                          <form action="{% url 'facilities:edit_student_facility_booking' a.id %}" method="POST">
+                            {% csrf_token %}
+                          <div class="modal-body">
+
+                              <div class="form-group">
+                                <label for="period">Facility (required)</label>
+                                <select name='facility_activity' id='id_facility_activity' class='form-control' required>
+                                  <option></option>
+                                  {% for facility in facilities %}
+                                    <optgroup label="{{ facility.facility }}">
+                                      {% for fa in facility.facilityactivity_set.all %}
+                                        {% if a.facility_activity_id == fa.id  %}
+                                          <option value="{{ fa.id }}" selected>
+                                            {{ fa.activity.activity }} (Capacity: {{ fa.capacity }})
+                                          </option>
+                                        {% else %}
+                                          <option value="{{ fa.id }}">
+                                            {{ fa.activity.activity }} (Capacity: {{ fa.capacity }})
+                                          </option>
+                                        {% endif %}
+                                      {% endfor %}
+                                    </optgroup>
+                                  {% endfor %}
+                              </select>
+                              </div>
+
+                              <div class="form-group mt-5">
+                                <label for="period">Description (required)</label>
+                                <textarea name="booking_description" id="booking_description" class="form-control mt-2">{{ a.booking_description }}</textarea>
+                              </div>
+
+                              <div class="form-group mt-5  ">
+                                <label for="period">Date (required)</label>
+                                <input type="date" name="booking_date" id="booking_date" class="form-control mt-2" value="{{ a.booking_date|date:'Y-m-d' }}">
+                              </div>
+
+                              <div class="form-group mt-5">
+                                <label>Time Start (required)</label>
+                                <input type="time" name="booking_time_start" id="booking_time_start" class="form-control mt-2" value="{{ a.booking_time_start|date:'h:i:s' }}">
+                              </div>
+
+                              <div class="form-group mt-5">
+                                <label>End Time (09:00 - 13h00)</label>
+                                <input name="booking_time_end" type="time" required class="form-control mt-2" value="{{ a.booking_time_end|date:'h:i:s' }}"/>
+                              </div>
+
+                          </div>
+                          <div class="modal-footer">
+                            <button type="submit" class="btn btn-primary">Edit Facility Booking</button>
+                            <button type="button" class="btn btn-light" data-tw-dismiss="modal">Close</button>
+                          </div>
+                          </form>
+
+                        </div>
+                      </div>
+                    </div>
+
+                {% endfor %}
+              
+            </div>
+        </div>
+    </div>
+    <!-- END: Calendar Side Menu -->
+    <!-- BEGIN: Calendar Content -->
+    <div class="col-span-12 xl:col-span-8 2xl:col-span-9">
+        <div class="box p-5">
+            <div id='test_calendar'>
+              
+            </div>
+        </div>
+    </div>
+    <!-- END: Calendar Content -->
+</div>
+
+{% endblock %}
+
+{% block js-content %}
+
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
+<script>
+   
+    document.addEventListener('DOMContentLoaded', function() {
+      var calendarEl = document.getElementById('test_calendar');
+      var calendar = new FullCalendar.Calendar(calendarEl, {
+        initialDate: "{{ today|date:'Y-m-d' }}",
+        headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek,timeGridDay,listMonth'
+        },
+        views: {
+            dayGridMonth: { buttonText: 'month' },
+            timeGridWeek: { buttonText: 'week' },
+            timeGridDay: { buttonText: 'day' }
+        },
+        initialView: 'dayGridMonth',
+        events: [
+          {% for leave in all_leave %}
+            {
+                title: '{{ leave.type_of_leave.type_of_leave }} - {{ leave.approved }}',
+                start: '{{ leave.from_date|date:"Y-m-d" }}',
+                end: '{{ leave.to_date|date:"Y-m-d" }}',
+                description: '{{ leave.comment }}',
+                color: "{% if leave.approved == 'Pending' %}orange{% elif leave.approved == 'Rejected' %}purple{% else %}green{% endif %}"
+            },
+          {% endfor %}      
+          {% for a in appointments %}
+                {
+                  title: '{{ a.category.category }}\n{{ a.status }}',
+                  start: '{{ a.appointment_date|date:"Y-m-d" }}T{{ a.appointment_time_start|date:"h:i:s" }}',
+                  color: {% if a.status == 'Completed' %} '#40316E' {% elif a.status == "Declined" %} 'red' {% else %} 'orange' {% endif %}
+                },
+          {% endfor %}    
+          {% for plan in timetable %}
+                  {
+                      title: '{{ plan.block.block_code }}',
+                      start: '{{ plan.education_plan_section_week.start_of_week|date:"Y-m-d" }}',
+                      end: '{{ plan.education_plan_section_week.end_of_week|date:"Y-m-d" }}',
+                      description: '{{ plan.block.block_name }}',
+                      color: "blue"
+                  },
+          {% endfor %}    
+          {% for a in facility_bookings %}
+                {
+                  title: '{{ a.facility_activity.facility.facility }}\n{{ a.facility_activity.activity.activity }}',
+                  start: '{{ a.booking_date|date:"Y-m-d" }}T{{ a.booking_time_start|date:"h:i:s" }}',
+                  color: '#40316E',
+                },
+          {% endfor %}    
+        ]
+      });
+      calendar.render();
+    });
+
+  </script>
+
+{% endblock %}

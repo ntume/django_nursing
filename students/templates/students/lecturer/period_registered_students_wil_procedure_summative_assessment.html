@@ -1,0 +1,39 @@
+{% extends 'base_tpl.html' %}
+
+{% block breadcrumb-content %}
+    <nav aria-label="breadcrumb" class="-intro-x mr-auto hidden sm:flex">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'administration:dashboard_lecturer' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'college:lecturer_learning_programme_cohorts' learning_programme.id %}">{{ learning_programme.programme_code }} Cohorts</a></li>
+           
+            <li class="breadcrumb-item"><a href="{% url 'college:lecturer_learning_programme_cohort_registration_periods' learning_programme_cohort.id %}">{{ learning_programme_cohort.title }} Registrations</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'college:lecturer_procedure_summative_list' learning_programme_cohort_registration_period.id %}">Procedures</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'students:lecturer_learning_programme_cohort_procedure_student_summative_assessment_list' learning_programme_cohort_registration_period.id procedure_entry.id %}">List of Students</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ procedure_entry.procedure.task }} Students</li>
+            
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block main-content %}
+
+
+    <div class="intro-y flex flex-col sm:flex-row items-center mt-8">
+        <h2 class="text-lg font-medium mr-auto">
+            {{ attempt_user.attempt.cohort_procedure.task }} Summative Assessment
+        </h2>
+
+        <div class="w-full sm:w-auto flex mt-4 sm:mt-0">
+            <a href="{% url 'students:process_procedure_summative_assessment_final_mark' student_registration.id   %}"  class="btn btn-primary shadow-md mr-2">Process Final Mark</a>
+        </div>
+        
+    </div>
+
+    <div class="intro-y p-5 mt-5">
+        
+        <div class="overflow-x-auto" id='procedure_div'>
+            {% include 'students/lecturer/partials/period_registered_students_wil_procedure_summative_assessment.html' %}
+        </div>
+    </div>
+
+{% endblock %}

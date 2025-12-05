@@ -1,0 +1,100 @@
+{% include 'messages.html' %}
+
+<table class="table table-report -mt-2">
+    <thead>
+        <tr>
+            <th><div class="flex items-center justify-center">#</div></th> 
+            <th><div class="flex items-center justify-center">ASSESSMENT CRITERIA</div></th>
+            <th><div class="flex items-center justify-center">OUTCOME</div></th>   
+            <th><div class="flex items-center justify-center">COMMENTS</div></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for entry in assessment %}                        
+            
+            {% if entry.question_type == 'Heading' %}
+                <tr class="intro-x">
+                            
+                    <td>
+                        {{ entry.number }}
+                    </td>
+                    <td colspan='3'><b>{{ entry.question }}</b></td>                                         
+                </tr>
+            {% elif entry.question_type == 'Note' %}
+                <tr class="intro-x">
+                        
+                    <td>
+                        {{ entry.number }}
+                    </td>
+                    <td colspan='3'>{{ entry.question }}</td>                                         
+                </tr>
+            {% elif entry.question_type == 'Question' %}
+                <tr class="intro-x">
+                        
+                    <td>
+                        {{ entry.number }}
+                        <div id='messages_attachments_{{ forloop.counter }}'></div>
+                    </td>
+                    <td>{{ entry.question }}</td>  
+                    <form>
+                        {% csrf_token %}
+                        <td>
+                            <select name='answer' class='form-select' required
+                                hx-get="{% url 'students:save_procedure_summative_answer' student_registration.id procedure_entry.id entry.id %}"
+                                hx-trigger="change"
+                                hx-target="#procedure_div"
+                                action="#">
+                                <option></option>
+                                {% if entry.answer_answer == 'Competent' %}
+                                    <option value="Competent" selected>Competent</option>
+                                    <option value="Not Yet Competent">Not Yet Competent</option>
+                                    <option value="Not Applicable">Not Applicable</option>
+                                {% elif entry.answer_answer == 'Not Yet Competent' %}
+                                    <option value="Competent">Competent</option>
+                                    <option value="Not Yet Competent" selected>Not Yet Competent</option>
+                                    <option value="Not Applicable">Not Applicable</option>
+                                {% elif entry.answer_answer == 'Not Applicable' %}
+                                    <option value="Competent">Competent</option>
+                                    <option value="Not Yet Competent">Not Yet Competent</option>
+                                    <option value="Not Applicable" selected>Not Applicable</option>
+                                {% else %}
+                                    <option value="Competent">Competent</option>
+                                    <option value="Not Yet Competent">Not Yet Competent</option>
+                                    <option value="Not Applicable">Not Applicable</option>
+                                {% endif %}                                    
+                            </select>
+                        </td>
+
+                        <td><textarea name='comment' required 
+                                hx-get="{% url 'students:save_procedure_summative_comment' student_registration.id procedure_entry.id entry.id %}"
+                                hx-trigger="change"
+                                hx-target="#messages_attachments_{{ forloop.counter }}"
+                                action="#">{{ entry.answer_comment }}</textarea>
+                        </td>       
+                    </form>                                        
+                </tr>
+            {% endif %}
+        
+        {% empty %}
+            <tr class="intro-x">
+                <td colspan="4">
+                    Nothing Added
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+    <tfoot>
+        <tr>
+            <td></td>
+            <td>Total</td>
+            <td>{{ total_marks }}/{{ total }}</td>
+            <td>{{total_marks_percentage }}%</td>
+        </tr>
+        <tr>
+            <td>Fifty percent (50%) will be deducted if assessment criteria indicated with # are not achieved, therefore student will be found NYC</td>
+            <td>Ten percent (10%) will be deducted if assessment criteria indicated with * are not achieved</td>
+            <td>Penalties deducted = {{ penalty }}</td>
+            <td>Total before Penalties deducted = {{ total_marks_percentage_before_penalty }}</td>
+        </tr>
+    </tfoot>
+</table>

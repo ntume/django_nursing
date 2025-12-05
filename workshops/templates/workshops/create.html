@@ -1,0 +1,167 @@
+{% extends 'base_vertical.html' %}
+
+{% load bootstrap3 %}
+
+{% block main-content %}
+
+<div class="row">
+  <div class="col-md-12 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          <nav aria-label="breadcrumb">
+              <ol class="breadcrumb bg-inverse-info">
+                  <li class="breadcrumb-item"><a href="{% url 'psycad:dashboard' %}">Dashboard</a></li>
+                  <li class="breadcrumb-item"><a href="{% url 'psycad:workshop_list' %}">Workshops</a></li>
+                  <li class="breadcrumb-item active" aria-current="page"><a>Add Workshop</a></li>
+              </ol>
+            </nav>
+
+            {% include 'messages.html' %}
+
+        </div>
+      </div>
+  </div>
+</div>
+
+<div class="col-12 grid-margin stretch-card">
+              <div class="card">
+                <div class="card-body">
+                  <h4 class="card-title">Create Workshop</h4>
+                  <p class="card-description">
+                    Please fill in the information below
+                  </p>
+                  <form class="forms-sample" method="POST" action="{% url 'psycad:add_workshop' %}">
+                    {% csrf_token %}
+                    <div class="row">
+                      <div class="col-md-12">
+                        <div class="form-group row">
+                          <label class="col-sm-2 col-form-label">Title</label>
+                          <div class="col-sm-10">
+                            {% bootstrap_field form.title show_label=False %}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-12">
+                        <div class="form-group row">
+                          <label class="col-sm-2 col-form-label">Description</label>
+                          <div class="col-sm-10">
+                            {% bootstrap_field form.description show_label=False %}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-12">
+                        <div class="form-group row">
+                          <label class="col-sm-2 col-form-label">Workshop Type</label>
+                          <div class="col-sm-10">
+                            {% bootstrap_field form.type show_label=False %}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-12">
+                        <div class="form-group row">
+                          <label class="col-sm-2 col-form-label">Registration</label>
+                          <div class="col-sm-10">
+                            {% bootstrap_field form.registration show_label=False %}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-12">
+                        <div class="form-group row">
+                          <label class="col-sm-2 col-form-label">Workshop Dates</label>
+                          <div class="col-sm-4">
+                            <input type="date" class="form-control" name="workshop_date" id="id_workshop_date">
+                          </div>
+                          to
+                          <div class="col-sm-4">
+                            <input type="date" class="form-control" name="workshop_enddate" id="id_workshop_enddatee">
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="row">
+                      <div class="col-md-12">
+                        <div class="form-group row">
+                          <label class="col-sm-2 col-form-label">Workshop Time</label>
+                          <div class="col-sm-10">
+                            <input type="time" class="form-control" name="workshop_time" id="id_workshop_time">
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-12">
+                        <div class="form-group row">
+                          <label class="col-sm-2 col-form-label">Location</label>
+                          <div class="col-sm-10">
+                            {% bootstrap_field form.location show_label=False %}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-12">
+                        <div class="form-group row">
+                          <label class="col-sm-2 col-form-label">Extra Information</label>
+                          <div class="col-sm-10">
+                            {% bootstrap_field form.extra_information show_label=False %}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-12">
+                        <div class="form-group row">
+                          <label class="col-sm-2 col-form-label">Published</label>
+                          <div class="col-sm-10">
+                            {% bootstrap_field form.published show_label=False %}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                      <div class="col-md-12">
+                        <div class="form-group row">
+                          <label class="col-sm-2 col-form-label">Faculties</label>
+                          <div class="col-sm-10">
+                            <select class="js-example-basic-multiple w-100" multiple="multiple" name="faculties[]" required>
+                              {% for faculty in faculties %}
+                                <option value="{{faculty.id}}">{{faculty.faculty}}</option>
+                              {% endfor %}
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-12">
+                        <div class="form-group row">
+                          <label class="col-sm-2 col-form-label">Campus</label>
+                          <div class="col-sm-10">
+                            <select name="campus" id="id_campus" class="form-control">
+                              {% for c in campuses %}
+                                <option value="{{ c.id }}">{{ c.campus }}</option>
+                              {% endfor %}
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary mr-2">Submit</button>
+                    <button class="btn btn-warning">Cancel</button>
+                  </form>
+                </div>
+              </div>
+            </div>
+
+{% endblock %}

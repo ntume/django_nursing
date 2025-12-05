@@ -1,0 +1,138 @@
+{% extends 'base_tpl.html' %}
+
+{% block breadcrumb-content %}
+    <nav aria-label="breadcrumb" class="-intro-x mr-auto hidden sm:flex">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'administration:dashboard_lecturer' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'college:lecturer_learning_programme_cohorts' learning_programme.id %}">{{ learning_programme.programme_code }} Cohorts</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'college:lecturer_learning_programme_cohort_registration_periods' learning_programme_cohort.id %}">{{ learning_programme_cohort.title }} Registrations</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'college:lecturer_procedure_list' learning_programme_cohort_period.id %}">Procedures</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ procedure.procedure.task }} Assessment Attendance</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block main-content %}
+
+{% include 'messages.html' %}
+
+    <div class="intro-y flex flex-col sm:flex-row items-center mt-8">
+        <h2 class="text-lg font-medium mr-auto">
+            {{ procedure.procedure.task }} Attendance 
+        </h2>
+    </div>
+    <form method = "POST" action="{% url 'students:lecturer_learning_programme_cohort_procedure_student_assessment_attendance_save' learning_programme_cohort_period.id %}" name="frmnotify" class="mt-5">
+
+        {% csrf_token %}
+        <div class="intro-y flex flex-col sm:flex-row items-center mt-8">
+            <div class="w-full sm:w-auto flex mt-4 sm:mt-0">
+                
+                    
+                    <div class="intro-y col-span-12 overflow-auto lg:overflow-visible">
+                        <div class="grid grid-cols-3 gap-4">
+                                                                                
+                            <div>
+                                <label for="id_admin" class="form-label w-48">Start Time</label>
+                                <select name='start' id="start"  class='tom-select' required>
+                                    <option></option>
+                                    {% for time_choice in time_choices %}
+                                        <option value="{{ time_choice }}">{{ time_choice }}</option>                                                   
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div>
+                                <label for="id_admin" class="form-label w-48">End Time</label>
+                                <select name='end' id="end"  class='tom-select' required>
+                                    <option></option>
+                                    {% for time_choice in time_choices %}
+                                        <option value="{{ time_choice }}">{{ time_choice }}</option>                                                   
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>  
+                    </div>  
+                
+            </div>
+        </div>
+        <div class="intro-y flex flex-col sm:flex-row items-center mt-8">
+            <div class="w-full sm:w-auto flex mt-4 sm:mt-0">
+                
+                    <div class="intro-y col-span-12 overflow-auto lg:overflow-visible">
+                        <div class="grid grid-cols-3 gap-4">
+                            <div>
+                                <label for="id_admin" class="form-label w-32">Date</label>
+                                <input type='date' name='date' required class='form-control'>
+                            </div>
+                            
+                            <div>                       
+                                <button type="submit" class="btn btn-primary w-48 text-white mt-6">Add Procedure</button>
+                            </div>
+                        </div>  
+                    </div>  
+
+            </div>
+        </div>
+
+    </form>
+
+    <div class="intro-y p-5 mt-5">
+        
+        <div class="overflow-x-auto">
+            <table class="table table-report -mt-2">
+                <thead>
+                    <tr>
+                        <th class="whitespace-nowrap">#</th>                  
+                        <th class="whitespace-nowrap">Date</th>
+                        <th class="whitespace-nowrap">Start Time</th>                    
+                        <th class="whitespace-nowrap">End time</th>
+                        <th class="whitespace-nowrap">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for l in students %}
+                    <tr class="intro-x">
+                        <td class="w-40">
+                            {{ forloop.counter }}
+                        </td>
+                        <td>
+                            {{ l.student_learning_programme__student__student_number }}
+                        </td>
+                        <td>
+                            {{ l.student_learning_programme__student__first_name }} {{ l.student_learning_programme__student__last_name }}
+                        </td>
+                        <td>
+                            {{ l.student_learning_programme__student__email }}
+                        </td>
+                        <td>
+                            {{ l.student_learning_programme__student__cellphone }}
+                        </td> 
+                    </tr>
+                    {% empty %}
+                    <tr class="intro-x"><td colspan='5'>Nothing added yet</td></tr>
+                    {% endfor %}
+                    
+                <tbody>
+            </table>
+        </div>
+    </div>
+</form>
+{% endblock %}
+
+
+{% block js-content %}
+
+<script type="text/javascript">
+    
+    function checkall(source){
+        var loop = document.frmnotify.userscustomLoop.value;
+        
+        checkboxes = document.getElementsByName('students_selected[]');
+        for(var i=0, n=checkboxes.length;i<n;i++) {
+            checkboxes[i].checked = source.checked;
+        }
+
+      }
+
+</script>
+
+{% endblock %}

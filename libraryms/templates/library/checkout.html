@@ -1,0 +1,194 @@
+{% extends 'base_tpl.html' %}
+
+{% block breadcrumb-content %}
+    <nav aria-label="breadcrumb" class="-intro-x mr-auto hidden sm:flex">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'administration:dashboard_librarian' %}">Dashboard</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Books - Checked Out</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block main-content %}
+
+{% include 'messages.html' %}
+
+
+    <div class="intro-y flex flex-col sm:flex-row items-center mt-8">
+        <h2 class="text-lg font-medium mr-auto">
+            Books - Checked Out List
+        </h2>
+        
+    </div>
+
+    <div class="intro-y col-span-12 lg:col-span-12 mt-5">
+        <!-- BEGIN: Form Layout -->
+        <div class="intro-y box p-5">
+            <form action="{% url 'library:check_out_list_filter' %}" method="POST">
+                {% csrf_token %}
+                <div class="grid grid-cols-4 gap-2">
+                    
+                    <div>
+                        <select data-placeholder="Select Status" class="tom-select w-full" id="crud-form-2" name="status">
+                            <option value="0">Select Status</option>
+                            <option value="Checked Out">Checked Out</option>
+                            <option value="Returned">Returned</option>
+                            <option value="Over Due">Over Due</option>                           
+                        </select>
+                    </div>
+                    <div><input id="title" name="title" type="text" class="form-control" placeholder="Book Title"></div>
+                    <div><input id="name" name="name" type="text" class="form-control" placeholder="Patron's Name"></div>
+                    <div class="">
+                        <button type="submit" class="btn btn-success w-24 text-white"><i data-lucide="filter" class="w-4 h-4 mr-2"></i>Filter</button>
+                    </div>
+                </div>         
+                
+            </form>
+                    
+                
+            
+        </div>
+        <!-- END: Form Layout -->
+    </div>
+
+    <div class="intro-y p-5 mt-5">
+        
+        <div class="overflow-x-auto">
+            <table class="table table-report -mt-2">
+                <thead>
+                    <tr>
+                        <th class="whitespace-nowrap">#</th>     
+                        <th class="whitespace-nowrap">Thumbnail</th>                
+                        <th class="whitespace-nowrap">Title</th>
+                        <th class="whitespace-nowrap">Patron</th>
+                        <th class="whitespace-nowrap">Email</th>
+                        <th class="whitespace-nowrap">Status</th>
+                        <th class="whitespace-nowrap">Checkout Date </th>
+                        <th class="whitespace-nowrap">Due Date</th>
+                        <th class="whitespace-nowrap">Return Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in items %}
+                    <tr class="intro-x">
+                        <td>
+                            {{ forloop.counter }}
+                        </td>
+                        <td >
+                            {% if r.book_copy.book.thumbnail %}
+                                <img alt="AHC SIMS" src="{{ r.book_copy.book.thumbnail.url }}" data-action="zoom" class="w-full rounded-md">
+                            {% endif %}
+                        </td>  
+                        <td>{{ r.book_copy.book.title }}</td>                                            
+                        <td>
+                            {{ r.user.first_name }} {{ r.user.last_name }}
+                        </td>
+                        <td>
+                            {{ r.user.email }} 
+                        </td>
+                        <td>
+                            {{ r.status }} 
+                        </td>
+                        <td>
+                            {{ r.checkout_date }} 
+                        </td>
+                        <td>
+                            {{ r.due_date }} 
+                        </td>
+                        <td>
+                            {{ r.return_date }} <br>
+                            {% if r.status != "Returned" %}
+                                <a href="javascript:;" data-tw-toggle="modal" data-tw-target="#return-modal_{{ r.id }}" class="btn btn-pending mr-1 mb-2"> <i data-lucide="download" class="w-5 h-5"></i> </a> 
+                                <div id="return-modal_{{ r.id }}" class="modal" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-body p-0">
+                                                <form action="{% url 'library:check_out_returned' r.id %}" method="POST">
+                                                    {% csrf_token %}
+                                                    <div class="p-5 text-center">
+                                                        <i data-lucide="x-circle" class="w-16 h-16 text-pending mx-auto mt-3"></i> 
+                                                        <div class="text-3xl mt-5">Book Returned?</div>
+                                                        <div class="text-slate-500 mt-2">
+                                                            Do you really want to mark this book as returned? 
+                                                            <br>
+                                                            This process cannot be undone.
+                                                        </div>
+                                                        <div class="col-span-12 sm:col-span-12 mt-10"> 
+                                                            <label for="modal-form-1" class="form-label">Return date</label> 
+                                                            <input id="return_date" name='return_date' type="date" class="form-control" value="{{ today|date:'Y-m-d' }}" required> 
+                                                        </div>
+                                                    </div>
+                                                    <div class="px-5 pb-8 text-center">
+                                                        <button type="button" data-tw-dismiss="modal" class="btn btn-outline-secondary w-24 mr-1">Cancel</button>
+                                                        <button type="submit" class="btn btn-pending w-48">Mark as Returned</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </td>
+                     
+                    </tr>
+                    {% empty %}
+                    <tr class="intro-x"><td colspan='9'>Nothing added yet</td></tr>
+                    {% endfor %}
+                    
+                <tbody>
+            </table>
+        </div>
+
+        <!-- BEGIN: Pagination -->
+    <div class="intro-y col-span-12 overflow-x-auto scrollbar-hidden items-center">
+        <nav class="w-full sm:w-auto sm:mr-auto">
+            {% if is_paginated %}
+                <ul class="pagination">
+                    <li class="page-item"><a class="page-link" href="#"> <i class="w-4 h-4" data-lucide="chevrons-left"></i> </a></li>
+                    {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}"> <i class="w-4 h-4" data-lucide="chevron-left"></i> </a>
+                        </li>
+                    {% endif %}
+                    {% for i in paginator.page_range %}
+                        {% if page_obj.number == i %}
+                        <li class="active page-item"> <a class="page-link" href="#">{{ i }}</a> </li>
+                        {% else %}
+                        <li class="active page-item"> <a href="?page={{ i }}" class="page-link">{{ i }}</a> </li>
+                        {% endif %}
+                    {% endfor %}
+                    {% if page_obj.has_next %}               
+                        <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}"> <i class="w-4 h-4" data-lucide="chevron-right"></i> </a></li>
+                    {% endif %}
+                </ul>
+            {% endif %}           
+        </nav>  
+        
+        <nav class="w-full sm:w-auto sm:mr-auto">
+            {% if items.has_other_pages %}
+                <ul class="pagination">
+                    {% if items.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ items.previous_page_number }}&pk={{period.id}}&filter={{filter}}"> <i class="w-4 h-4" data-lucide="chevron-left"></i> </a>
+                        </li>
+                  
+                    {% endif %}
+                    {% for i in items.paginator.page_range %}
+                        {% if items.number == i %}
+                        <li class="active page-item"> <a class="page-link" href="#">{{ i }}</a> </li>
+                        {% else %}
+                        <li class="page-item"> <a href="?page={{ i }}&pk={{ period.id }}&filter={{filter}}" class="page-link">{{ i }}</a> </li>
+                        {% endif %}
+                    {% endfor %}
+                    {% if items.has_next %}               
+                        <li class="page-item"><a class="page-link" href="?page={{ items.next_page_number }}&pk={{period.id}}&filter={{filter}}"> <i class="w-4 h-4" data-lucide="chevron-right"></i> </a></li>
+                   
+                    {% endif %}
+                </ul>
+            {% endif %}           
+        </nav>
+    </div>
+    <!-- END: Pagination -->
+    </div>
+
+{% endblock %}

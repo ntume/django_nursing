@@ -1,0 +1,64 @@
+{% extends 'base_tpl.html' %}
+
+
+{% block breadcrumb-content %}
+    <nav aria-label="breadcrumb" class="-intro-x mr-auto hidden sm:flex">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'administration:dashboard_lecturer' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'college:lecturer_learning_programme_cohorts' period.learning_programme_cohort.learning_programme.id %}">{{ period.learning_programme_cohort.learning_programme.programme_code }} Cohorts</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'college:lecturer_education_plans' period.id %}">Educational Plans</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Educational Plan Weeks</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block main-content %}
+
+{% include 'messages.html' %}
+
+
+    <div class="intro-y flex flex-col sm:flex-row items-center mt-8">
+        <h2 class="text-lg font-medium mr-auto">
+            {{ section.education_plan_year.year }} {{ section.section }} Weeks
+        </h2>
+     
+        
+    </div>
+
+    <div class="intro-y box p-5 mt-5">
+        
+        <div class="overflow-x-auto">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th class="whitespace-nowrap">Week Number</th>
+                        <th class="whitespace-nowrap">Academic Week</th>
+                        <th class="whitespace-nowrap">Start Week</th>
+                        <th class="whitespace-nowrap">End Week</th>
+                        <th class="whitespace-nowrap">Programme Block Code</th>
+                        <th class="whitespace-nowrap">Facility Type</th>
+                        <th class="whitespace-nowrap">Time Period</th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in items %}
+                        <tr>
+                            <td>{{ r.week_number }}</td>
+                            <td>{{ r.academic_week_number }}</td>
+                            <td>{{ r.start_of_week }}</td>
+                            <td>{{ r.end_of_week }}</td>  
+                            <td>{{ r.block.block_code }}</td>
+                            <td>{{ r.facility_type }}</td>
+                            <td>{{ r.time_period }}</td>    
+                                              
+                        </tr>
+                    {% empty %}
+                    <tr><td colspan = '7'>No weeks added</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+{% endblock %}

@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block main-content %}
+{% include 'messages.html' %}
+<div class="row">
+
+    <div class="col-md-6 grid-margin grid-margin-md-0 stretch-card">
+  		<div class="card">
+  			<div class="card-body text-center">
+  				<div>
+  					<h4>{{event.title}}</h4>
+  					<p class="text-muted mb-0">{{event.type}}</p>
+  				</div>
+  				<p class="mt-2 card-text">
+  						{{event.description}}
+  				</p>
+          {% if past_events == False %}
+  				    <a id="{{event.id}}" onclick="rsvp({{event.id}},{{MENU_DESIGNATION.student.id}})" class="btn {%if event.rsvp%}btn-warning{%else%}btn-info{%endif%} btn-sm mt-3 mb-4">{%if event.rsvp%}Remove RSVP{%else%}RSVP{%endif%}</a>
+          {% else %}
+              <a class="btn btn-secondary btn-sm mt-3 mb-4" data-toggle="tooltip" data-placement="bottom" title="You cannot RSVP to a past Event">{%if event.rsvp%}Remove RSVP{%else%}RSVP{%endif%}</a>
+          {% endif %}
+  				<div class="border-top pt-3">
+  					<div class="row">
+  						<div class="col-4">
+  							<h6>{{event.event_date}}</h6>
+  							<p>Date</p>
+  						</div>
+  						<div class="col-4">
+  							<h6>{{event.event_time}}</h6>
+  							<p>Time</p>
+  						</div>
+  						<div class="col-4">
+  							<h6>{{event.registration}}</h6>
+  							<p>Registration</p>
+  						</div>
+  					</div>
+  				</div>
+          <div class="border-top pt-3">
+  					<div class="row">
+  						<p>{{event.location}}</p>
+  					</div>
+  				</div>
+          <div class="border-top pt-3">
+  					<div class="row">
+  						<p>{{event.extra_information}}</p>
+  					</div>
+  				</div>
+  			</div>
+  		</div>
+  	</div>
+
+    <div class="col-md-6 grid-margin grid-margin-md-0 stretch-card">
+  		<div class="card">
+  			<div class="card-body text-center">
+  				<div>
+  					<h4>Recruitment Program Media</h4>
+
+  				</div>
+
+
+  				<div class="border-top pt-3">
+  					<div class="row">
+
+              <div id="lightgallery" class="row lightGallery">
+                {% for media in event.media_files.all %}
+                  {% if media.type == 'image' %}
+                  <div id="open_image_{{ media.id }}" class="">
+                        <a href="{{ media.image.url }}" class="image-tile"><img src="{{ media.image.url }}" alt="{{ media.title }}" width='150' height='100'></a>
+                  </div>
+                  {% endif %}
+                {% endfor %}
+              </div>
+  					</div>
+  				</div>
+          <div class="border-top pt-3">
+  					<div class="row">
+              <div id="video-gallery" class="row lightGallery">
+                {% for media in event.media_files.all %}
+                  {% if media.type == 'Video Link' %}
+                  <video width="220" height="140" controls>
+                      <source src="{{ media.file.url }}" type="video/mp4">
+                      Your browser does not support the video tag.
+                  </video>
+                  {% endif %}
+                {% endfor %}
+              </div>
+  					</div>
+  				</div>
+          <div class="border-top pt-3">
+  					<div class="row">
+              <div id="video-gallery" class="row lightGallery">
+                {% for media in event.media_files.all %}
+                  {% if media.type == 'PDF file' %}
+                  <a data-iframe="true" id="open-pdf_{{ media.id }}" data-src="{{ media.file.url }}"><i class="fa fa-file-pdf-o icon-lg text-primary"></i></a>
+                  {% endif %}
+                {% endfor %}
+              </div>
+  					</div>
+  				</div>
+          <div class="border-top pt-3">
+  					<div class="row">
+
+  					</div>
+  				</div>
+  			</div>
+  		</div>
+  	</div>
+
+</div>
+
+{% endblock %}
+
+{% block js-content %}
+
+<script type="text/javascript">
+    $(document).ready(function(){
+      {% for media in event.media_files.all %}
+        {% if media.type == 'PDF file' %}
+            $('#open-pdf_{{ media.id }}').lightGallery({
+              selector: 'this'
+            });
+        {% elif media.type == "image" %}
+            $('#open_image_{{ media.id }}').lightGallery();
+        {% endif %}
+      {% endfor %}
+    });
+</script>
+
+
+
+{% endblock %}

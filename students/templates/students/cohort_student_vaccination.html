@@ -1,0 +1,281 @@
+{% extends 'base_tpl.html' %}
+
+{% block breadcrumb-content %}
+    <nav aria-label="breadcrumb" class="-intro-x mr-auto hidden sm:flex">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'administration:dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'college:learning_programme_cohorts' learning_programme.id %}">{{ learning_programme.programme_code }} Cohorts</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'students:cohort_learners' learning_programme_cohort.id %}">{{ learning_programme.programme_code }} Cohort Students</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ student.student.first_name }} {{ student.student.last_name }} Vaccinations</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block main-content %}
+
+{% include 'messages.html' %}
+
+
+    <div class="intro-y flex flex-col sm:flex-row items-center mt-8">
+        <h2 class="text-lg font-medium mr-auto">
+            {{ student.student.first_name }} {{ student.student.last_name }} Vaccinations
+        </h2>
+        <div class="w-full sm:w-auto flex mt-4 sm:mt-0">
+            
+            <button data-tw-toggle="modal" data-tw-target="#add-modal"  class="btn btn-primary shadow-md mr-2">Add Vaccination</button>
+
+            <div id="add-modal" class="modal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-xl">
+                    <div class="modal-content">
+                        <form action="{% url 'students:add_learner_programme_cohort_student_vaccination' student.id %}" method="POST"  onsubmit="addButton.disabled = true;addButton.innerHTML ='Adding...'; return true;">
+                            {% csrf_token %}
+                            <!-- BEGIN: Modal Header -->
+                            <div class="modal-header">
+                                <h2 class="font-medium text-base mr-auto">Add Vaccination</h2>                                             
+                            </div> <!-- END: Modal Header -->
+                            <!-- BEGIN: Modal Body -->
+                            <div class="modal-body">
+                                
+                                <div class="form-inline col-span-12 sm:col-span-12 mt-5">
+                                    <label for="id_first_name" class="form-label w-48">Vaccination Dose*</label>
+                                    <select name='vaccine' id="vaccine" class="form-control" required>
+                                        <option></option>
+                                        {% for dose in doses %}
+                                            <option value="{{ dose.id }}">{{ dose.dose }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="form-inline col-span-12 sm:col-span-12 mt-5">
+                                    <label for="id_last_name" class="form-label w-48">Batch Number*</label>
+                                    <input name='batch_number' id="batch_number" type="text" class="form-control" placeholder="Batch Number" maxlength="30" required>
+                                </div> 
+                                <div class="form-inline col-span-12 sm:col-span-12 mt-5">
+                                    <label for="id_email" class="form-label w-48">Expiry Date*</label>
+                                    <input name='expiry_date' id="expiry_date" type="date" class="form-control" placeholder="Expiry Date" required>
+                                </div> 
+                                <div class="form-inline col-span-12 sm:col-span-12 mt-5">
+                                    <label for="id_date_learner_entered" class="form-label w-48">Vaccination Date*</label>
+                                    <input name='administration_date' id="administration_date" type="date" class="form-control"  placeholder="Administration Date" required>
+                                </div> 
+                                
+                                <div class="form-inline col-span-12 sm:col-span-12 mt-5">
+                                    <label for="id_last_name" class="form-label w-48">Injection Site*</label>
+                                    <select name='administration_site' id="administration_site" class="form-control" required>
+                                        <option></option>
+                                        <option value = 'Left Upper Arm'>Left Upper Arm</option>
+                                        <option value = 'Right Upper Arm'>Right Upper Arm</option>
+                                    </select>
+                                </div>
+                                <div class="form-inline col-span-12 sm:col-span-12 mt-5">
+                                    <label for="id_last_name" class="form-label w-48">Administered By*</label>
+                                    <select name='administered_by' id="administered_by" class="form-control" required>
+                                        <option></option>
+                                        {% for staff in staffs %}
+                                            <option value="{{ staff.id }}">{{ staff.first_name }} {{ staff.last_name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="form-inline col-span-12 sm:col-span-12 mt-5">
+                                    <label for="id_date_learner_entered" class="form-label w-48">Next Dose Date</label>
+                                    <input name='next_dose_date' id="next_dose_date" type="date" class="form-control"  placeholder="Next Dose Date">
+                                </div> 
+                                                         
+                            </div> <!-- END: Modal Body -->
+                            <!-- BEGIN: Modal Footer -->
+                            <div class="modal-footer"> 
+                                <button type="button" data-tw-dismiss="modal" class="btn btn-outline-secondary w-20 mr-1">Cancel</button> 
+                                <button  name="addButton" type="submit" class="btn btn-primary w-60">Add Vaccination</button> 
+                            </div> <!-- END: Modal Footer -->
+                        </form>
+                    </div>
+                </div>
+            </div> 
+
+        </div>
+    </div>
+
+    <div class="intro-y p-5 mt-5">
+        
+        <div class="overflow-x-auto">
+            <table class="table table-report -mt-2">
+                <thead>
+                    <tr>
+                        <th class="whitespace-nowrap">Vaccince Dose</th>
+                        <th class="whitespace-nowrap">Batch Number</th>                    
+                        <th class="whitespace-nowrap">Expiry Date</th>
+                        <th class="whitespace-nowrap">Administration Date</th>
+                        <th class="whitespace-nowrap">Administration Site</th>
+                        <th class="whitespace-nowrap">Administered By</th>
+                        <th class="whitespace-nowrap">Next Dose</th>
+                        <th class="whitespace-nowrap">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for l in vaccines %}
+                    <tr class="intro-x">
+                      
+                        <td>
+                            {{ l.vaccine.dose }}
+                        </td>
+                        <td>
+                            {{ l.batch_number }}
+                        </td>
+                        <td>
+                            {{ l.expiry_date }}
+                        </td>
+                        <td>
+                            {{ l.administration_date }}
+                        </td>                    
+                        <td>
+                            {{ l.administration_site }}
+                        </td>
+                        <td>
+                            {{ l.administered_by.first_name }} {{ l.administered_by.last_name }}
+                        </td>  
+                        <td>
+                            {{ l.next_dose_date }}
+                        </td>                    
+                        <td class="table-report__action">
+                           
+                            <div class="flex justify-center items-center">
+                                <div class="dropdown">
+                                    <button class="dropdown-toggle btn px-2 btn-warning" aria-expanded="false" data-tw-toggle="dropdown">
+                                        <span class="w-5 h-5 flex items-center justify-center text-white"> <i class="w-4 h-4" data-lucide="arrow-down"></i> </span>
+                                    </button>
+                                    <div class="dropdown-menu w-64">
+                                        <ul class="dropdown-content">                                                                                        
+                                            <li>
+                                                <a href="javascript:;" data-tw-toggle="modal" data-tw-target="#edit-confirmation-modal_{{ l.id }}" class="dropdown-item tooltip" title="Edit"><i data-lucide="edit" class="w-4 h-4 mr-2"></i> Edit</a>
+                                            </li>
+                                            <li>
+                                                <a href="javascript:;" data-tw-toggle="modal" data-tw-target="#delete-confirmation-modal_{{ l.id }}" class="dropdown-item tooltip" title="Delete"><i data-lucide="trash-2" class="w-4 h-4 mr-2"></i> Delete</a>
+                                            </li>
+
+                                            <div id="edit-confirmation-modal_{{ l.id }}" class="modal" tabindex="-1" aria-hidden="true">
+                                                <div class="modal-dialog">
+                                                    <div class="modal-content">
+                                                        <form action="{% url 'students:edit_learner_programme_cohort_student_vaccination' student.id l.id %}" method="POST">
+                                                            {% csrf_token %}
+                                                            <!-- BEGIN: Modal Header -->
+                                                            <div class="modal-header">
+                                                                <h2 class="font-medium text-base mr-auto">Edit</h2>                                             
+                                                            </div> <!-- END: Modal Header -->
+                                                            <!-- BEGIN: Modal Body -->
+                                                            <div class="modal-body grid grid-cols-12 gap-4 gap-y-3">
+                                                                <div class="form-inline col-span-12 sm:col-span-12 mt-5">
+                                                                    <label for="id_first_name" class="form-label w-48">Vaccine Dose</label>
+                                                                    <select name='vaccine' id="vaccine" class="form-control" required>
+                                                                        <option></option>
+                                                                        {% for dose in doses %}
+                                                                            {% if dose.id == l.vaccine_id %}
+                                                                                <option value="{{ dose.id }}" selected>{{ dose.dose }}</option>
+                                                                            {% else %}
+                                                                                <option value="{{ dose.id }}">{{ dose.dose }}</option>
+                                                                            {% endif %}                                                                            
+                                                                        {% endfor %}
+                                                                    </select>
+                                                                </div>
+                                                                <div class="form-inline col-span-12 sm:col-span-12 mt-5">
+                                                                    <label for="id_last_name" class="form-label w-48">Batch Number</label>
+                                                                    <input name='batch_number' id="batch_number" type="text" class="form-control" value="{{ l.batch_number }}" maxlength="30" required>
+                                                                </div> 
+                                                                <div class="form-inline col-span-12 sm:col-span-12 mt-5">
+                                                                    <label for="id_email" class="form-label w-48">Expiry Date</label>
+                                                                    <input name='expiry_date' id="expiry_date" type="date" class="form-control" value="{{ l.expiry_date|date:'Y-m-d' }}" required>
+                                                                </div> 
+                                                                <div class="form-inline col-span-12 sm:col-span-12 mt-5">
+                                                                    <label for="id_date_learner_entered" class="form-label w-48">Vaccination Date</label>
+                                                                    <input name='administration_date' id="administration_date" type="date" class="form-control"  value="{{ l.administration_date|date:'Y-m-d' }}" required>
+                                                                </div>                                                                
+                                                                <div class="form-inline col-span-12 sm:col-span-12 mt-5">
+                                                                    <label for="id_last_name" class="form-label w-48">Injection Site</label>
+                                                                    <select name='administration_site' id="administration_site" class="form-control" required>
+                                                                        <option></option>
+                                                                        {% if l.administration_site == 'Left Upper Arm' %}
+                                                                            <option value = 'Left Upper Arm' selected>Left Upper Arm</option>
+                                                                            <option value = 'Right Upper Arm'>Right Upper Arm</option>
+                                                                        {% elif l.administration_site == 'Right Upper Arm' %}
+                                                                            <option value = 'Left Upper Arm'>Left Upper Arm</option>
+                                                                            <option value = 'Right Upper Arm' selected>Right Upper Arm</option>
+                                                                        {% else %}
+                                                                            <option value = 'Left Upper Arm'>Left Upper Arm</option>
+                                                                            <option value = 'Right Upper Arm'>Right Upper Arm</option>
+                                                                        {% endif %}
+                                                                        
+                                                                    </select>
+                                                                </div>
+                                                                <div class="form-inline col-span-12 sm:col-span-12 mt-5">
+                                                                    <label for="id_last_name" class="form-label w-48">Administered By</label>
+                                                                    <select name='administered_by' id="administered_by" class="form-control" required>
+                                                                        <option></option>
+                                                                        {% for staff in staffs %}
+                                                                            {% if l.administered_by == staff %}
+                                                                                <option value="{{ staff.id }}" selected>{{ staff.first_name }} {{ staff.last_name }}</option>
+                                                                            {% else %}
+                                                                                <option value="{{ staff.id }}">{{ staff.first_name }} {{ staff.last_name }}</option>
+                                                                            {% endif %}                                                                            
+                                                                        {% endfor %}
+                                                                    </select>
+                                                                </div>
+                                                                <div class="form-inline col-span-12 sm:col-span-12 mt-5">
+                                                                    <label for="id_date_learner_entered" class="form-label w-48">Next Dose Date</label>
+                                                                    <input name='next_dose_date' id="next_dose_date" type="date" class="form-control"  value="{{ l.next_dose_date|date:'Y-m-d' }}">
+                                                                </div>                                   
+                                                            </div> <!-- END: Modal Body -->
+                                                            <!-- BEGIN: Modal Footer -->
+                                                            <div class="modal-footer"> 
+                                                                <button type="button" data-tw-dismiss="modal" class="btn btn-outline-secondary w-20 mr-1">Cancel</button> 
+                                                                <button type="submit" class="btn btn-primary w-40">Edit</button> 
+                                                            </div> <!-- END: Modal Footer -->
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div id="delete-confirmation-modal_{{ l.id }}" class="modal" tabindex="-1" aria-hidden="true">
+                                                <div class="modal-dialog">
+                                                    <div class="modal-content">
+                                                        <div class="modal-body p-0">
+                                                            <form action="{% url 'students:delete_learner_programme_cohort_student_vaccination' student.id l.id %}" method="POST">
+                                                                {% csrf_token %}
+                                                                <div class="p-5 text-center">
+                                                                    <i data-lucide="x-circle" class="w-16 h-16 text-danger mx-auto mt-3"></i> 
+                                                                    <div class="text-3xl mt-5">Delete Dose?</div>
+                                                                    <div class="text-slate-500 mt-2">
+                                                                        Do you really want to delete this Dose?
+                                                                    </div>                                                                    
+                                                                </div>
+                                                                <div class="px-5 pb-8 text-center">
+                                                                    <button type="button" data-tw-dismiss="modal" class="btn btn-outline-secondary w-24 mr-1">Cancel</button>
+                                                                    <button type="submit" class="btn btn-danger w-24">Delete</button>
+                                                                </div>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>   
+                                        </ul>
+                                    </div>
+                                </div>        
+                            </div>
+                            
+                        </td>
+                    </tr>
+                    {% empty %}
+                        <tr class="intro-x"><td colspan="9">Nothing added yet</td></tr>
+                    {% endfor %}
+                    
+                <tbody>
+            </table>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block js-content %}
+
+<script type="text/javascript">
+    
+</script>
+
+{% endblock %}

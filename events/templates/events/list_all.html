@@ -1,0 +1,348 @@
+{% extends 'base_vertical.html' %}
+{% load bootstrap3 %}
+{% block main-content %}
+
+<div class="row">
+  <div class="col-md-12 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          <nav aria-label="breadcrumb">
+              <ol class="breadcrumb bg-inverse-info">
+                {%  if user.is_authenticated and user.roles_id == 2  %}
+                  <li class="breadcrumb-item"><a href="{% url 'wil:dashboard' %}">Dashboard</a></li>
+                  <li class="breadcrumb-item active" aria-current="page"><a>Recruitment Programs</a></li>
+                {% elif user.is_authenticated and user.roles_id == 10 or user.is_authenticated and user.roles_id == 11 or user.is_authenticated and user.roles_id == 9 %}
+                  <li class="breadcrumb-item"><a href="{% url 'psycad:dashboard' %}">Dashboard</a></li>
+                  <li class="breadcrumb-item active" aria-current="page"><a>Recruitment Programs</a></li>
+                {% endif %}
+              </ol>
+            </nav>
+
+            {% include 'messages.html' %}
+
+        </div>
+      </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-lg-12 grid-margin stretch-card">
+              <div class="card">
+                <div class="card-body">
+                  <h4 class="card-title">List of Recruitment Programs</h4>
+                  <p class="card-description">
+                    <div class="row">
+                      <div class="col-md-10">
+                          <p>To publish or unpublish, look at the thumb up or down in the 'Published Column'</p>
+                      </div>
+                      <div class="col-md-2 pull-right">
+                        <ul class="navbar-nav mr-lg-2">
+                          <li class="nav-item nav-search d-none d-lg-block">
+                            <div class="input-group">
+                                <div class="form-group">
+                                  <div class="input-group">
+                                    <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Select View</button>
+                                      <div class="dropdown-menu">
+                                        <a class="dropdown-item" href="{% url 'psycad:view_events_as' 'student' %}" target="_blank" style="target-new: tab;">Student View</a>
+                                        <a class="dropdown-item" href="{% url 'psycad:view_events_as' 'company_contact' %}" target="_blank" style="target-new: tab;">Company Contact View</a>
+                                      </div>
+                                  </div>
+                                </div>
+                            </div>
+                          </li>
+                        </ul>
+                      </div>
+
+                  </p>
+                  <div class="table-responsive">
+                    <table class="table table-striped table-bordered">
+                      <thead>
+                        <tr>
+                          <th>Type</th>
+                          <th>Details</th>
+                          <th>Faculty</th>
+                          <th>Invitees</th>
+                          <th>Published</th>
+                          <th>File</th>
+                          <th>Students</th>
+                          <th>Companies</th>
+                          <th>Virtual Space</th>
+                          <th>Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for event in events %}
+                            <tr>
+                              <td class="py-1">{{event.type.type}}</td>
+                              <td>{{event.title}}<br><br><b>Date:</b> {{event.event_date}} to {{event.event_date_end}}<br> <b>Time: </b> {{event.event_time}} - {{event.event_time_end}}<br><br><b>Location:</b> {{ event.location }}</td>
+                              <td>{{event.faculty.faculty}}
+                                  {% for faculty in event.faculties.all %}
+                                    <a href="{% url 'psycad:event_remove_faculty' event.id faculty.id %}" data-toggle="tooltip" data-placement="bottom" title="Click to remove"><div class="badge badge-primary badge-pill">{{ faculty.faculty }}</div></a><br><br>
+                                  {% empty %}
+                                    No faculties added yet
+                                  {% endfor %}
+                                  <br>
+                                  <button class="btn btn-inverse-primary btn-rounded btn-icon" data-toggle="modal" data-target="#faculty{{ event.id }}"><i class="fa fa-plus-circle"></i></button>
+
+                                  <div class="modal fade" id="faculty{{ event.id }}" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog" role="document">
+                                      <div class="modal-content">
+                                        <div class="modal-header">
+                                          <h5 class="modal-title" id="ModalLabel">Add Faculty to Recruitment Program: {{event.title}}</h5>
+                                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                          </button>
+                                        </div>
+                                        <form action="{% url 'psycad:event_add_faculty' event.id %}" method="POST">
+                                          {% csrf_token %}
+                                        <div class="modal-body">
+                                          <div class="form-group">
+                                            <label for="date_visit">Faculty</label>
+                                            <select name="faculty" id="id_faculty" class="form-control">
+                                                {% for faculty in faculties %}
+                                                  <option value="{{ faculty.id }}">{{ faculty.faculty }}</option>
+                                                {% endfor %}
+                                            </select>
+                                          </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                          <button type="submit" class="btn btn-success">Add Faculty</button>
+                                          <button type="button" class="btn btn-light" data-dismiss="modal">Close</button>
+                                        </div>
+                                        </form>
+                                      </div>
+                                    </div>
+                                  </div>
+                              </td>
+                              <td>
+                                  {% if event.invitees == '1' %}
+                                    <div class="badge badge-primary badge-pill">Students Only</div>
+                                  {% elif event.invitees == '2' %}
+                                    <div class="badge badge-primary badge-pill">Company Representatives Only</div>
+                                  {% elif event.invitees == '3' %}
+                                    <div class="badge badge-primary badge-pill">Both Students and Company Representatives</div>
+                                  {% endif %}
+                              </td>
+                              <td>
+                                {% if event.published == 'Yes' %}
+                                  <a href="{% url 'psycad:event_publish' event.id %}" class="btn btn-success btn-rounded btn-icon"> <br><i class="fa fa-thumbs-o-up"></i></a>
+                                {% else %}
+                                  <a href="{% url 'psycad:event_publish' event.id %}" class="btn btn-warning btn-rounded btn-icon"> <br><i class="fa fa-thumbs-o-down"></i></a>
+                                {% endif %}
+                              </td>
+                              <td>
+                                {% if event.file != '' %}
+                                  <a href="{{ event.file.url }}">Download File</a>
+                                {% endif %}
+
+                                <button type="button" class="btn btn-inverse-primary btn-rounded btn-icon" data-toggle="modal" data-target="#file{{ event.id }}" > <i class="fa fa-cloud-upload"></i> </button>
+
+                                <div class="modal fade" id="file{{ event.id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel-3" aria-hidden="true">
+                                  <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                      <div class="modal-header">
+                                        <h5 class="modal-title" id="exampleModalLabel-3">Upload Recruitment Program File: {{event.title}}</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                          <span aria-hidden="true">&times;</span>
+                                        </button>
+                                      </div>
+                                      <form action="{% url 'psycad:event_file' event.id %}" method="POST" enctype="multipart/form-data">
+                                        {% csrf_token %}
+                                      <div class="modal-body">
+                                        <div class="row">
+                                          <div class="col-md-12">
+                                            <div class="form-group row">
+                                              <div class="col-sm-12">
+                                                {% bootstrap_field form.file %}
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div class="modal-footer">
+                                        <button type="submit" class="btn btn-success">Upload</button>
+                                        <button type="button" class="btn btn-light" data-dismiss="modal">No</button>
+                                      </div>
+                                      </form>
+                                    </div>
+                                  </div>
+                                </div>
+                              </td>
+                              <td>
+                                <a href="{% url 'psycad:view_rsvps' event.id %}" class="btn btn-social-icon-text btn-facebook"><i class="ti-user"></i>{{event.rsvp_students.count}}</a>
+                              </td>
+                              <td>
+                                <a href="{% url 'psycad:view_company_rsvps' event.id %}" class="btn btn-social-icon-text btn-twitter"><i class="ti-briefcase"></i>{{event.companies.count}}</a>
+                              </td>
+                              <td>
+                                {% if event.virtual_spaces.count > 0 %}
+                                  <a href="{% url 'psycad:virtual_space_edit' event.virtual_spaces.first.id %}">{{ event.virtual_spaces.first }}</a> 
+                                {% else %}
+                                <button class="btn btn-inverse-primary btn-rounded btn-icon" data-toggle="modal" data-target="#space{{ event.id }}"><i class="fa fa-plus-circle"></i></button>
+
+                                  <div class="modal fade" id="space{{ event.id }}" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog  modal-lg" role="document">
+                                      <div class="modal-content">
+                                        <div class="modal-header">
+                                          <h5 class="modal-title" id="ModalLabel">Add a Virtual Space to: {{event.title}}</h5>
+                                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                          </button>
+                                        </div>
+                                        <form action="{% url 'psycad:event_add_virtual_space' event.id %}" method="POST">
+                                          {% csrf_token %}
+                                        <div class="modal-body">
+                                          <div class="row">
+                                            <div class="col-md-12">
+                                              <div class="form-group row">
+                                                <label class="col-sm-2 col-form-label">Title</label>
+                                                <div class="col-sm-10">
+                                                  <input type="text" name="title" id="id_title" class='form-control' value="{{ event.title }}">
+                                                </div>
+                                              </div>
+                                            </div>
+                                          </div>
+                                          <div class="row">
+                                            <div class="col-md-12">
+                                              <div class="form-group row">
+                                                <label class="col-sm-2 col-form-label">Description</label>
+                                                <div class="col-sm-10">
+                                                  <textarea name="description" id="id_description" class="form-control"></textarea>
+                                                </div>
+                                              </div>
+                                            </div>
+                                          </div>
+                                          <div class="row">
+                                            <div class="col-md-12">
+                                              <div class="form-group row">
+                                                <label class="col-sm-2 col-form-label">Who to Invite</label>
+                                                <div class="col-sm-10">
+                                                  <select name="invitees" id="id_invitees" class=form-control>
+                                                    {% if event.invitees == '1' %}
+                                                      <option value="1" selected>Students Only</option>                                                    
+                                                      <option value="2">Company Representatives Only</option>
+                                                      <option value="3">Both Students and Company Representatives</option>
+                                                    {% elif event.invitees == '2' %}
+                                                      <option value="1">Students Only</option>                                                    
+                                                      <option value="2" selected>Company Representatives Only</option>
+                                                      <option value="3">Both Students and Company Representatives</option>
+                                                    {% else %}
+                                                      <option value="1">Students Only</option>                                                    
+                                                      <option value="2">Company Representatives Only</option>
+                                                      <option value="3" selected>Both Students and Company Representatives</option>
+                                                    {% endif %}
+                                                  </select>
+                                                </div>
+                                              </div>
+                                            </div>
+                                          </div>
+                                          <div class="row">
+                                            <div class="col-md-12">
+                                              <div class="form-group row">
+                                                <label class="col-sm-2 col-form-label">Type</label>
+                                                <div class="col-sm-10">
+                                                  <select name='type' id='id_type' class='form-control'>
+                                                    {% for t in space_types %}
+                                                      <option value="{{ t.id }}">{{ t.type }}</option>
+                                                    {% endfor %}
+                                                  </select>
+                                                </div>
+                                              </div>
+                                            </div>
+                                          </div>
+
+                                          <div class="row">
+                                            <div class="col-md-12">
+                                              <div class="form-group row">
+                                                <label class="col-sm-2 col-form-label">Date</label>
+                                                <div class="col-sm-4">
+                                                  <input type="date" class="form-control" name="start_date" id="id_start_date" value="{{ event.event_date|date:'Y-m-d' }}" required>
+                                                </div>
+                                                <label class="col-sm-1 col-form-label">To</label>
+                                                <div class="col-sm-5">
+                                                  <input type="date" class="form-control" name="end_date" id="id_end_date"  value="{{ event.event_date_end|date:'Y-m-d' }}" required>
+                                                </div>
+                                              </div>
+                                            </div>
+                                          </div>
+                                          <div class="row">
+                                            <div class="col-md-12">
+                                              <div class="form-group row">
+                                                <label class="col-sm-2 col-form-label">Time</label>
+                                                <div class="col-sm-4">
+                                                  <input type="time" class="form-control" name="start_time" id="id_start_time"  value="{{ event.event_time|date:'H:i' }}" required>
+                                                </div>
+                                                <label class="col-sm-1 col-form-label">To</label>
+                                                <div class="col-sm-5">
+                                                  <input type="time" class="form-control" name="end_time" id="id_end_time"  value="{{ event.event_time_end|date:'H:i' }}" required>
+                                                </div>
+                                              </div>
+                                            </div>
+                                          </div>
+                      
+                                          <div class="row">
+                                            <div class="col-md-12">
+                                              <div class="form-group row">
+                                                <label class="col-sm-2 col-form-label">Published</label>
+                                                <div class="col-sm-10">
+                                                  <select name="published" id="id_published" class="form-control">
+                                                    <option value="Yes">Yes</option>
+                                                    <option value="No">No</option>
+                                                  </select>
+                                                </div>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                          <button type="submit" class="btn btn-success">Create Virtual Space</button>
+                                          <button type="button" class="btn btn-light" data-dismiss="modal">Close</button>
+                                        </div>
+                                        </form>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  {% endif %}
+                              </td>
+                              <td>
+
+                                    <a href="{% url 'psycad:event_edit' event.id %}" class="btn btn-info btn-rounded btn-icon"> <br><i class="fa fa-edit"></i></a>
+
+                                    <button type="button" class="btn btn-danger btn-rounded btn-icon" data-toggle="modal" data-target="#delete{{ event.id }}" > <i class="fa fa-trash-o"></i> </button>
+
+                                    <div class="modal fade" id="delete{{ event.id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel-3" aria-hidden="true">
+                                      <div class="modal-dialog" role="document">
+                                        <div class="modal-content">
+                                          <div class="modal-header">
+                                            <h5 class="modal-title" id="exampleModalLabel-3">Delete Recruitment Program: {{event.title}}</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                              <span aria-hidden="true">&times;</span>
+                                            </button>
+                                          </div>
+                                          <form action="{% url 'psycad:event_delete' event.id %}" method="POST">
+                                            {% csrf_token %}
+                                          <div class="modal-body">
+                                            <p>Are you sure you want to delete this Recruitment Program?</p>
+                                          </div>
+                                          <div class="modal-footer">
+                                            <button type="submit" class="btn btn-success">Yes</button>
+                                            <button type="button" class="btn btn-light" data-dismiss="modal">No</button>
+                                          </div>
+                                          </form>
+                                        </div>
+                                      </div>
+                                    </div>
+
+                              </td>
+                            </tr>
+                        {% empty %}
+                            <tr><td colspan="10">Sorry no Recruitment Programs added</td></tr>
+                        {% endfor %}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+</div>
+{% endblock %}

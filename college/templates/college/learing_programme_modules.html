@@ -1,0 +1,512 @@
+{% extends 'base_tpl.html' %}
+
+{% block breadcrumb-content %}
+    <nav aria-label="breadcrumb" class="-intro-x mr-auto hidden sm:flex">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'administration:dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'college:learning_programmes' %}">Learning Programmes</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ learning_programme.programme_code  }} Modules</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+
+{% block main-content %}
+
+{% include 'messages.html' %}
+
+
+    <div class="intro-y flex flex-col sm:flex-row items-center mt-8">
+        <h2 class="text-lg font-medium mr-auto">
+            {{ learning_programme.programme_name }} Modules
+        </h2>
+        <div class="w-full sm:w-auto flex mt-4 sm:mt-0">
+            <button data-tw-toggle="modal" data-tw-target="#add-modal"  class="btn btn-primary shadow-md mr-2">Add Learning Programme Module</button>
+
+            <div id="add-modal" class="modal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <form action="{% url 'college:learning_programme_module_add'  learning_programme.id %}" method="POST">
+                            {% csrf_token %}
+                            <!-- BEGIN: Modal Header -->
+                            <div class="modal-header">
+                                <h2 class="font-medium text-base mr-auto">Add Learning Programme Module</h2>                                             
+                            </div> <!-- END: Modal Header -->
+                            <!-- BEGIN: Modal Body -->
+                            <div class="modal-body grid grid-cols-12 gap-4 gap-y-3">
+                                <div class="col-span-12 sm:col-span-12"> 
+                                    <label for="modal-form-1" class="form-label">Module Name*</label> 
+                                    <input id="module_name" name='module_name' type="text" class="form-control" placeholder="Module Name" required maxlength='100'> 
+                                </div>
+                                
+                                <div class="col-span-12 sm:col-span-12"> 
+                                    <label for="modal-form-1" class="form-label">Module Code*</label> 
+                                    <input id="module_code" name='module_code' type="text" class="form-control" placeholder="Module Code" required maxlength='10'> 
+                                </div>
+
+                                <div class="col-span-12 sm:col-span-12"> 
+                                    <label for="modal-form-1" class="form-label">Type of Module*</label> 
+                                    <select name="module_type" class='form-select' required>
+                                        <option></option>
+                                        <option value="Core">Core</option>
+                                        <option value="Fundamental">Fundamental</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-span-12 sm:col-span-12"> 
+                                    <label for="modal-form-1" class="form-label">NQF Level*</label> 
+                                    <select name="nqf_level" class='form-select' required>
+                                        <option></option>
+                                        {% for nqf_level in nqf_levels %}
+                                            <option value="{{ nqf_level.id }}">{{ nqf_level.nqf_level }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                                <div class="col-span-12 sm:col-span-12"> 
+                                    <label for="modal-form-1" class="form-label">Total Credits*</label> 
+                                    <input id="credits" name='credits' type="number" class="form-control" placeholder="Credits" required min='0'> 
+                                </div>
+
+                                <div class="col-span-12 sm:col-span-12"> 
+                                    <label for="modal-form-1" class="form-label">Theory Credits*</label> 
+                                    <input id="theory_credits" name='theory_credits' type="number" class="form-control" placeholder="Theory Credits" required min='0'> 
+                                </div>
+
+                                <div class="col-span-12 sm:col-span-12"> 
+                                    <label for="modal-form-1" class="form-label">WIL Credits*</label> 
+                                    <input id="wil_credits" name='wil_credits' type="number" class="form-control" placeholder="WIL Credits" required min='0'> 
+                                </div>
+
+                                <div class="col-span-12 sm:col-span-12"> 
+                                    <label for="modal-form-1" class="form-label">Theory Hours*</label> 
+                                    <input id="theory_hours" name='theory_hours' type="number" class="form-control" placeholder="Theory Hours" required min='0'> 
+                                </div>
+
+                                <div class="col-span-12 sm:col-span-12"> 
+                                    <label for="modal-form-1" class="form-label">Wil Hours*</label> 
+                                    <input id="wil_hours" name='wil_hours' type="number" class="form-control" placeholder="Wil Hours" required min='0'> 
+                                </div>
+
+                                <div class="col-span-12 sm:col-span-12"> 
+                                    <label for="modal-form-1" class="form-label">Test Weight*</label> 
+                                    <input value='80' id="test_weight" name='test_weight' type="number" class="form-control" placeholder="Test Weight" required min='0' max='100'> 
+                                </div>
+
+                                <div class="col-span-12 sm:col-span-12"> 
+                                    <label for="modal-form-1" class="form-label">Assignments Weight*</label> 
+                                    <input value='20' id="assignment_weight" name='assignment_weight' type="number" class="form-control" placeholder="Assignment Weight" required min='0' max='100'> 
+                                </div>
+
+                                <div class="col-span-12 sm:col-span-12"> 
+                                    <label for="modal-form-1" class="form-label">Summative Entry Year Mark Minimum*</label> 
+                                    <input value='50' id="entrance_year_mark" name='entrance_year_mark' type="number" class="form-control" placeholder="Entrance Marks" required min='0' max='100'> 
+                                </div>
+
+                                <div class="col-span-12 sm:col-span-12"> 
+                                    <label for="modal-form-1" class="form-label">Summative Weight*</label> 
+                                    <input value='100' id="summative_weight" name='summative_weight' type="number" class="form-control" placeholder="Summative Weight" required min='0' max='100'> 
+                                </div>
+                                                                                           
+                            </div> <!-- END: Modal Body -->
+                            <!-- BEGIN: Modal Footer -->
+                            <div class="modal-footer"> 
+                                <button type="button" data-tw-dismiss="modal" class="btn btn-outline-secondary w-20 mr-1">Cancel</button> 
+                                <button type="submit" class="btn btn-primary w-60">Add Learning Programme Module</button> 
+                            </div> <!-- END: Modal Footer -->
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            
+        </div>
+    </div>
+
+    <div class="intro-y p-5 mt-5">
+        
+        <div class="overflow-x-auto">
+            <table class="table table-report -mt-2">
+                <thead>
+                    <tr>
+                        <th class="whitespace-nowrap">#</th>                    
+                        <th class="whitespace-nowrap">Module</th>
+                        <th class="whitespace-nowrap">Type</th>
+                        <th class="whitespace-nowrap">Credits</th>
+                        <th class="whitespace-nowrap">Hours</th>
+                        <th class="whitespace-nowrap">Study Units</th>
+                        <th class="whitespace-nowrap">Prerequisite</th>
+                        <th class="whitespace-nowrap">Formative</th>
+                        <th class="whitespace-nowrap">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in items %}
+                    <tr class="intro-x">
+                        <td>
+                            {{ forloop.counter }}
+                        </td>
+                        <td>
+                            {{ r.module_code }} {{ r.module_name }}
+                        </td>
+                        <td>
+                            {{ r.module_type }}
+                        </td>
+                        <td>
+                            Total:  {{ r.credits }}<br>
+                            Theory: {{ r.theory_credits }}<br>
+                            WIL:    {{ r.wil_credits }}
+                            
+                        </td>
+                        <td>
+                            Theory: {{ r.theory_hours }}<br>
+                            WIL:    {{ r.wil_hours }}
+                        </td>
+                        <td>
+                            <a href="{% url 'college:learning_programme_module_studyunits' r.learning_programme.id r.id %}">{{ r.study_units.count }}</a>
+                        </td>
+                        <td>
+                            {% for p in r.prerequisites.all %}
+                            <b>{{ p.prerequisite.module_name }}</b><br>
+                          <a data-tw-toggle="modal" data-tw-target="#delete_period_{{ r.id }}_{{ p.id }}" class='text-danger'>Remove Prerequisites</a><br>
+                            <hr><br>
+                                <div id="delete_period_{{ r.id }}_{{ p.id }}" class="modal" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-body p-0">
+                                                <form action="{% url 'college:learning_programme_module_prerequisite_delete' learning_programme.id r.id p.id %}" method="POST">
+                                                    {% csrf_token %}
+                                                    <div class="p-5 text-center">
+                                                        <i data-lucide="x-circle" class="w-16 h-16 text-danger mx-auto mt-3"></i> 
+                                                        <div class="text-3xl mt-5">Are you sure?</div>
+                                                        <div class="text-slate-500 mt-2">
+                                                            Do you really want to delete this record? 
+                                                            <br>
+                                                            This process cannot be undone.
+                                                        </div>
+                                                    </div>
+                                                    <div class="px-5 pb-8 text-center">
+                                                        <button type="button" data-tw-dismiss="modal" class="btn btn-outline-secondary w-24 mr-1">Cancel</button>
+                                                        <button type="submit" class="btn btn-danger w-24">Delete</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+
+                            <a class="btn btn-success w-24 ml-2 text-white mb-5" data-tw-toggle="modal" data-tw-target="#add_period_{{ r.id }}"> <i data-lucide="plus" class="w-4 h-4 mr-1"></i> Add Prerequisite</a>
+                            <div id="add_period_{{ r.id }}" class="modal" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog modal-xl">
+                                    <form action="{% url 'college:learning_programme_module_prerequisite_add' learning_programme.id r.id %}" method="POST">       
+                                        {% csrf_token %}                                  
+                                        <div class="modal-content">
+                                            <div class="modal-body p-5">
+                                                <div class="mt-5 col-span-12 sm:col-span-12"> 
+                                                    <label for="id_beginning" class="form-label">Prerequisite</label> 
+                                                    <select name='prerequisite' class='form-select' required>
+                                                        <option></option>
+                                                        {% for m in items %}
+                                                            {% if m != r %}
+                                                                <option value='{{ m.id }}'>{{ m.module_code}} {{ m.module_name }}</option>
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                                                                                                  
+                                                <br><br>
+                                                <div class="px-5 pb-8 text-center"> 
+                                                    <button type="button" data-tw-dismiss="modal" class="btn btn-outline-secondary w-24 mr-1">Cancel</button> 
+                                                    <button type="submit" class="btn btn-success w-60 text-white">Add Prerequisite</button> 
+                                                </div>
+                                                
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            {% for p in r.formative.all %}
+                            <b>{{ p.title }} {{ p.weight }}%</b><br>
+                            <a data-tw-toggle="modal" data-tw-target="#edit_formative_{{ r.id }}_{{ p.id }}" class='text-success'>Edit</a>&nbsp; &nbsp;  |&nbsp; &nbsp;  <a data-tw-toggle="modal" data-tw-target="#delete_formative_{{ r.id }}_{{ p.id }}" class='text-danger'>Remove</a><br>
+                            <hr><br>
+
+                            <div id="edit_formative_{{ r.id }}_{{ p.id }}" class="modal" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog modal-xl">
+                                    <form action="{% url 'college:learning_programme_module_formative_edit' learning_programme.id r.id p.id %}" method="POST">       
+                                        {% csrf_token %}                                  
+                                        <div class="modal-content">
+                                            <div class="modal-body p-5">
+                                                <div class="mt-5 col-span-12 sm:col-span-12"> 
+                                                    <label for="id_beginning" class="form-label">Assessment Type</label> 
+                                                    <select name='assessment_type' class='form-select' required>
+                                                        <option></option>
+                                                        {% if p.assessment_type == 'Assignment' %}
+                                                            <option value='Assignment' selected>Assignment</option>
+                                                            <option value='Test'>Test</option>
+                                                        {% elif p.assessment_type == 'Test' %}
+                                                            <option value='Assignment'>Assignment</option>
+                                                            <option value='Test' selected>Test</option>
+                                                        {% else %}
+                                                            <option value='Assignment'>Assignment</option>
+                                                            <option value='Test'>Test</option>
+                                                        {% endif %}
+                                                        
+                                                    </select>
+                                                </div>
+
+                                                <div class="mt-5 col-span-12 sm:col-span-12"> 
+                                                    <label for="id_beginning" class="form-label">Assessment Title</label> 
+                                                    <input type='text' name='title' required class='form-control' value="{{ p.title }}">
+                                                </div>
+
+                                                <div class="mt-5 col-span-12 sm:col-span-12"> 
+                                                    <label for="id_beginning" class="form-label">Assessment Weight</label> 
+                                                    <input type='number' name='weight' required class='form-control' value='{{ p.weight }}'>
+                                                </div>
+                                                                                                  
+                                                <br><br>
+                                                <div class="px-5 pb-8 text-center"> 
+                                                    <button type="button" data-tw-dismiss="modal" class="btn btn-outline-secondary w-24 mr-1">Cancel</button> 
+                                                    <button type="submit" class="btn btn-success w-60 text-white">Edit Assessment</button> 
+                                                </div>
+                                                
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                                <div id="delete_formative_{{ r.id }}_{{ p.id }}" class="modal" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-body p-0">
+                                                <form action="{% url 'college:learning_programme_module_formative_delete' learning_programme.id r.id p.id %}" method="POST">
+                                                    {% csrf_token %}
+                                                    <div class="p-5 text-center">
+                                                        <i data-lucide="x-circle" class="w-16 h-16 text-danger mx-auto mt-3"></i> 
+                                                        <div class="text-3xl mt-5">Are you sure?</div>
+                                                        <div class="text-slate-500 mt-2">
+                                                            Do you really want to delete this record? 
+                                                            <br>
+                                                            This process cannot be undone.
+                                                        </div>
+                                                    </div>
+                                                    <div class="px-5 pb-8 text-center">
+                                                        <button type="button" data-tw-dismiss="modal" class="btn btn-outline-secondary w-24 mr-1">Cancel</button>
+                                                        <button type="submit" class="btn btn-danger w-24">Delete</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+
+                            <a class="btn btn-success w-24 ml-2 text-white mb-5" data-tw-toggle="modal" data-tw-target="#add_formative_{{ r.id }}"> <i data-lucide="plus" class="w-4 h-4 mr-1"></i> Add Assessment</a>
+                            <div id="add_formative_{{ r.id }}" class="modal" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog modal-xl">
+                                    <form action="{% url 'college:learning_programme_module_formative_add' learning_programme.id r.id %}" method="POST">       
+                                        {% csrf_token %}                                  
+                                        <div class="modal-content">
+                                            <div class="modal-body p-5">
+                                                <div class="mt-5 col-span-12 sm:col-span-12"> 
+                                                    <label for="id_beginning" class="form-label">Assessment Type</label> 
+                                                    <select name='assessment_type' class='form-select' required>
+                                                        <option></option>
+                                                        <option value='Assignment'>Assignment</option>
+                                                        <option value='Test'>Test</option>
+                                                    </select>
+                                                </div>
+
+                                                <div class="mt-5 col-span-12 sm:col-span-12"> 
+                                                    <label for="id_beginning" class="form-label">Assessment Title</label> 
+                                                    <input type='text' name='title' required class='form-control'>
+                                                </div>
+
+                                                <div class="mt-5 col-span-12 sm:col-span-12"> 
+                                                    <label for="id_beginning" class="form-label">Assessment Weight</label> 
+                                                    <input type='number' name='weight' required class='form-control'>
+                                                </div>
+                                                                                                  
+                                                <br><br>
+                                                <div class="px-5 pb-8 text-center"> 
+                                                    <button type="button" data-tw-dismiss="modal" class="btn btn-outline-secondary w-24 mr-1">Cancel</button> 
+                                                    <button type="submit" class="btn btn-success w-60 text-white">Add Assessment</button> 
+                                                </div>
+                                                
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="table-report__action w-56">
+                            <div class="flex justify-center items-center">
+
+                                <div class="flex justify-center items-center">
+
+                                    <div class="dropdown ml-auto sm:ml-0">
+                                        <button class="dropdown-toggle btn px-2 box" aria-expanded="false" data-tw-toggle="dropdown">
+                                            <span class="w-5 h-5 flex items-center justify-center"> <i class="w-4 h-4" data-lucide="arrow-down"></i> </span>
+                                        </button>
+                                        <div class="dropdown-menu w-40">
+                                            <ul class="dropdown-content">
+                                                <li>
+                                                    <a class="dropdown-item" href="javascript:;" data-tw-toggle="modal" data-tw-target="#edit-modal_{{ r.id }}"> <i data-lucide="check-square" class="w-4 h-4 mr-1"></i> Edit </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item" href="javascript:;" data-tw-toggle="modal" data-tw-target="#delete-modal_{{ r.id }}"> <i data-lucide="trash" class="w-4 h-4 mr-1"></i> Delete </a>
+                                                </li>
+                                               
+                                            </ul>
+                                        </div>
+                                    </div>
+                                                                    
+                                </div>
+                                
+                                <div id="edit-modal_{{ r.id }}" class="modal" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <form action="{% url 'college:learning_programme_module_edit' learning_programme.id r.id %}" method="POST">
+                                                {% csrf_token %}
+                                                <!-- BEGIN: Modal Header -->
+                                                <div class="modal-header">
+                                                    <h2 class="font-medium text-base mr-auto">Edit Learning Programme Module</h2>                                             
+                                                </div> <!-- END: Modal Header -->
+                                                <!-- BEGIN: Modal Body -->
+                                                <div class="modal-body grid grid-cols-12 gap-4 gap-y-3">
+                                                    <div class="col-span-12 sm:col-span-12"> 
+                                                        <label for="modal-form-1" class="form-label">Module Name*</label> 
+                                                        <input id="module_name" name='module_name' type="text" class="form-control" value="{{ r.module_name }}" required maxlength='100'> 
+                                                    </div>
+                                                    
+                                                    <div class="col-span-12 sm:col-span-12"> 
+                                                        <label for="modal-form-1" class="form-label">Module Code*</label> 
+                                                        <input id="module_code" name='module_code' type="text" class="form-control" value="{{ r.module_code }}" required maxlength='10'> 
+                                                    </div>
+
+                                                    <div class="col-span-12 sm:col-span-12"> 
+                                                        <label for="modal-form-1" class="form-label">Type of Module*</label> 
+                                                        <select name="module_type" class='form-select' required>
+                                                            <option></option>
+                                                            {% if r.module_type == 'Core' %}
+                                                                <option value="Core" selected>Core</option>
+                                                                <option value="Fundamental">Fundamental</option>
+                                                            {% elif r.module_type == 'Fundamental' %}
+                                                                <option value="Core">Core</option>
+                                                                <option value="Fundamental" selected>Fundamental</option>
+                                                            {% else %}
+                                                                <option value="Core">Core</option>
+                                                                <option value="Fundamental">Fundamental</option>
+                                                            {% endif %}
+                                                        </select>
+                                                    </div>
+                    
+                                                    <div class="col-span-12 sm:col-span-12"> 
+                                                        <label for="modal-form-1" class="form-label">NQF Level*</label> 
+                                                        <select name="nqf_level" class='form-select' required>
+                                                            <option></option>
+                                                            {% for nqf_level in nqf_levels %}
+                                                                {% if r.nqf_level == nqf_level %}
+                                                                    <option value="{{ nqf_level.id }}" selected>{{ nqf_level.nqf_level }}</option>
+                                                                {% else %}
+                                                                    <option value="{{ nqf_level.id }}">{{ nqf_level.nqf_level }}</option>
+                                                                {% endif %}
+                                                            {% endfor %}
+                                                        </select>
+                                                    </div>
+                    
+                                                    <div class="col-span-12 sm:col-span-12"> 
+                                                        <label for="modal-form-1" class="form-label">Total Credits*</label> 
+                                                        <input id="credits" name='credits' type="number" class="form-control" value="{{ r.credits }}" required min='0'> 
+                                                    </div>                
+                                                    <div class="col-span-12 sm:col-span-12"> 
+                                                        <label for="modal-form-1" class="form-label">Theory Credits*</label> 
+                                                        <input id="theory_credits" name='theory_credits' type="number" class="form-control" value="{{ r.theory_credits }}" required min='0'> 
+                                                    </div>
+                    
+                                                    <div class="col-span-12 sm:col-span-12"> 
+                                                        <label for="modal-form-1" class="form-label">WIL Credits*</label> 
+                                                        <input id="wil_credits" name='wil_credits' type="number" class="form-control" value="{{ r.wil_credits }}" required min='0'> 
+                                                    </div>
+                    
+                                                    <div class="col-span-12 sm:col-span-12"> 
+                                                        <label for="modal-form-1" class="form-label">Theory Hours*</label> 
+                                                        <input id="theory_hours" name='theory_hours' type="number" class="form-control" value="{{ r.theory_hours }}" required min='0'> 
+                                                    </div>
+                    
+                                                    <div class="col-span-12 sm:col-span-12"> 
+                                                        <label for="modal-form-1" class="form-label">Wil Hours*</label> 
+                                                        <input id="wil_hours" name='wil_hours' type="number" class="form-control" value="{{ r.wil_hours }}" required min='0'> 
+                                                    </div> 
+                                                    
+                                                    <div class="col-span-12 sm:col-span-12"> 
+                                                        <label for="modal-form-1" class="form-label">Test Weight*</label> 
+                                                        <input id="test_weight" name='test_weight' type="number" class="form-control" value="{{ r.test_weight }}" required min='0' max='100'> 
+                                                    </div>
+                    
+                                                    <div class="col-span-12 sm:col-span-12"> 
+                                                        <label for="modal-form-1" class="form-label">Assignments Weight*</label> 
+                                                        <input id="assignment_weight" name='assignment_weight' type="number" class="form-control" value="{{ r.assignment_weight }}" required min='0' max='100'> 
+                                                    </div>
+                                                    
+                                                    <div class="col-span-12 sm:col-span-12"> 
+                                                        <label for="modal-form-1" class="form-label">Summative Entry Year Mark Minimum*</label> 
+                                                        <input id="entrance_year_mark" name='entrance_year_mark' type="number" class="form-control" value="{{ r.entrance_year_mark }}" required min='0' max='100'> 
+                                                    </div>
+                    
+                                                    <div class="col-span-12 sm:col-span-12"> 
+                                                        <label for="modal-form-1" class="form-label">Summative Weight*</label> 
+                                                        <input id="summative_weight" name='summative_weight' type="number" class="form-control" value="{{ r.summative_weight }}" required min='0' max='100'> 
+                                                    </div>
+
+                                                </div> <!-- END: Modal Body -->
+                                                <!-- BEGIN: Modal Footer -->
+                                                <div class="modal-footer"> 
+                                                    <button type="button" data-tw-dismiss="modal" class="btn btn-outline-secondary w-20 mr-1">Cancel</button> 
+                                                    <button type="submit" class="btn btn-primary w-60">Edit Learning Programme Module</button> 
+                                                </div> <!-- END: Modal Footer -->
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div> 
+                                
+                                <div id="delete-modal_{{ r.id }}" class="modal" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-body p-0">
+                                                <form action="{% url 'college:learning_programme_module_delete'  learning_programme.id r.id %}" method="POST">
+                                                    {% csrf_token %}
+                                                    <div class="p-5 text-center">
+                                                        <i data-lucide="x-circle" class="w-16 h-16 text-danger mx-auto mt-3"></i> 
+                                                        <div class="text-3xl mt-5">Are you sure?</div>
+                                                        <div class="text-slate-500 mt-2">
+                                                            Do you really want to delete this record? 
+                                                            <br>
+                                                            This process cannot be undone.
+                                                        </div>
+                                                    </div>
+                                                    <div class="px-5 pb-8 text-center">
+                                                        <button type="button" data-tw-dismiss="modal" class="btn btn-outline-secondary w-24 mr-1">Cancel</button>
+                                                        <button type="submit" class="btn btn-danger w-24">Delete</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr class="intro-x"><td colspan='8'>Nothing added yet</td></tr>
+                    {% endfor %}
+                    
+                <tbody>
+            </table>
+        </div>
+    </div>
+
+{% endblock %}

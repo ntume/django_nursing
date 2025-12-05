@@ -1,0 +1,145 @@
+{% extends 'base_vertical.html' %}
+
+{% block breadcrumb-content %}
+    <nav aria-label="breadcrumb" class="-intro-x h-full mr-auto">
+        <ol class="breadcrumb breadcrumb-light">
+            <li class="breadcrumb-item"><a href="{% url 'students:student_dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Leave Requests</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block main-content %}
+
+{% include 'messages.html' %}
+
+<div class="intro-y mt-8 flex flex-col items-center sm:flex-row">
+    <h2 class="mr-auto text-lg font-medium">Leave Requests</h2>
+    
+</div>
+<div class="mt-5 grid grid-cols-12 gap-5">
+    <!-- BEGIN: Calendar Side Menu -->
+    <div class="col-span-12 xl:col-span-4 2xl:col-span-3">
+        <div class="box intro-y p-5">
+            <form action="{% url 'students:student_leave_request_submission' registration.id %}" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div data-tw-merge="" id="calendar-events" class="full-calendar-draggable mb-5 mt-6 border-b border-t border-slate-200/60 py-3 dark:border-darkmode-400">
+                    <div>
+                        <label data-tw-merge for="regular-form-1" class="inline-block mb-2 group-[.form-inline]:mb-2 group-[.form-inline]:sm:mb-0 group-[.form-inline]:sm:mr-5 group-[.form-inline]:sm:text-right">
+                            Select Leave Type
+                        </label>
+                        <select name='type_of_leave' class='form-select' required>
+                            <option></option>
+                            {% for leave in leave_types  %}
+                                <option value='{{ leave.id }}'>{{ leave.type_of_leave }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mt-3">
+                        <label data-tw-merge for="regular-form-2" class="inline-block mb-2 group-[.form-inline]:mb-2 group-[.form-inline]:sm:mb-0 group-[.form-inline]:sm:mr-5 group-[.form-inline]:sm:text-right">
+                            Start Date
+                        </label>
+                        <input required data-tw-merge name="from_date" type="date" placeholder="Start Date" required class="disabled:bg-slate-100 disabled:cursor-not-allowed dark:disabled:bg-darkmode-800/50 dark:disabled:border-transparent [&[readonly]]:bg-slate-100 [&[readonly]]:cursor-not-allowed [&[readonly]]:dark:bg-darkmode-800/50 [&[readonly]]:dark:border-transparent transition duration-200 ease-in-out w-full text-sm border-slate-200 shadow-sm rounded-md placeholder:text-slate-400/90 focus:ring-4 focus:ring-primary focus:ring-opacity-20 focus:border-primary focus:border-opacity-40 dark:bg-darkmode-800 dark:border-transparent dark:focus:ring-slate-700 dark:focus:ring-opacity-50 dark:placeholder:text-slate-500/80 group-[.form-inline]:flex-1 group-[.input-group]:rounded-none group-[.input-group]:[&:not(:first-child)]:border-l-transparent group-[.input-group]:first:rounded-l group-[.input-group]:last:rounded-r group-[.input-group]:z-10 rounded-full" />
+                    </div>
+                    <div class="mt-3">
+                        <label data-tw-merge for="regular-form-2" class="inline-block mb-2 group-[.form-inline]:mb-2 group-[.form-inline]:sm:mb-0 group-[.form-inline]:sm:mr-5 group-[.form-inline]:sm:text-right">
+                            End Date
+                        </label>
+                        <input required data-tw-merge name="to_date" type="date" placeholder="End Date" required class="disabled:bg-slate-100 disabled:cursor-not-allowed dark:disabled:bg-darkmode-800/50 dark:disabled:border-transparent [&[readonly]]:bg-slate-100 [&[readonly]]:cursor-not-allowed [&[readonly]]:dark:bg-darkmode-800/50 [&[readonly]]:dark:border-transparent transition duration-200 ease-in-out w-full text-sm border-slate-200 shadow-sm rounded-md placeholder:text-slate-400/90 focus:ring-4 focus:ring-primary focus:ring-opacity-20 focus:border-primary focus:border-opacity-40 dark:bg-darkmode-800 dark:border-transparent dark:focus:ring-slate-700 dark:focus:ring-opacity-50 dark:placeholder:text-slate-500/80 group-[.form-inline]:flex-1 group-[.input-group]:rounded-none group-[.input-group]:[&:not(:first-child)]:border-l-transparent group-[.input-group]:first:rounded-l group-[.input-group]:last:rounded-r group-[.input-group]:z-10 rounded-full" />
+                    </div>
+                    <div class="mt-3">
+                        <label data-tw-merge for="regular-form-2" class="inline-block mb-2 group-[.form-inline]:mb-2 group-[.form-inline]:sm:mb-0 group-[.form-inline]:sm:mr-5 group-[.form-inline]:sm:text-right">
+                            Extra Information
+                        </label>
+                        <textarea data-tw-merge name="comment" placeholder="Extra Information" required class="form-control"></textarea>
+                    </div>
+                    <div class="mt-3">
+                        <label data-tw-merge for="regular-form-2" class="inline-block mb-2 group-[.form-inline]:mb-2 group-[.form-inline]:sm:mb-0 group-[.form-inline]:sm:mr-5 group-[.form-inline]:sm:text-right">
+                            File
+                        </label>
+                        <input type='file' data-tw-merge name="file" class="form-control">
+                    </div>
+                </div>
+                <div data-tw-merge="" class="flex items-center">
+                    <button data-tw-merge="" type="submit" class="transition duration-200 border shadow-sm inline-flex items-center justify-center py-2 px-3 rounded-md font-medium cursor-pointer focus:ring-4 focus:ring-primary focus:ring-opacity-20 focus-visible:outline-none dark:focus:ring-slate-700 dark:focus:ring-opacity-50 [&:hover:not(:disabled)]:bg-opacity-90 [&:hover:not(:disabled)]:border-opacity-90 [&:not(button)]:text-center disabled:opacity-70 disabled:cursor-not-allowed bg-primary border-primary text-white dark:border-primary mt-2 w-full"><i data-tw-merge="" data-lucide="edit" class="stroke-1.5 mr-2 h-4 w-4"></i>
+                        Add New Leave Request
+                    </button>
+                </div>
+            </form>
+        </div>
+        <div class="box intro-y mt-5 p-5">
+            <div data-tw-merge="" id="calendar-events" class="full-calendar-draggable mb-5 mt-6 border-b border-t border-slate-200/60 py-3 dark:border-darkmode-400">
+                {% for breakdown in leave_type_breakdown %}
+                    <div class="relative">
+                        <div class="event -mx-3 flex cursor-pointer items-center rounded-md p-3 transition duration-300 ease-in-out hover:bg-slate-100 dark:hover:bg-darkmode-400">
+                            <div class="mr-3 h-2 w-2 rounded-full {% if breakdown.count_remainder > 0 %}bg-success{% else %}bg-danger{% endif %} "></div>
+                            <div class="pr-10">
+                                <div class="event__title truncate">{{ breakdown.leave_type }}</div>
+                                <div class="mt-0.5 text-xs text-slate-500">
+                                    <span class="event__days"><b>Total:</b> {{ breakdown.total_days }}</span> Days
+                                    <span class="mx-1"><b>• Approved:</b></span> {{ breakdown.count_requested }} Days
+                                    <span class="mx-1"><b>• Remanider:</b></span> {{ breakdown.count_remainder }} Days
+                                </div>
+                            </div>
+                        </div>
+                        <a class="absolute bottom-0 right-0 top-0 my-auto flex items-center">
+                            <i data-tw-merge="" data-lucide="edit" class="stroke-1.5 h-4 w-4 text-slate-500"></i>
+                        </a>
+                    </div>
+                {% endfor %}
+              
+            </div>
+        </div>
+    </div>
+    <!-- END: Calendar Side Menu -->
+    <!-- BEGIN: Calendar Content -->
+    <div class="col-span-12 xl:col-span-8 2xl:col-span-9">
+        <div class="box p-5">
+            <div id='test_calendar'>
+              
+            </div>
+        </div>
+    </div>
+    <!-- END: Calendar Content -->
+</div>
+
+{% endblock %}
+
+{% block js-content %}
+
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
+<script>
+   
+    document.addEventListener('DOMContentLoaded', function() {
+      var calendarEl = document.getElementById('test_calendar');
+      var calendar = new FullCalendar.Calendar(calendarEl, {
+        initialDate: "{{ today|date:'Y-m-d' }}",
+        headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek,timeGridDay,listMonth'
+        },
+        views: {
+            dayGridMonth: { buttonText: 'month' },
+            timeGridWeek: { buttonText: 'week' },
+            timeGridDay: { buttonText: 'day' }
+        },
+        initialView: 'dayGridMonth',
+        events: [
+          {% for leave in all_leave %}
+            {
+                title: '{{ leave.type_of_leave.type_of_leave }} - {{ leave.approved }}',
+                start: '{{ leave.from_date|date:"Y-m-d" }}',
+                end: '{{ leave.to_date|date:"Y-m-d" }}',
+                description: '{{ leave.comment }}',
+                color: "{% if leave.approved == 'Pending' %}orange{% elif leave.approved == 'Rejected' %}purple{% else %}green{% endif %}"
+            },
+          {% endfor %}          
+        ]
+      });
+      calendar.render();
+    });
+
+  </script>
+
+{% endblock %}

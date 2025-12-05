@@ -1,0 +1,179 @@
+{% extends 'base_vertical.html' %}
+{% load bootstrap3 %}
+{% block css-content %}
+
+<style type="text/css">
+
+table.timecard {
+	margin: auto;
+	width: 100%;
+	border-collapse: collapse;
+	border: 1px solid #fff; /*for older IE*/
+	border-style: solid;
+}
+
+table.timecard caption {
+	background-color: #f79646;
+	color: #fff;
+  font-size: 0.875rem;
+	font-weight: normal;
+	letter-spacing: .4em;
+}
+
+table.timecard thead th {
+	padding: 8px;
+	background-color: #ffffff;
+	font-size: 0.875rem;
+  font-weight: bold;
+}
+
+table.timecard thead th#thDay {
+	width: 40%;
+}
+
+table.timecard thead th#thRegular, table.timecard thead th#thOvertime, table.timecard thead th#thTotal {
+	width: 20%;
+}
+
+table.timecard th, table.timecard td {
+	padding: 10px;
+	border-width: 1px;
+	border-style: solid;
+}
+
+table.timecard td {
+	text-align: left;
+  font-size: 0.875rem;
+}
+
+table.timecard tbody th {
+	text-align: left;
+	font-weight: normal;
+}
+
+table.timecard tfoot {
+	font-weight: bold;
+	font-size: 0.875rem;
+	background-color: #687886;
+	color: #fff;
+}
+
+table.timecard tr.even {
+	background-color: #008080;
+}
+</style>
+
+
+{% endblock %}
+
+{% block main-content %}
+<div class="row">
+  <div class="col-md-12 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          <nav aria-label="breadcrumb">
+              <ol class="breadcrumb bg-inverse-info">
+                {%  if user.is_authenticated and user.roles_id == 2  %}
+                  <li class="breadcrumb-item"><a href="{% url 'wil:dashboard' %}">Dashboard</a></li>
+                  <li class="breadcrumb-item"><a href="{% url 'wil:advert_list' %}">Adverts</a></li>
+                  <li class="breadcrumb-item active" aria-current="page"><a>Email Sent</a></li>
+                {% elif user.is_authenticated and user.roles_id == 10 or user.is_authenticated and user.roles_id == 11 %}
+                  <li class="breadcrumb-item"><a href="{% url 'psycad:dashboard' %}">Dashboard</a></li>
+                  <li class="breadcrumb-item"><a href="{% url 'psycad:advert_list' %}">Adverts</a></li>
+                  <li class="breadcrumb-item active" aria-current="page"><a>Email Sent</a></li>
+                {% endif %}
+              </ol>
+            </nav>
+
+            {% include 'messages.html' %}
+
+        </div>
+      </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-lg-12 grid-margin stretch-card">
+              <div class="card">
+                <div class="card-body">
+                  <h4 class="card-title">
+                      <u>Company:</u> {{ advert.company_name }}<br><br>
+                      <u>Position:</u> {{ advert.position }}<br><br>
+                      An email alert was sent to the following students
+                  </h4>                  
+                  <div class="table-responsive">
+                    <table class="table">
+                      <thead>
+                        <tr>
+                          <th>#</th>
+                          <th>Student Number</th>
+                          <th>Name</th>
+                          <th>Email</th>
+                          <th>Department</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for s in students %}
+                            <tr>
+                              <td class="py-1">{{ forloop.counter }}</td> 
+                              <td>{{ s.student_number }}</td>                             
+                              <td>{{ s.name }} {{ s.surname }}</td>
+                              <td>{{ s.email }}<br>{{ s.alternate_email }}</td>
+                              <td>{{ s.department.department }}</td>
+                            </tr>
+                        {% empty %}
+                            <tr><td colspan="8">Sorry no emails sent</td></tr>
+                        {% endfor %}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+</div>
+{% endblock %}
+
+{% block js-content %}
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/jszip-2.5.0/dt-1.10.18/b-1.5.6/b-colvis-1.5.6/b-html5-1.5.6/b-print-1.5.6/cr-1.5.0/r-2.2.2/sl-1.3.0/datatables.min.css"/>
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/v/dt/jszip-2.5.0/dt-1.10.18/b-1.5.6/b-colvis-1.5.6/b-html5-1.5.6/b-print-1.5.6/cr-1.5.0/r-2.2.2/sl-1.3.0/datatables.min.js"></script>
+
+<script>
+  $(document).ready( function () {
+    $('#table_advert').DataTable({
+
+      dom: 'B<"clear">lfrtip',
+      buttons: {
+        name: 'primary',
+        buttons: [
+            {
+                extend: 'copyHtml5',
+                exportOptions: {
+                    columns: [ 0, ':visible' ]
+                }
+            },
+            {
+                extend: 'excelHtml5',
+                exportOptions: {
+                    columns: ':visible'
+                }
+            },
+            {
+                extend: 'pdfHtml5',
+                exportOptions: {
+                    columns: ':visible'
+                }
+            },
+            'colvis'
+        ]
+      }}
+    );
+  });
+
+</script>
+
+
+
+{% endblock %}

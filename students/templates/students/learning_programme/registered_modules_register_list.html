@@ -1,0 +1,96 @@
+{% extends 'base_vertical.html' %}
+
+{% block breadcrumb-content %}
+    <nav aria-label="breadcrumb" class="-intro-x h-full mr-auto">
+        <ol class="breadcrumb breadcrumb-light">
+            <li class="breadcrumb-item"><a href="{% url 'students:student_dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'students:student_learning_programmes' %}">Learning Programmes</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'students:student_learning_programme_registrations' learning_programme.id  %}">{{ learning_programme.programme_code }} Registrations</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'students:student_learning_programme_registrations_modules' registration.id  %}">{{ learning_programme.programme_code }} Registration Modules</a></li>
+            
+            <li class="breadcrumb-item active" aria-current="page">{{ module.module.module_name }} Register List</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block main-content %}
+
+{% include 'messages.html' %}
+
+<div class="intro-y flex items-center mt-8">
+    <h2 class="text-lg font-medium mr-auto">
+        {{ module.module.module_name }}  Register List
+    </h2>
+</div>
+<div class="intro-y p-5 mt-5">
+        
+    <div class="overflow-x-auto">
+        <table class="table table-report -mt-2">
+            <thead>
+                <tr>
+                    <th class="whitespace-nowrap">#</th>                    
+                    <th class="whitespace-nowrap">Date</th>
+                    <th class="whitespace-nowrap">Time</th>
+                    <th class="whitespace-nowrap">Unit</th>
+                    <th class="whitespace-nowrap">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in items %}
+                    <tr class="intro-x">
+                        <td class="w-40">
+                            {{ forloop.counter }}
+                        </td>
+                        <td>
+                            {{ r.register.date }}
+                        </td>
+                        <td>
+                            {{ r.register.time }}
+                        </td>                        
+                        <td>
+                            {{ r.register.unit.study_unit_name }}
+                        </td>
+                        <td>
+                            {% if  r.student %}
+                                {{ r.student.status }}
+                            {% else %}                         
+                                <a href="javascript:;" data-tw-toggle="modal" data-tw-target="#sign_register_{{ r.id }}" class="btn btn-success mr-1 mb-2"> <i data-lucide="info" class="w-5 h-5"></i> </a>                         
+
+                                <div id="sign_register_{{ r.id }}" class="modal" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-body p-0">
+                                                <form action="{% url 'students:student_learning_programme_registrations_module_register_sign' registration.id module.id r.register.id %}" method="POST">
+                                                    {% csrf_token %}
+                                                    <div class="p-5 text-center">
+                                                        <i data-lucide="info" class="w-16 h-16 text-success mx-auto mt-3"></i> 
+                                                        <div class="text-3xl mt-5">Sign Register?</div>
+                                                        <div class="text-slate-500 mt-2">
+                                                            Do you really want to mark yourself as present? 
+                                                            <br>
+                                                            This process cannot be undone.
+                                                        </div>
+                                                    </div>
+                                                    <div class="px-5 pb-8 text-center">
+                                                        <button type="button" data-tw-dismiss="modal" class="btn btn-outline-secondary w-24 mr-1">Cancel</button>
+                                                        <button type="submit" class="btn btn-success w-48">Sign Register</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr class="intro-x"><td colspan='4'>Nothing added yet</td></tr>
+                {% endfor %}
+                
+            <tbody>
+        </table>
+    </div>
+
+</div>
+
+{% endblock %}

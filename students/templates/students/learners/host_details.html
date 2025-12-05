@@ -1,0 +1,64 @@
+<div class="border border-slate-200/60 dark:border-darkmode-400 rounded-md p-5 mt-5">
+    <div class="font-medium flex items-center border-b border-slate-200/60 dark:border-darkmode-400 pb-5"> <i data-lucide="chevron-down" class="w-4 h-4 mr-2"></i> Host Employer </div>
+    
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Host Employer</th>
+                    <th>Registration Number</th>
+                    <th>Contact Person</th>
+                    <th>Physical Address</th>
+                    <th>SDL Number</th>
+                    <th>Selected</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for host in lp.learning_programme.intervention.loi.company.host_employers.all  %}
+                    <tr>                   
+                        <td>{{ host.company_name }}</td>
+                        <td>{{ host.registration_number }}</td>
+                        <td>
+                            {{ host.contact_first_name }} {{ host.contact_last_name }}<br>
+                            {{ host.contact_number }}<br>
+                            {{ host.contact_email }}
+                        </td>
+                        <td>
+                            {{ host.physical_address_1 }}<br>
+                            {{ host.physical_address_2 }}<br>
+                            {{ host.physical_address_3 }}
+                        </td>
+                        <td>
+                            {{ host.SDL_number }}
+                        </td>
+
+                        <td>
+
+                            {% if user.logged_in_role_id == 24 or user.logged_in_role_id == 46 %}
+
+                                {% if host == lp.host_employer %}
+                                    <a href="{% url 'lpd:save_learner_host_employer' lp.id host.id %}" class="btn btn-success mr-1 mb-2 text-white"> <i data-lucide="check" class="w-5 h-5"></i> </a>
+                                {% else %}
+                                    <a href="{% url 'lpd:save_learner_host_employer' lp.id host.id %}" class="btn btn-danger mr-1 mb-2 text-white"> <i data-lucide="x" class="w-5 h-5"></i> </a>
+                                {% endif %}
+
+                            {% else %}
+
+                                {% if host == lp.host_employer %}
+                                    <a class="btn btn-success mr-1 mb-2 text-white"> <i data-lucide="check" class="w-5 h-5"></i> </a>
+                                {% else %}
+                                    <a class="btn btn-danger mr-1 mb-2 text-white"> <i data-lucide="x" class="w-5 h-5"></i> </a>
+                                {% endif %}
+
+                            {% endif %}
+                            
+                        </td>
+                    
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="6"><mark class="p-1 bg-success text-white"><a target="_blank" href="{% url 'lpd:lp_host_companies' lp.learning_programme.id %}">No Host Employers Added, to add a host employer, please click here</a></mark> </td></tr>
+                {% endfor %}
+            </tbody>
+
+        </table>
+
+</div>

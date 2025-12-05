@@ -1,0 +1,60 @@
+<!-- BEGIN: Page -->
+<div class="intro-y box col-span-12 2xl:col-span-6">
+    <div class="flex items-center px-5 py-5 sm:py-3 border-b border-slate-200/60 dark:border-darkmode-400">
+        <h2 class="font-medium text-base mr-auto">
+            WIL Logsheet Consolidated Hours
+        </h2>
+    </div>
+    <div class="p-5">
+
+        <div class="intro-y col-span-12 flex flex-wrap sm:flex-nowrap items-center mt-2">
+        
+            <div class="hidden md:block mx-auto text-slate-500"></div>
+            
+        </div>
+        <!-- BEGIN: Data List -->
+        <div class="intro-y col-span-12 overflow-x-auto scrollbar-hidden mt-10">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th><div class="flex items-center justify-center">Discipline</div></th> 
+                        <th><div class="flex items-center justify-center">Total Hours</div></th>
+                        <th><div class="flex items-center justify-center">Total Required Hours</div></th>
+                        <th><div class="flex items-center justify-center">Total Quarter Hours</div></th>
+                        <th><div class="flex items-center justify-center">Total Required Quarter Hours</div></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for discipline in discipline_hours %}
+                        <tr class="intro-x">
+                            <td>
+                                {{ discipline.discipline.discipline }}
+                            </td>
+                            <td>
+                                <label class='text-danger'>{{ discipline.hours }}</label>
+                            </td>  
+                            <td>
+                                <b>{{ discipline.total_required_hours }}</b>
+                            </td>   
+                            <td>
+                                <label class='text-danger'>{{ discipline.total_quarter_hours }}</label>
+                            </td> 
+                            <td>
+                                <b>{{ discipline.total_required_quarter_hours }}</b>
+                            </td>               
+                        </tr>
+                    
+                    {% empty %}
+                        <tr class="intro-x">
+                            <td colspan="2">
+                                Nothing Added
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+
+    </div>
+</div>

@@ -1,0 +1,60 @@
+{% extends 'base_vertical.html' %}
+
+{% block main-content %}
+{% include 'messages.html' %}
+
+          <div class="row">
+              <div class="col-lg-12">
+                  <div class="card px-2">
+                    {% if article.cover_image %}
+                      <img class="card-img-top" src="{{article.cover_image.url}}">
+                    {% endif %}
+                      <div class="card-body">
+                          <div class="container-fluid">
+                            <h4 class="my-5">{{article.title}}</h4>
+                            <hr>
+                          </div>
+                          <div>
+                            {{article.article|safe}}
+                          </div>
+
+                      </div>
+                  </div>
+              </div>
+          </div>
+
+          <div class="row">
+              <div class="col-lg-12">
+                  <div class="card px-2">
+
+                      <div class="card-body">
+                          <div class="container-fluid">
+                            <h4 class="my-5">Comments</h4>
+                            <hr>
+                          </div>
+                          <div>
+                            {% for c in article.comments.all %}
+                              <p class="my-1">
+                                {% if c.published == 'Yes' %}
+                                  <i>{{ c.comment }}</i>
+                                  <hr>
+                                {% endif %}
+                              </p>
+                            {% empty %}
+                              <p class="my-5">No comments added, be the first to comment...</p>
+                            {% endfor %}
+                          </div>
+
+                          <div class="container-fluid w-100">
+                            <form action="{% url 'student:blog_view_addcomment' article.id %}" method="POST">
+                              {% csrf_token %}
+                              <textarea name="comment" id="comment" class="form-control col-md-12" placeholder="Write your comment..." required></textarea>
+                              <button type="submit" class="btn btn-success float-right mt-4"><i class="ti-export mr-1"></i>Post Comment</button>
+                          </form>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+
+{% endblock %}

@@ -1,0 +1,120 @@
+{% extends 'accounts/accounts_base.html' %}
+{% load django_bootstrap5 %}
+{% load static %}
+
+{% block main-content %}
+<div class="w-full ml-auto md:w-5/12">
+    <img class ="mt-10" src="{% static 'images/AHC-LOGO.png' %}"/>
+<div class="w-full ml-auto md:w-5/12">
+    <div class="flex flex-col items-center justify-center h-screen bg-red-200 mt-1k0">
+        <h2 class="intro-x font-bold text-2xl xl:text-3xl text-center xl:text-left">
+            Sign Up
+        </h2>
+        
+        <form 
+            hx-post="{% url 'accounts:register' %}"
+            hx-trigger="submit"
+            hx-target="#registration_messages"                  
+            hx-on::before-request="register_details.disabled = true;register_details.innerHTML ='Registering....'; return true;"
+            hx-on::after-request="register_details.disabled = false;register_details.innerHTML ='Register!'; return true;">  
+      
+            {% csrf_token %}
+            <div class="intro-x mt-8">
+                <input name="first_name" id="first_name" type="text" class="intro-x login__input form-control py-3 px-4 block" placeholder="First Name" required>
+                <input name="last_name" id="last_name" type="text" class="intro-x login__input form-control py-3 px-4 block mt-4" placeholder="Last Name" required>
+                <input name="email" id="email" type="email" class="intro-x login__input form-control py-3 px-4 block mt-4" placeholder="Email" required>
+                <select name="type_of_id" id="type_of_id" class="intro-x login__input form-select py-3 px-4 block mt-4" required>
+                    <option value="5">SA ID</option>
+                    <option value="2">Passport</option>
+                </select>
+                <input name="id_number" id="id_number" type="text" class="intro-x login__input form-control py-3 px-4 block mt-4" placeholder="ID/Passport Number" required><br>
+                <label class="cursor-pointer select-none intro-x flex items-center text-slate-600 dark:text-slate-500 mt-4 text-xs sm:text-sm" for="remember-me">Select a role from the list below</label>  
+                <select name="role" id='id_role'  class="form-select intro-x login__input py-3 px-4 block mt-4" required>
+                    {% for role in roles %}
+                        {% if role.active == 'Yes' %}
+                            <option value="{{ role.id }}">{{ role.role }}</option>
+                        {% endif %}
+                    {% endfor %}                    
+                </select>
+               
+                <div class="input-group">
+                    <input class="pass1 h-12 w-full border mt-6 outline-none p-2 pr-password" type="password" placeholder="Password" name="password" id="password">
+                    <div id="input-group-email" class="input-group-text h-12 border mt-6 rounded-lg outline-none p-2"><i class="fa fa-eye-slash eye_1"></i></div>
+               </div>
+               
+                <input name="password2" id="password2" type="password" class="intro-x login__input form-control py-3 px-4 block mt-4" placeholder="Password2" required><br>
+                
+            </div>
+            <div class="intro-x flex items-center text-slate-600 dark:text-slate-500 mt-4 text-xs sm:text-sm">
+                <input id="popia" type="checkbox" class="form-check-input border mr-2" required>
+                <label class="cursor-pointer select-none" for="popia">I agree to the MICT SETA</label>
+                <a class="text-primary dark:text-slate-200 ml-1" href="{% static 'disclaimer/MICT_SETA_POPIA_Disclaimer.pdf' %}">Privacy Policy</a>.  
+            </div>
+            <br>
+            <div id='registration_messages'>
+                {{ form_recaptcha.captcha }}
+            </div>
+
+            <div class="intro-x mt-5 xl:mt-8 text-center xl:text-left">
+                <button type="submit" id="register_details" class="btn btn-primary py-3 px-4 w-full xl:w-32 xl:mr-3 align-top">Register</button>
+            
+            </div>
+            <div class="intro-x flex items-center text-slate-600 dark:text-slate-500 mt-4 text-m m:text-m">
+                <a class="text-primary dark:text-slate-200 ml-1" href="{% url 'accounts:login_user' %}">Already have an account, <b>Sign in Here</b></a>.  
+            </div>
+        </form>
+        <div id="modal_error_check" class="modal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-body p-0">
+                        <div class="p-5 text-center"> <i data-lucide="x-circle" class="w-16 h-16 text-danger mx-auto mt-3"></i>
+                            <div class="text-3xl mt-5">An error has occurred!</div>
+                            <div id="div_error_message" class="text-slate-500 mt-2"></div>
+                        </div>
+                        <div class="px-5 pb-8 text-center"> <button type="button" data-tw-dismiss="modal" class="btn btn-outline-secondary w-24 mr-1">Okay</button></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+{% endblock %}
+
+{% block js-content %}
+
+<script type="text/javascript">
+    
+	$(document).ready(function(){
+        $('#id_role').on('change', function(){
+
+            /*var role = $('#id_role').val();
+            if(role == "26"){
+                document.getElementById("div_assessor_return_question").style.display = "block";
+            } else{
+                document.getElementById("div_assessor_return_question").style.display = "none";
+            }*/       
+                
+            return false;     
+                
+        });
+
+        $('#id_return_assessor').on('change', function(){
+
+            var returning_assessor = $('#id_return_assessor').val();
+            if(returning_assessor == "Yes"){
+                document.getElementById("div_assessor_registration_number").style.display = "block";
+            } else{
+                document.getElementById("div_assessor_registration_number").style.display = "none";
+            }            
+                
+            return false;     
+                
+        });
+
+    });
+
+</script>
+
+{% endblock %}

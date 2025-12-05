@@ -1,0 +1,18 @@
+Dear Consultant\n\n
+
+A new appointment has been assigned to you:
+
+\n\n
+Appointment Details:\n\n
+Student:</b> {{ fullname }}\n
+Department:</b> {{ department }}\n
+Contact:</b> {{ contact }}\n
+Email:</b> {{ email }}\n
+Category:</b> {{ category }}\n
+Description:</b> {{ description }}\n
+Appointment Date:</b> {{ appt_date }}\n
+Appointment Time:</b> {{ appt_time }} \n\n
+
+Please log in to the AHC SIMS Platform to review the appointment\n\n
+
+AHC SIMS Web Admin

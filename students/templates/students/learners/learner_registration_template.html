@@ -1,0 +1,906 @@
+{% extends 'base_tpl.html' %}
+
+{% block breadcrumb-content %}
+    <nav aria-label="breadcrumb" class="-intro-x mr-auto hidden sm:flex">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'administration:dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'college:learning_programme_cohorts' learning_programme.id %}">{{ learning_programme.programme_code }} Cohorts</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'students:cohort_learners' learning_programme_cohort.id %}">{{ learning_programme_cohort.title }} Students</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ lp.student.first_name }} {{ lp.student.last_name }}</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block main-content %}
+
+
+{% if previous_learner %}
+    <a href=""  class="btn btn-success shadow-md mr-2 text-white"><i data-lucide="arrow-left" class="w-4 h-4 mr-2"></i>Previous Learner - {{ previous_learner.learner.first_name }} {{ previous_learner.learner.last_name }}</a>
+{% endif %}
+{% if next_learner %}
+    <a href=""  class="btn btn-warning shadow-md mr-2 text-white">Next Learner - {{ next_learner.learner.first_name }} {{ next_learner.learner.last_name }}<i data-lucide="arrow-right" class="w-4 h-4 mr-2"></i></a>
+{% endif %}
+
+<div class="pos intro-y grid grid-cols-12 gap-5 mt-5">
+    <!-- BEGIN: Post Content -->
+    <div class="intro-y col-span-12 lg:col-span-12">
+        {% include 'messages.html' %}
+        <div class="post intro-y overflow-hidden box mt-5">
+            <ul class="post__tabs nav nav-tabs flex-col sm:flex-row bg-slate-200 dark:bg-darkmode-800" role="tablist">
+                <li class="nav-item">
+                    <button title="Complete Learner Details" data-tw-toggle="tab" data-tw-target="#content" class="nav-link tooltip w-full sm:w-48 py-4 active" id="content-tab" role="tab" aria-controls="content" aria-selected="true"> <i data-lucide="user" class="w-4 h-4 mr-2"></i> Learner Details </button>
+                </li>    
+                <li class="nav-item">
+                    <button title="Learner Address Details" data-tw-toggle="tab" data-tw-target="#address" class="nav-link tooltip w-full sm:w-48 py-4 {{ address_page }}" id="address-tab" role="tab" aria-selected="false"> <i data-lucide="map" class="w-4 h-4 mr-2"></i> Learner Address </button>
+                </li>            
+                <li class="nav-item">
+                    <button title="Education Details" data-tw-toggle="tab" data-tw-target="#education" class="nav-link tooltip w-full sm:w-48 py-4 {{ education_page }}" id="education-tab" role="tab" aria-selected="false"> <i data-lucide="code" class="w-4 h-4 mr-2"></i> Highest Level of Qualification </button>
+                </li>
+                <li class="nav-item">
+                    <button title="Next of Kin Details" data-tw-toggle="tab" data-tw-target="#parent" class="nav-link tooltip w-full sm:w-48 py-4 {{ parent_page }}" id="parent-tab" role="tab" aria-selected="false"> <i data-lucide="code" class="w-4 h-4 mr-2"></i> Next of Kin </button>
+                </li>
+                <li class="nav-item">
+                    <button title="Modules" data-tw-toggle="tab" data-tw-target="#modules" class="nav-link tooltip w-full sm:w-48 py-4 {{ modules_page }}" id="modules-tab" role="tab" aria-selected="false"> <i data-lucide="code" class="w-4 h-4 mr-2"></i> Modules </button>
+                </li>
+                
+                <li class="nav-item">
+                    <button title="Attachments" data-tw-toggle="tab" data-tw-target="#attachments" class="nav-link tooltip w-full sm:w-48 py-4 {{ attachments_page }}" id="attachments-tab" role="tab" aria-selected="false"> <i data-lucide="code" class="w-4 h-4 mr-2"></i> Attachments </button>
+                </li>
+                <li class="nav-item">
+                    <button title="Summary" data-tw-toggle="tab" data-tw-target="#summary" class="nav-link tooltip w-full sm:w-48 py-4 {{ summary_page }}" id="summary-tab" role="tab" aria-selected="false"> <i data-lucide="code" class="w-4 h-4 mr-2"></i> Summary </button>
+                </li>
+            </ul>
+            <div class="post__content tab-content">
+                <div id="content" class="tab-pane p-5 active" role="tabpanel" aria-labelledby="content-tab">
+                    {% include 'students/learners/learner_details.html' %}                    
+                </div>
+
+                <div id="address" class="tab-pane p-5 {{ address_page }}" role="tabpanel" aria-labelledby="address-tab">
+                    {% include 'students/learners/learner_address.html' %}                     
+                </div>
+
+                <div id="education" class="tab-pane p-5 {{ education_page }}" role="tabpanel" aria-labelledby="education-tab">
+                    {% include 'students/learners/education_details.html' %}                     
+                </div>
+
+                <div id="parent" class="tab-pane p-5 {{ parent_page }}" role="tabpanel" aria-labelledby="parent-tab">
+                    {% include 'students/learners/next_of_kin.html' %}                     
+                </div>
+
+                <div id="modules" class="tab-pane p-5 {{ modules_page }}" role="tabpanel" aria-labelledby="modules-tab">
+                    {% include 'students/learners/module_registration.html' %}                     
+                </div>
+
+                <div id="attachments" class="tab-pane p-5 {{ attachments_page }}" role="tabpanel" aria-labelledby="attachments-tab">
+                    {% include 'students/learners/attachments.html' %}                     
+                </div>
+
+                <div id="summary" class="tab-pane p-5 {{ summary_page }}" role="tabpanel" aria-labelledby="summary-tab">
+                    {% include 'students/learners/summary_reg.html' %}                     
+                </div>
+                
+            </div>
+        </div>
+    </div>
+
+    <div id="modal_error_check" class="modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body p-0">
+                    <div class="p-5 text-center"> <i data-lucide="x-circle" class="w-16 h-16 text-danger mx-auto mt-3"></i>
+                        <div class="text-3xl mt-5">An error has occurred!</div>
+                        <div id="div_error_message" class="text-slate-500 mt-2"></div>
+                    </div>
+                    <div class="px-5 pb-8 text-center"> <button type="button" data-tw-dismiss="modal" class="btn btn-outline-secondary w-24 mr-1">Okay</button></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- END: Post Content -->
+
+{% endblock %}
+
+{% block js-content %}
+
+<script type="text/javascript">
+    
+	$(document).ready(function(){
+
+        
+        function checkAreaPostalCode(){
+            var area = $('#id_area_learner').val();
+                $.ajax({ // ajax call starts
+                    url: "{% url 'configurable:ajax_verify_area' %}", 
+                    data: 'area=' + area, // Send value of the clicked button
+                    dataType: 'json', // Choosing a JSON datatype
+                  })
+                  .done(function(data) { // Variable data contains the data we get from serverside              
+                       if(data.valid == 2 || data.valid == 1){   
+                            $('#id_area_learner').val('');
+                            Toastify({text: 'Invalid area input, please try again ',duration: 6000,className: "info",}).showToast();                                        
+                        }
+                  });
+                return false;         
+        }
+
+        function checkAreaPostalCodeP(){
+            var area = $('#id_postal_address_postal_code_postal').val();
+                $.ajax({ // ajax call starts
+                    url: "{% url 'configurable:ajax_verify_area' %}", 
+                    data: 'area=' + area, // Send value of the clicked button
+                    dataType: 'json', // Choosing a JSON datatype
+                  })
+                  .done(function(data) { // Variable data contains the data we get from serverside              
+                       if(data.valid == 2 || data.valid == 1){   
+                            $('#id_postal_address_postal_code_postal').val('');
+                            Toastify({text: 'Invalid area input, please try again ',duration: 6000,className: "info",}).showToast();                                        
+                        }
+                  });
+                return false;         
+        }
+
+        var availableTags = [
+                {% for area in areas %}
+                    "{{area.postal_code}} * {{area.suburb}}",
+                {% endfor %}
+            ];
+
+        var autoComplete,
+        input = $("#id_area_learner"),
+        input_postal = $("#id_postal_address_postal_code_postal"),
+        data = availableTags;
+
+        // initialize autocomplete
+        input.autocomplete({
+            source: data,
+            minLength: 4
+        });
+
+        input_postal.autocomplete({
+            source: data,
+            minLength: 4
+        });
+
+
+        $("#copy_address").change(function() {
+           
+            if(this.checked) {
+                $( "#id_postal_address_1" ).val( $( "#id_physical_address_1" ).val() );
+                $( "#id_postal_address_2" ).val( $( "#id_physical_address_2" ).val() );
+                $( "#id_postal_address_3" ).val( $( "#id_physical_address_3" ).val() );
+                $( "#id_postal_address_postal_code_postal" ).val( $( "#id_area_learner" ).val() );
+            } else{
+                $( "#id_postal_address_3" ).val( '' );
+                $( "#id_postal_address_2" ).val( '' );
+                $( "#id_postal_address_1" ).val( '' );
+                $( "#id_postal_address_postal_code_postal" ).val( '' );
+            }
+        });
+
+
+        $('#id_province_learner').on('change', function(){
+            
+            var province_id = $('#id_province_learner').val();
+            $.ajax({ // ajax call starts
+                url: "{% url 'configurable:ajax_fetch_municipalities' %}", 
+                data: 'province_id=' + province_id, // Send value of the clicked button
+                dataType: 'json', // Choosing a JSON datatype
+              })
+              .done(function(data) { // Variable data contains the data we get from serverside              
+                   if(data.valid == 1){   
+                        var data = data 
+                        document.getElementById("div_municiaplity").style.display = "block";
+                        $('#id_municipality_learner').empty();
+                        $('#id_municipality_learner').append('<option></option>');
+                        for (var x = 0; x <= data.info.length - 1; x++) {
+                            $('#id_municipality_learner').append('<option value="' + data.info[x].id + '">' + data.info[x].municipality + '</option>');
+                        }                         
+                    }
+                    else{
+                        document.getElementById("div_municiaplity").style.display = "none";
+                    }
+              });
+            return false;          
+        });
+
+        $('#id_municipality_learner').on('change', function(){
+            var municipality_id = $('#id_municipality_learner').val();
+            
+            $.ajax({ // ajax call starts
+                url: "{% url 'configurable:ajax_fetch_cities' %}", 
+                data: 'municipality_id=' + municipality_id, // Send value of the clicked button
+                dataType: 'json', // Choosing a JSON datatype
+              })
+              .done(function(data) { // Variable data contains the data we get from serverside          
+             
+                   if(data.valid == 1){    
+                        document.getElementById("div_city").style.display = "block";
+                        $('#id_city_learner').empty();
+                        $('#id_city_learner').append('<option></option>');
+                        for (var x = 0; x <= data.info.length - 1; x++) {         
+                            var option = new Option(data.info[x].text, data.info[x].id, true, true);               
+                            $('#id_city_learner').append(option);
+                        }                         
+                    }
+                    else{
+                        document.getElementById("div_city").style.display = "none";
+                    }
+              });
+            return false;          
+        });
+
+        $('#id_city_learner').on('change', function(){
+            var city_id = $('#id_city_learner').val();
+            
+            $.ajax({ // ajax call starts
+                url: "{% url 'configurable:ajax_fetch_surburbs' %}", 
+                data: 'city_id=' + city_id, // Send value of the clicked button
+                dataType: 'json', // Choosing a JSON datatype
+              })
+              .done(function(data) { // Variable data contains the data we get from serverside          
+             
+                   if(data.valid == 1){    
+                        document.getElementById("div_surburbs").style.display = "block";
+                        $('#id_area_learner').empty();
+                        $('#id_area_learner').append('<option></option>');
+                        for (var x = 0; x <= data.info.length - 1; x++) {         
+                            var option = new Option(data.info[x].text, data.info[x].id, true, true);               
+                            $('#id_area_learner').append(option);
+                        }                         
+                    }
+                    else{
+                        document.getElementById("div_surburbs").style.display = "none";
+                    }
+              });
+            return false;          
+        });
+
+
+        $('#id_province_host').on('change', function(){
+            
+            var province_id = $('#id_province_host').val();
+            $.ajax({ // ajax call starts
+                url: "{% url 'configurable:ajax_fetch_municipalities' %}", 
+                data: 'province_id=' + province_id, // Send value of the clicked button
+                dataType: 'json', // Choosing a JSON datatype
+              })
+              .done(function(data) { // Variable data contains the data we get from serverside              
+                   if(data.valid == 1){   
+                        var data = data 
+                        document.getElementById("div_municiaplity_host").style.display = "block";
+                        $('#id_municipality_host').empty();
+                        $('#id_municipality_host').append('<option></option>');
+                        for (var x = 0; x <= data.info.length - 1; x++) {
+                            $('#id_municipality_host').append('<option value="' + data.info[x].id + '">' + data.info[x].municipality + '</option>');
+                        }                         
+                    }
+                    else{
+                        document.getElementById("div_municiaplity_host").style.display = "none";
+                    }
+              });
+            return false;          
+        });
+
+        $('#id_municipality_host').on('change', function(){
+            var municipality_id = $('#id_municipality_host').val();
+            
+            $.ajax({ // ajax call starts
+                url: "{% url 'configurable:ajax_fetch_cities' %}", 
+                data: 'municipality_id=' + municipality_id, // Send value of the clicked button
+                dataType: 'json', // Choosing a JSON datatype
+              })
+              .done(function(data) { // Variable data contains the data we get from serverside          
+             
+                   if(data.valid == 1){    
+                        document.getElementById("div_city_host").style.display = "block";
+                        $('#id_city_host').empty();
+                        $('#id_city_host').append('<option></option>');
+                        for (var x = 0; x <= data.info.length - 1; x++) {         
+                            var option = new Option(data.info[x].text, data.info[x].id, true, true);               
+                            $('#id_city_host').append(option);
+                        }                         
+                    }
+                    else{
+                        document.getElementById("div_city_host").style.display = "none";
+                    }
+              });
+            return false;          
+        });
+
+        $('#id_city_host').on('change', function(){
+            var city_id = $('#id_city_host').val();
+            
+            $.ajax({ // ajax call starts
+                url: "{% url 'configurable:ajax_fetch_surburbs' %}", 
+                data: 'city_id=' + city_id, // Send value of the clicked button
+                dataType: 'json', // Choosing a JSON datatype
+              })
+              .done(function(data) { // Variable data contains the data we get from serverside          
+             
+                   if(data.valid == 1){    
+                        document.getElementById("div_surburbs_host").style.display = "block";
+                        $('#id_area_host').empty();
+                        $('#id_area_host').append('<option></option>');
+                        for (var x = 0; x <= data.info.length - 1; x++) {         
+                            var option = new Option(data.info[x].text, data.info[x].id, true, true);               
+                            $('#id_area_host').append(option);
+                        }                         
+                    }
+                    else{
+                        document.getElementById("div_surburbs_host").style.display = "none";
+                    }
+              });
+            return false;          
+        });
+
+
+        $('#id_province_provider').on('change', function(){
+            
+            var province_id = $('#id_province_provider').val();
+            $.ajax({ // ajax call starts
+                url: "{% url 'configurable:ajax_fetch_municipalities' %}", 
+                data: 'province_id=' + province_id, // Send value of the clicked button
+                dataType: 'json', // Choosing a JSON datatype
+              })
+              .done(function(data) { // Variable data contains the data we get from serverside              
+                   if(data.valid == 1){   
+                        var data = data 
+                        document.getElementById("div_municiaplity_provider").style.display = "block";
+                        $('#id_municipality_provider').empty();
+                        $('#id_municipality_provider').append('<option></option>');
+                        for (var x = 0; x <= data.info.length - 1; x++) {
+                            $('#id_municipality_provider').append('<option value="' + data.info[x].id + '">' + data.info[x].municipality + '</option>');
+                        }                         
+                    }
+                    else{
+                        document.getElementById("div_municiaplity_provider").style.display = "none";
+                    }
+              });
+            return false;          
+        });
+
+        $('#id_municipality_provider').on('change', function(){
+            var municipality_id = $('#id_municipality_provider').val();
+            
+            $.ajax({ // ajax call starts
+                url: "{% url 'configurable:ajax_fetch_cities' %}", 
+                data: 'municipality_id=' + municipality_id, // Send value of the clicked button
+                dataType: 'json', // Choosing a JSON datatype
+              })
+              .done(function(data) { // Variable data contains the data we get from serverside          
+             
+                   if(data.valid == 1){    
+                        document.getElementById("div_city_provider").style.display = "block";
+                        $('#id_city_provider').empty();
+                        $('#id_city_provider').append('<option></option>');
+                        for (var x = 0; x <= data.info.length - 1; x++) {         
+                            var option = new Option(data.info[x].text, data.info[x].id, true, true);               
+                            $('#id_city_provider').append(option);
+                        }                         
+                    }
+                    else{
+                        document.getElementById("div_city_provider").style.display = "none";
+                    }
+              });
+            return false;          
+        });
+
+        $('#id_city_provider').on('change', function(){
+            var city_id = $('#id_city_provider').val();
+            
+            $.ajax({ // ajax call starts
+                url: "{% url 'configurable:ajax_fetch_surburbs' %}", 
+                data: 'city_id=' + city_id, // Send value of the clicked button
+                dataType: 'json', // Choosing a JSON datatype
+              })
+              .done(function(data) { // Variable data contains the data we get from serverside          
+             
+                   if(data.valid == 1){    
+                        document.getElementById("div_surburbs_provider").style.display = "block";
+                        $('#id_area_provider').empty();
+                        $('#id_area_provider').append('<option></option>');
+                        for (var x = 0; x <= data.info.length - 1; x++) {         
+                            var option = new Option(data.info[x].text, data.info[x].id, true, true);               
+                            $('#id_area_provider').append(option);
+                        }                         
+                    }
+                    else{
+                        document.getElementById("div_surburbs_provider").style.display = "none";
+                    }
+              });
+            return false;          
+        });
+
+
+
+        $('#id_disability').on('change', function(){
+                
+            var disability = $('#id_disability').val();
+            if(disability == "Yes"){
+                document.getElementById("div_disability_specify").style.display = "block";
+            } else{
+                document.getElementById("div_disability_specify").style.display = "none";
+            }            
+            return false;          
+        });
+
+
+      
+
+        lightGallery(document.getElementById('open-id_copy'), {
+            selector: 'this',
+            download: false,
+        });
+
+        lightGallery(document.getElementById('open-affidavit'), {
+            selector: 'this',
+            download: false,
+        });
+
+        lightGallery(document.getElementById('open-highest_qualification'), {
+            selector: 'this',
+            download: false,
+        }); 
+        
+        lightGallery(document.getElementById('open-matric_certificate'), {
+            selector: 'this',
+            download: false,
+        });
+
+        lightGallery(document.getElementById('open-employment_contract'), {
+            selector: 'this',
+            download: false,
+        });
+
+        lightGallery(document.getElementById('open-signed_contract'), {
+            selector: 'this',
+            download: false,
+        });
+
+        lightGallery(document.getElementById('open-professional_body_registration'), {
+            selector: 'this',
+            download: false,
+        });
+
+        lightGallery(document.getElementById('open-placement_letter'), {
+            selector: 'this',
+            download: false,
+        });
+
+        lightGallery(document.getElementById('open-other_compliant'), {
+            selector: 'this',
+            download: false,
+        });
+
+        lightGallery(document.getElementById('open-academic_record'), {
+            selector: 'this',
+            download: false,
+        });
+
+        lightGallery(document.getElementById('open-proof_of_registration'), {
+            selector: 'this',
+            download: false,
+        });
+
+        lightGallery(document.getElementById('open-fees_statement'), {
+            selector: 'this',
+            download: false,
+        });
+
+        lightGallery(document.getElementById('open-other'), {
+            selector: 'this',
+            download: false,
+        });
+
+        
+
+        $('#id_dob').change(function(){
+            var error_msg = "The following errors have occurred: "
+            const modal_error_check = tailwind.Modal.getInstance(document.querySelector("#modal_error_check"));
+
+            var unser_input_dob = $('#id_dob').val();
+            var dob = new Date(unser_input_dob);
+
+            //age
+            //calculate month difference from current date in time  
+            var month_diff = Date.now() - dob.getTime();  
+            
+            //convert the calculated difference in date format  
+            var age_dt = new Date(month_diff);   
+            
+            //extract year from date      
+            var year = age_dt.getUTCFullYear();  
+            
+            //now calculate the age of the user  
+            var calc_age = Math.abs(year - 1970);  
+
+            if(calc_age < 10){
+                
+                error_msg = error_msg + "The age from the date of birth cannot be less than 10<br><br>"
+                $('#div_error_message').html(error_msg);
+                modal_error_check.show();
+            }
+
+            else{
+                $('#id_age').val(calc_age)
+            }
+
+       });
+
+        $('#btn_learner_details').on('click', function(){
+
+            var type_of_id = $('#id_type_of_id').val();
+            var id_num = $('#id_id_number').val();
+            var first_name = $('#first_name').val();
+            var last_name = $('#last_name').val();
+            var gender = $('#id_gender').val();
+            var race = $('#id_race').val();
+            var disability = $('#id_disability').val();
+            var disability_specify = $('#id_disability_specify').val();
+            var age = $('#id_age').val();
+            var citizen = $('#id_citizen').val();
+            var employed = $('#id_employed').val()
+            var how_long_unemployed = $('#id_how_long_unemployed').val()
+            var date_employed = $('#id_date_employed').val()
+            var date_learner_entered = $('#id_date_learner_entered').val()
+            var programme_start = $('#id_date_programme_start').val()
+            var unser_input_dob = $('#id_dob').val();
+            var dob = new Date(unser_input_dob); 
+
+            var form_valid = true;
+            var error_msg = "The following errors have occurred: "
+            const modal_error_check = tailwind.Modal.getInstance(document.querySelector("#modal_error_check"));
+
+            if(date_learner_entered == "" || programme_start == "" || employed == "" || id_num == "" || first_name == "" || last_name =="" || gender == "" || race == "" || type_of_id == "" || disability == "" || citizen == "" || unser_input_dob == ""){
+                form_valid = false;
+                error_msg = error_msg + "Please make sure all fields are complete.<br><br>"
+            }
+
+            if(type_of_id == "SA"){        
+                               
+                var parsedID = saIdParser.parse(id_num);
+                //alert(isValid.dateOfBirth.toLocaleDateString()); 
+                isValid = parsedID.isValid
+                if(isValid == true){
+                    dob = parsedID.dateOfBirth;
+                    citizen_calc = parsedID.isSouthAfricanCitizen;
+                    var month_diff = Date.now() - dob.getTime();        
+                    //convert the calculated difference in date format  
+                    var age_dt = new Date(month_diff);                   
+                    //extract year from date      
+                    var year = age_dt.getUTCFullYear();                  
+                    //now calculate the age of the user  
+                    var calc_age = Math.abs(year - 1970);  
+                    
+                    citizen_calc = citizen_calc == true ? 'Yes' : 'No';
+                    
+                    if(calc_age != age){
+                        form_valid = false;
+                        error_msg = error_msg + " The age input does not match with your ID number.<br><br>";
+                    }
+
+                    if(citizen_calc != citizen){
+                        form_valid = false;
+                        error_msg = error_msg + " The citizenship input does not match with your ID number.<br><br>";
+                    }
+                }
+                if(isValid == false){
+                    form_valid = false;
+                    error_msg = error_msg + " Please input a valid SA ID Number.<br><br>";
+                }
+
+                
+                
+            }   
+            
+            if(disability == 'Yes' && disability_specify == ""){
+                form_valid = false;
+                error_msg = error_msg + "Please make sure to specify the disability.<br><br>"
+            }
+
+            if(employed == 'Yes' && date_employed == ""){
+                form_valid = false;
+                error_msg = error_msg + "Please make sure to specify the date of employment.<br><br>"
+            }
+
+            if(employed == 'No' && how_long_unemployed == ""){
+                form_valid = false;
+                error_msg = error_msg + "Please make sure to specify how long the learner has been unemployed.<br><br>"
+            }
+
+            //age
+            //calculate month difference from current date in time  
+            var month_diff = Date.now() - dob.getTime();  
+            
+            //convert the calculated difference in date format  
+            var age_dt = new Date(month_diff);   
+            
+            //extract year from date      
+            var year = age_dt.getUTCFullYear();  
+            
+            //now calculate the age of the user  
+            var calc_age = Math.abs(year - 1970);  
+
+            if(calc_age < 10){
+                form_valid = false;
+                error_msg = error_msg + "The age from the date of birth cannot be less than 10<br><br>"
+            }
+
+            if(calc_age != age){
+                form_valid = false;
+                error_msg = error_msg + "The age supplied does not correspond to the date of birth supplied<br><br>"
+            }
+
+           
+            if(form_valid){
+                $('#frm_learner_details').submit();
+            }
+            else{
+                $('#div_error_message').html(error_msg);
+                modal_error_check.show();
+                return false;
+            }        
+ 
+        });
+
+        $('#btn_save_parent').on('click', function(){
+
+            var type_of_id = $('#parent_type_of_id').val();
+            var id_num = $('#parent_id_number').val();
+            var first_name = $('#parent_id_first_name').val();
+            var last_name = $('#parent_id_last_name').val();
+            var cellphone = $('#parent_id_cellphone').val();
+            var email = $('#parent_id_email').val();
+            var home_address = $('#parent_id_home_address').val();
+            var postal_address = $('#parent_id_postal_address').val();
+
+            var form_valid = true;
+            var error_msg = "The following errors have occurred: "
+            const modal_error_check = tailwind.Modal.getInstance(document.querySelector("#modal_error_check"));
+
+            if(id_num == "" || first_name == "" || last_name =="" || postal_address == "" || home_address == "" || type_of_id == "" || cellphone =="" || email == "" ){
+                form_valid = false;
+                error_msg = error_msg + "Please make sure all fields are complete.<br><br>"
+            }
+
+            if(type_of_id == "SA"){        
+                               
+                var parsedID = saIdParser.parse(id_num);
+
+                isValid = parsedID.isValid
+                
+                if(isValid == false){
+                    form_valid = false;
+                    error_msg = error_msg + " Please input a valid SA ID Number.<br><br>";
+                }
+                
+            }   
+            
+            if(form_valid){
+                $('#frm_save_parent').submit();
+            }
+            else{
+                $('#div_error_message').html(error_msg);
+                modal_error_check.show();
+                return false;
+            }        
+ 
+        });
+
+        $('#id_marticulated').on('change', function(){
+                
+            var marticulated = $('#id_marticulated').val();
+            if(marticulated == "Yes"){
+                document.getElementById("div_marticulated_sa").style.display = "block";
+                document.getElementById("div_year_national_certificate").style.display = "block";
+            } else if(marticulated == "No"){
+                document.getElementById("div_marticulated_sa").style.display = "none";
+                document.getElementById("div_year_national_certificate").style.display = "none";
+                document.getElementById("div_high_school_name").style.display = "none";
+                document.getElementById("div_high_school").style.display = "none";
+                document.getElementById("div_high_school_province").style.display = "none";
+            }         
+            return false;          
+        });
+
+        $('#id_marticulated_sa').on('change', function(){
+                
+            var marticulated_sa = $('#id_marticulated_sa').val();
+            if(marticulated_sa == "Yes"){
+                document.getElementById("div_high_school_province").style.display = "block";
+                document.getElementById("div_high_school_name").style.display = "none";
+            } else if(marticulated_sa == "No"){
+                document.getElementById("div_high_school_province").style.display = "none";
+                document.getElementById("div_high_school_name").style.display = "block";
+            }         
+            return false;          
+        });
+
+        $('#id_high_school_code').on('change', function(){
+                
+            var marticulated_code = $('#id_high_school_code').val();
+            if(marticulated_code == "Can not find school"){                
+                document.getElementById("div_high_school_name").style.display = "block";
+            }          
+            return false;          
+        });
+
+        
+
+        $('#id_province_highschool').on('change', function(){
+            
+            var province_id = $('#id_province_highschool').val();
+            $.ajax({ // ajax call starts
+                url: "{% url 'students:ajax_fetch_highschools' %}", 
+                data: 'province_id=' + province_id, // Send value of the clicked button
+                dataType: 'json', // Choosing a JSON datatype
+              })
+              .done(function(data) { // Variable data contains the data we get from serverside              
+                   if(data.valid == 1){   
+                        var data = data 
+                        document.getElementById("div_high_school").style.display = "block";
+                        $('#id_high_school_code').empty();
+                        $('#id_high_school_code').append('<option></option>');
+                        $('#id_high_school_code').append('<option>Can not find school</option>');
+                        for (var x = 0; x <= data.info.length - 1; x++) {
+                            $('#id_high_school_code').append('<option value="' + data.info[x].id + '">' + data.info[x].high_school + '</option>');
+                        }                         
+                    }
+                    else{
+                        document.getElementById("div_high_school").style.display = "none";
+                    }
+              });
+            return false;          
+        });
+
+        $('#btn_education_save').on('click', function(){
+
+            var highest_nqf_level = $('#id_highest_nqf_level').val();
+            var highest_other = $('#highest_other').val();
+            var highest_qualification = $('#id_highest_qualification').val();
+            var marticulated = $('#id_marticulated').val();
+            var marticulated_sa = $('#id_marticulated_sa').val();
+            var province_highschool = $('#province_highschool').val();
+            var high_school_code = $('#id_high_school_code').val();
+            var high_school = $('#id_high_school').val();
+            var year_national_certificate = $('#id_year_national_certificate').val();
+
+            var form_valid = true;
+            var error_msg = "The following errors have occurred: "
+            const modal_error_check = tailwind.Modal.getInstance(document.querySelector("#modal_error_check"));
+
+            if(highest_qualification == "" || marticulated == "" ){
+                form_valid = false;
+                error_msg = error_msg + "Please make sure to feel Title of your highest qualification? and Has the Learner Marticulated from high school?.<br><br>"
+            }
+
+            if(marticulated == "Yes"){        
+                               
+                if(marticulated_sa == ""){
+                    form_valid = false;
+                    error_msg = error_msg + "Please make sure to complete: Did the Learner Marticulate in South Africa?<br><br>"
+                } else if(marticulated_sa == "Yes"){
+                    if(high_school_code == ""){
+                        form_valid = false;
+                        error_msg = error_msg + "Please make sure to complete: Did the Learner Marticulate in South Africa?<br><br>"
+                    }
+                } else if(marticulated_sa == "No"){
+                    if(high_school == ""){
+                        form_valid = false;
+                        error_msg = error_msg + "Please make sure to complete: High school Marticulated from?<br><br>"
+                    }
+                }                
+            }            
+                        
+            if(form_valid){
+                $('#frm_education_save').submit();
+            }
+            else{
+                $('#div_error_message').html(error_msg);
+                modal_error_check.show();
+                return false;
+            }        
+ 
+        });
+
+        lightGallery(document.getElementById('open-host_mou'), {
+            selector: 'this',
+            download: false,
+        });
+
+        lightGallery(document.getElementById('open-tp_accreditation'), {
+            selector: 'this',
+            download: false,
+        });
+
+        $('#id_province_learner').on('change', function(){
+            
+            var province_id = $('#id_province_learner').val();
+            $.ajax({ // ajax call starts
+                url: "{% url 'configurable:ajax_fetch_municipalities' %}", 
+                data: 'province_id=' + province_id, // Send value of the clicked button
+                dataType: 'json', // Choosing a JSON datatype
+              })
+              .done(function(data) { // Variable data contains the data we get from serverside              
+                   if(data.valid == 1){   
+                        var data = data 
+                        document.getElementById("div_municiaplity_learner").style.display = "block";
+                        $('#id_municipality_learner').empty();
+                        $('#id_municipality_learner').append('<option></option>');
+                        for (var x = 0; x <= data.info.length - 1; x++) {
+                            $('#id_municipality_learner').append('<option value="' + data.info[x].id + '">' + data.info[x].municipality + '</option>');
+                        }                         
+                    }
+                    else{
+                        document.getElementById("div_municiaplity_learner").style.display = "none";
+                    }
+              });
+            return false;          
+        });
+
+        $('#id_municipality_learner').on('change', function(){
+            var municipality_id = $('#id_municipality_learner').val();
+            
+            $.ajax({ // ajax call starts
+                url: "{% url 'configurable:ajax_fetch_cities' %}", 
+                data: 'municipality_id=' + municipality_id, // Send value of the clicked button
+                dataType: 'json', // Choosing a JSON datatype
+              })
+              .done(function(data) { // Variable data contains the data we get from serverside          
+             
+                   if(data.valid == 1){    
+                        document.getElementById("div_city_learner").style.display = "block";
+                        $('#id_city_learner').empty();
+                        $('#id_city_learner').append('<option></option>');
+                        for (var x = 0; x <= data.info.length - 1; x++) {         
+                            var option = new Option(data.info[x].text, data.info[x].id);               
+                            $('#id_city_learner').append(option);
+                        }                         
+                    }
+                    else{
+                        document.getElementById("div_city_learner").style.display = "none";
+                    }
+              });
+            return false;          
+        });
+
+        $('#id_city_learner').on('change', function(){
+            var city_id = $('#id_city_learner').val();
+            
+            $.ajax({ // ajax call starts
+                url: "{% url 'configurable:ajax_fetch_surburbs' %}", 
+                data: 'city_id=' + city_id, // Send value of the clicked button
+                dataType: 'json', // Choosing a JSON datatype
+              })
+              .done(function(data) { // Variable data contains the data we get from serverside          
+             
+                   if(data.valid == 1){    
+                        document.getElementById("div_surburbs").style.display = "block";
+                        document.getElementById("div_surburbs_postal").style.display = "block";
+                        
+                        $('#id_area').empty();
+                        $('#id_area').append('<option></option>');
+
+                        $('#id_postal_address_postal_code_postal').empty();
+                        $('#id_postal_address_postal_code_postal').append('<option></option>');
+
+                        for (var x = 0; x <= data.info.length - 1; x++) {         
+                            var option = new Option(data.info[x].text, data.info[x].id);               
+                            $('#id_area').append(option);
+                            $('#id_postal_address_postal_code_postal').append(option);
+                        }                         
+                    }
+                    else{
+                        document.getElementById("div_surburbs").style.display = "none";
+                        document.getElementById("div_surburbs_postal").style.display = "none";
+                    }
+              });
+            return false;          
+        });
+       
+    });
+
+</script>
+
+{% endblock %}

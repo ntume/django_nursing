@@ -1,0 +1,311 @@
+{% extends 'base.html' %}
+
+{% load bootstrap3 %}
+
+{% block main-content %}
+
+  <div class="col-12 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          <h4 class="card-title">Edit Advert</h4>
+          <p class="card-description">
+            Please fill in the information below
+          </p>
+          <form class="forms-sample" method="POST">
+            {% csrf_token %}
+            <div class="row">
+              <div class="col-md-12">
+                <div class="form-group row">
+                  <label class="col-sm-2 col-form-label">*Type of Position</label>
+                  <div class="col-sm-10">
+                    <select class="form-control" name="type" id="id_type" required>
+                      <option value="0">Select Type of Position</option>
+                      {% for type in types %}
+                        {% if type.id == advert.type_id %}
+                          <option value="{{ type.id }}" selected>{{ type.type }}</option>
+                        {% else %}
+                          <option value="{{ type.id }}">{{ type.type }}</option>
+                        {% endif %}
+                      {% endfor %}
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-12">
+                <div class="form-group row">
+                  <label class="col-sm-2 col-form-label">*Package Pricing for Type</label>
+                  <div class="col-sm-10">
+                    <select class="form-control" name="type_price" id="id_type_price" required>
+                      <option value="0">Select Package Pricing</option>
+                      {% for p in pricing %}
+                        {% if p.id == advert.type_price_id %}
+                          <option value="{{ p.id }}" selected>{{ p.period }} - {{ p.price }}</option>
+                        {% else %}
+                          <option value="{{ p.id }}">{{ p.period }} - {{ p.price }}</option>
+                        {% endif %}
+                      {% endfor %}
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-12">
+                <div class="form-group row">
+                  <label class="col-sm-2 col-form-label">*Job Title</label>
+                  <div class="col-sm-10">
+                    {% bootstrap_field form.position show_label=False %}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-12">
+                <div class="form-group row">
+                  <label class="col-sm-2 col-form-label">*Industry</label>
+                  <div class="col-sm-10">
+
+                    <select name='industry' id="id_industry" class="form-control">
+                        {% for i in industries %}
+                          {% if advert.industry_id == i.id%}
+                            <option value='{{ i.id }}' selected>{{ i.industry }}</option>
+                          {% else %}
+                            <option value='{{ i.id }}'>{{ i.industry }}</option>
+                          {% endif %}
+                        {% endfor %}
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-12">
+                <div class="form-group row">
+                  <label class="col-sm-2 col-form-label">*Description</label>
+                  <div class="col-sm-10">
+                    {% bootstrap_field form.description show_label=False %}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-12">
+                <div class="form-group row">
+                  <label class="col-sm-2 col-form-label">*Requirements</label>
+                  <div class="col-sm-10">
+                    {% bootstrap_field form.requirements show_label=False %}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-12">
+                <div class="form-group row">
+                  <label class="col-sm-2 col-form-label">*How to Apply</label>
+                  <div class="col-sm-10">
+                    {% bootstrap_field form.apply show_label=False %}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-12">
+                <div class="form-group row">
+                  <label class="col-sm-2 col-form-label">Link</label>
+                  <div class="col-sm-10">
+                    <input type="text" name="link" id="id_link" class="form-control" value="{{ advert.link }}">
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-12">
+                <div class="form-group row">
+                  <label class="col-sm-2 col-form-label">*Post Date</label>
+                  <div class="col-sm-10">
+                    <input type="date" name="post_date" id="id_post_date" value="{{ advert.post_date|date:'Y-m-d' }}" class="form-control" required>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-12">
+                <div class="form-group row">
+                  <label class="col-sm-2 col-form-label">*Cut off date</label>
+                  <div class="col-sm-10">
+                    <input type="date" name="cut_off_date" id="id_cut_off_date" value="{{ advert.cut_off_date|date:'Y-m-d' }}" class="form-control" required>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+
+            <div class="row">
+              <div class="col-md-12">
+                <div class="form-group row">
+                  <label class="col-sm-2 col-form-label">*Region</label>
+                  <div class="col-sm-10">
+                    <select name="region" id='id_region' class="form-control" required>
+                      {% for r in regions %}
+                        {% if r.id == advert.region_id %}
+                          <option value="{{ r.id }}" selected>{{ r.region }}</option>
+                        {% else %}
+                          <option value="{{ r.id }}">{{ r.region }}</option>
+                        {% endif %}
+                      {% endfor %}
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-12">
+                <div class="form-group row">
+                  <label class="col-sm-2 col-form-label">*Address</label>
+                  <div class="col-sm-10">
+                    {% bootstrap_field form.address show_label=False %}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-12">
+                <div class="form-group row">
+                  <label class="col-sm-2 col-form-label">*Paid/Unpaid</label>
+                  <div class="col-sm-10">
+                    {% bootstrap_field form.paid show_label=False %}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-12">
+                <div class="form-group row">
+                  <label class="col-sm-2 col-form-label">*Contract</label>
+                  <div class="col-sm-10">
+                    {% bootstrap_field form.contract show_label=False %}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-12">
+                <div class="form-group row">
+                  <label class="col-sm-2 col-form-label">*Required Documents</label>
+                  <div class="col-sm-10">
+              <input type="text" name="documents" id="id_documents" value="{{ advert.documents }}" class="form-control" required>
+            </div>
+          </div>
+        </div>
+      </div>
+
+            <div class="row">
+              <div class="col-md-12">
+                <div class="form-group row">
+                  <label class="col-sm-2 col-form-label">*Degree Choice</label>
+                  <div class="col-sm-10">
+              <select class="form-control" name="degree" id="id_degree" required>
+                <option value='0'>Select the degree level</option>
+                {% for degree in degrees %}
+                  {% if advert.degree_id == degree.id %}
+                    <option value="{{ degree.id }}" selected>{{ degree.degree }}</option>
+                  {% else %}
+                    <option value="{{ degree.id }}">{{ degree.degree }}</option>
+                  {% endif %}
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-12">
+          <div class="form-group row">
+            <label class="col-sm-2 col-form-label">Level</label>
+            <div class="col-sm-10">
+              <select class="form-control" name="level" id="id_level">
+                <option value='0'>Select the year level</option>
+                {% for level in levels %}
+                  {% if advert.level_id == level.id %}
+                    <option value="{{ level.id }}" selected>{{ level.level }}</option>
+                  {% else %}
+                    <option value="{{ level.id }}">{{ level.level }}</option>
+                  {% endif %}
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+
+            <button type="submit" class="btn btn-primary mr-2">Edit</button>
+            <button class="btn btn-light">Cancel</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+{% endblock %}
+
+{% block js-content %}
+
+<script type="text/javascript">
+
+    $(document).ready(function(){
+
+
+
+        $('#id_type').on('change', function(){
+
+          var id_type = $( "#id_type" ).val();
+
+          if(id_type > 0){
+            //document.getElementById("div_advert_info").style.display = "block";
+            $.ajax({ // ajax call starts
+              url: "{% url 'contact:ajax_type_payments' %}", // JQuery loads serverside.php
+              data: 'id_type=' + id_type, // Send value of the clicked button
+              dataType: 'json', // Choosing a JSON datatype
+            })
+            .done(function(data) { // Variable data contains the data we get from serverside
+              var len = data.length;
+              $("#id_type_price").empty();
+              if(len > 0){
+                for( var i = 0; i<len; i++){
+                  var id = data[i]['id'];
+                  var period = data[i]['period'];
+                  $("#id_type_price").append("<option value='"+ id +"'>"+ period +"</option>");
+                }
+              }
+
+            });
+          } else{
+            //document.getElementById("div_advert_info").style.display = "none";
+            alert("Please select the type of position you want to advertise");
+          }
+         // or $(this).val()
+        return false; // keeps the page from not refreshing
+        });
+
+    });
+</script>
+
+
+{% endblock %}

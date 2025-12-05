@@ -1,0 +1,273 @@
+{% extends 'base_vertical.html' %}
+
+{% block breadcrumb-content %}
+    <nav aria-label="breadcrumb" class="-intro-x h-full mr-auto">
+        <ol class="breadcrumb breadcrumb-light">
+            <li class="breadcrumb-item active" aria-current="page">Dashboard</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block main-content %}
+
+{% include 'messages.html' %}
+
+<div class="grid grid-cols-12 gap-6">
+    
+    <div class="col-span-12 2xl:col-span-12">
+        <div class="2xl:border-l -mb-10 pb-10">
+            <div class="2xl:pl-6 grid grid-cols-12 gap-x-6 2xl:gap-x-0 gap-y-6">
+
+                <!-- BEGIN: Important Notes -->
+                <div class="col-span-12 md:col-span-12 xl:col-span-12 xl:col-start-1 xl:row-start-1 2xl:col-start-auto 2xl:row-start-auto mt-3">
+                    <div class="intro-x flex items-center h-10">
+                        <h2 class="text-lg font-medium truncate mr-auto">
+                            Important Announcements
+                        </h2>
+                        <button data-carousel="important-notes" data-target="prev" class="tiny-slider-navigator btn px-2 border-slate-300 text-slate-600 dark:text-slate-300 mr-2"> <i data-lucide="chevron-left" class="w-4 h-4"></i> </button>
+                        <button data-carousel="important-notes" data-target="next" class="tiny-slider-navigator btn px-2 border-slate-300 text-slate-600 dark:text-slate-300 mr-2"> <i data-lucide="chevron-right" class="w-4 h-4"></i> </button>
+                    </div>
+                    <div class="mt-5 intro-x">
+                        <div class="box zoom-in">
+                            <div class="tiny-slider" id="important-notes">
+                                {% for announcement in cohort_registration_announcements %}
+                                    <div class="p-5">
+                                        <div class="text-base font-medium truncate">{{ announcement.title }}</div>
+                                        <div class="text-slate-400 mt-1">{{ announcement.category.category }}</div>
+                                        <div class="text-slate-500 text-justify mt-1">{{ announcement.description }}</div>                                        
+                                    </div>
+                                {% endfor %}
+                                {% for announcement in cohort_announcements %}
+                                    <div class="p-5">
+                                        <div class="text-base font-medium truncate">{{ announcement.title }}</div>
+                                        <div class="text-slate-400 mt-1">{{ announcement.category.category }}</div>
+                                        <div class="text-slate-500 text-justify mt-1">{{ announcement.description }}</div>                                        
+                                    </div>
+                                {% endfor %}
+                                {% for announcement in announcements %}
+                                    <div class="p-5">
+                                        <div class="text-base font-medium truncate">{{ announcement.title }}</div>
+                                        <div class="text-slate-400 mt-1">{{ announcement.category.category }}</div>
+                                        <div class="text-slate-500 text-justify mt-1">{{ announcement.description }}</div>                                        
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- END: Important Notes -->
+                
+                <!-- BEGIN: Recent Activities -->
+                <div class="col-span-12 md:col-span-6 xl:col-span-6 2xl:col-span-12 mt-3">
+                    <div class="intro-x flex items-center h-10">
+                        <h2 class="text-lg font-medium truncate mr-5">
+                           Education Timetable
+                        </h2>
+                    </div>
+                    <div class="mt-5">
+                        <div class="intro-x box">
+                            <div class="p-5">
+                                <div id='plan_calendar'>
+              
+                                </div>
+                            </div>
+                            <div class="border-t border-slate-200/60 p-5">
+                                {% for week in month_plans %}
+                                    <div class="flex items-center mt-5">
+                                        <div class="w-2 h-2 bg-pending rounded-full mr-3"></div>
+                                        <span class="truncate">{{ week.education_plan_section_week.block.block_name }}</span> <span class="font-medium xl:ml-auto">{{ week.education_plan_section_week.start_of_week }} - {{ week.education_plan_section_week.end_of_week }}</span> 
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- END: Recent Activities -->
+                
+                <!-- BEGIN: Schedules -->
+                <div class="col-span-12 md:col-span-6 xl:col-span-6 2xl:col-span-12 xl:col-start-1 xl:row-start-2 2xl:col-start-auto 2xl:row-start-auto mt-3">
+                    <div class="intro-x flex items-center h-10">
+                        <h2 class="text-lg font-medium truncate mr-5">
+                            My Appointments Snapshot
+                        </h2>                        
+                    </div>
+                    <div class="mt-5">
+                        <div class="intro-x box">
+                            <div class="p-5">
+                                <div id='dash_calendar'>
+              
+                                </div>
+                            </div>
+                            <div class="border-t border-slate-200/60 p-5">
+                                {% for leave in months_leave %}
+                                    <div class="flex items-center mt-4">
+                                        <div class="w-2 h-2 {% if leave.approved == 'Approved' %}bg-success{% elif leave.approved == 'Rejected' %}bg-danger{% elif leave.approved == 'Pending' %}bg-warning{% endif %} bg-primary rounded-full mr-3"></div>
+                                        <span class="truncate">{{ leave.type_of_leave.type_of_leave }} ({{ leave.approved }})</span> <span class="font-medium xl:ml-auto">{{ leave.from_date }} - {{ leave.to_date }}</span> 
+                                    </div>
+                                {% endfor %}
+                                {% for appointment in months_appointments %}
+                                    <div class="flex items-center mt-4">
+                                        <div class="w-2 h-2 bg-warning rounded-full mr-3"></div>
+                                        <span class="truncate">{{ appointment.category.category }} ({{ appointment.status }})</span> <span class="font-medium xl:ml-auto">{{ appointment.appointment_date }}@{{ appointment.appointment_time_start }}</span> 
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- END: Schedules -->
+            </div>
+        </div>
+    </div>
+
+    <div class="col-span-12 2xl:col-span-12">
+        <div class="2xl:border-l -mb-10 pb-10">
+            <div class="2xl:pl-6 grid grid-cols-12 gap-x-6 2xl:gap-x-0 gap-y-6">
+
+                <!-- BEGIN: Important Notes -->
+                <div class="col-span-12 md:col-span-12 xl:col-span-12 xl:col-start-1 xl:row-start-1 2xl:col-start-auto 2xl:row-start-auto mt-3">
+                    <div class="intro-x flex items-center h-10">
+                        <h2 class="text-lg font-medium truncate mr-auto">
+                            The Week's Timetable
+                        </h2>
+                        <button data-carousel="important-notes" data-target="prev" class="tiny-slider-navigator btn px-2 border-slate-300 text-slate-600 dark:text-slate-300 mr-2"> <i data-lucide="chevron-left" class="w-4 h-4"></i> </button>
+                        <button data-carousel="important-notes" data-target="next" class="tiny-slider-navigator btn px-2 border-slate-300 text-slate-600 dark:text-slate-300 mr-2"> <i data-lucide="chevron-right" class="w-4 h-4"></i> </button>
+                    </div>
+                    <div class="mt-5 intro-x">
+                        {% for r in current_week_days %}
+                            <!-- BEGIN: Data List -->
+                            {% if r.timetable_sessions.count > 0 %}
+                                <div class="intro-y col-span-12 overflow-auto lg:overflow-visible">
+                                    <h1><b><u>{{ r.day }}</u></b></h1>
+                                    <table class="table table-report -mt-2">
+                                        <thead>
+                                            <tr>
+                                                <th class="whitespace-nowrap">#</th>  
+                                                <th class="whitespace-nowrap">Session</th>
+                                                <th class="whitespace-nowrap">Time</th>
+                                                {% if r.education_plan_section_week.block.block_name == 'Theory Block' %}
+                                                    <th class="whitespace-nowrap">Module</th>
+                                                    <th class="whitespace-nowrap">Study Unit</th>                    
+                                                {% elif r.education_plan_section_week.block.block_name == 'Simulation' %}
+                                                    <th class="whitespace-nowrap">Type</th>
+                                                    <th class="whitespace-nowrap">Procedures</th>
+                                                {% endif %}
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for x in r.timetable_sessions.all %}
+                                            <tr class="intro-x">
+                                                <td>{{ forloop.counter }}</td>                            
+                                                <td>{{ x.session.title }}</td>
+                                                <td>{{ x.session.start_time }} to {{ x.session.end_time }}</td>
+                                                {% if r.education_plan_section_week.block.block_name == 'Theory Block' %}
+                                                    <td>{{ x.module.module.module_code }}</td>    
+                                                    <td>{{ x.study_unit.study_unit_name }}</td>  
+                                                {% elif r.education_plan_section_week.block.block_name == 'Simulation' %}   
+                                                    <td>{{ x.type_procedure }}</td>                     
+                                                    <td>
+                                                        {% for p in x.procedures.all  %}
+                                                            {{ p.procedure.task }}<br>
+                                                        {% endfor %}
+                                                    </td> 
+                                                {% endif %}
+                                            
+                                            </tr>
+                                            {% empty %}
+                                            <tr class="intro-x"><td colspan='5'>No Sessions Added Yet</td></tr>
+                                            {% endfor %}
+                                            
+                                        <tbody>
+                                    </table>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+                <!-- END: Important Notes -->
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
+
+{% block js-content %}
+
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
+<script>
+   
+    document.addEventListener('DOMContentLoaded', function() {
+      var calendarEl = document.getElementById('dash_calendar');
+      var calendar = new FullCalendar.Calendar(calendarEl, {
+        initialDate: "{{ today|date:'Y-m-d' }}",
+        headerToolbar: {
+            left: 'prev,next',
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek,timeGridDay,listMonth,multiMonthYear'
+        },
+        views: {
+            dayGridMonth: { buttonText: 'month' },
+            timeGridWeek: { buttonText: 'week' },
+            timeGridDay: { buttonText: 'day' }
+        },
+        initialView: 'dayGridMonth',
+        events: [
+        {% for leave in all_leave %}
+            {
+                title: '{{ leave.type_of_leave.type_of_leave }} - {{ leave.approved }}',
+                start: '{{ leave.from_date|date:"Y-m-d" }}',
+                end: '{{ leave.to_date|date:"Y-m-d" }}',
+                description: '{{ leave.comment }}',
+                color: "{% if leave.approved == 'Pending' %}orange{% elif leave.approved == 'Rejected' %}purple{% else %}green{% endif %}"
+            },
+        {% endfor %}      
+        {% for a in appointments %}
+                {
+                title: '{{ a.category.category }}\n{{ a.status }}',
+                start: '{{ a.appointment_date|date:"Y-m-d" }}T{{ a.appointment_time_start|date:"h:i:s" }}',
+                color: {% if a.status == 'Completed' %} '#40316E' {% elif a.status == "Declined" %} 'red' {% else %} 'orange' {% endif %}
+                },
+        {% endfor %}           
+        ]
+      });
+      calendar.render();
+    });
+
+
+    document.addEventListener('DOMContentLoaded', function() {
+        var calendarEl = document.getElementById('plan_calendar');
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+         
+          headerToolbar: {
+              left: 'prev,next',
+              center: 'title',
+          },
+          views: {
+              dayGridMonth: { buttonText: 'month' },
+              timeGridWeek: { buttonText: 'week' },
+              timeGridDay: { buttonText: 'day' }
+          },
+          multiMonthMinWidth: 600,
+          multiMonthMaxColumns: 3,
+          initialView: 'dayGridMonth',
+          events: [
+              {% for plan in timetable %}
+                  {
+                      title: '{{ plan.block.block_code }}',
+                      start: '{{ plan.education_plan_section_week.start_of_week|date:"Y-m-d" }}',
+                      end: '{{ plan.education_plan_section_week.end_of_week|date:"Y-m-d" }}',
+                      description: '{{ plan.block.block_name }}',
+                      color: "{% if plan.block.block_code == 'EX' %}red{% elif plan.block.block_code == 'LRT' %}purple{% elif plan.block.block_code == 'REG + OR' %}blue{% elif plan.block.block_code == 'REC' %}orange{% elif plan.block.block_code == 'BL' %}maroon{% elif plan.block.block_code == 'SIM' %}teal{% elif plan.block.block_code == 'CPL' %}tan{% elif plan.block.block_code == 'RV' %}pink{% else %}green{% endif %}"
+                  },
+              {% endfor %}          
+          ]
+        });
+        calendar.render();
+      });
+
+  </script>
+
+{% endblock %}

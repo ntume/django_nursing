@@ -1,0 +1,28 @@
+<nav class="bottom-navbar">
+    <div class="container">
+      <ul class="nav page-navigation">
+
+        <li class="nav-item {{dash_active}}">
+          <a class="nav-link" href="{% url 'spaces:dashboard' space.id %}">
+            <i class="ti-home menu-icon"></i>
+            <span class="menu-title">Dashboard</span>
+          </a>
+        </li>
+
+        <li class="nav-item {{rooms_active}}">
+          <a class="nav-link" href="{% url 'spaces:rooms' space.id %}">
+            <i class="ti-desktop menu-icon"></i>
+            <span class="menu-title">Rooms</span>
+          </a>
+        </li>
+
+        <li class="nav-item {{space_active}}">
+            <a class="nav-link" href="{% url 'spaces:edit' space.id %}">
+              <i class="ti-cloud menu-icon"></i>
+              <span class="menu-title">Virtual Space</span>
+            </a>
+        </li>
+          
+      </ul>
+    </div>
+  </nav>

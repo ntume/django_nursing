@@ -1,0 +1,81 @@
+<ul>
+    <li>
+        <a href="{% url 'students:student_dashboard' %}" class="top-menu top-menu{{ dash_active }}">
+            <div class="top-menu__icon"> <i data-lucide="home"></i> </div>
+            <div class="top-menu__title"> Dashboard </div>
+        </a>      
+    </li>
+    
+    <li>
+        <a href="{% url 'students:student_learning_programmes' %}" class="top-menu top-menu{{ reg_active }}">
+            <div class="top-menu__icon"> <i data-lucide="activity"></i> </div>
+            <div class="top-menu__title"> Learning<br> Programmes </div>
+        </a>
+    </li>
+    <li>
+        <a href="{% url 'students:student_leave' %}" class="top-menu top-menu{{ leave_active }}">
+            <div class="top-menu__icon"> <i data-lucide="book"></i> </div>
+            <div class="top-menu__title"> Leave</div>
+        </a>
+    </li>
+    <li>
+        <a href="{% url 'appointments:appointment_student_list' %}" class="top-menu top-menu{{ appt_menu }}">
+            <div class="top-menu__icon"> <i data-lucide="calendar"></i> </div>
+            <div class="top-menu__title"> Appointments</div>
+        </a>
+    </li>
+    
+    <li>
+        <a href="javascript:;" class="top-menu top-menu{{ book_menu }}">
+            <div class="top-menu__icon"> <i data-lucide="files"></i> </div>
+            <div class="top-menu__title"> Library <i data-lucide="chevron-down" class="top-menu__sub-icon"></i> </div>
+        </a>
+        <ul class="">
+            <li>
+                <a href="{% url 'library:patron_book_list' %}" class="top-menu">
+                    <div class="top-menu__icon"> <i data-lucide="activity"></i> </div>
+                    <div class="top-menu__title"> Available Books </div>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'library:patron_book_hold_list' %}" class="top-menu">
+                    <div class="top-menu__icon"> <i data-lucide="activity"></i> </div>
+                    <div class="top-menu__title"> My Books On Hold </div>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'library:patron_book_waiting_list' %}" class="top-menu">
+                    <div class="top-menu__icon"> <i data-lucide="activity"></i> </div>
+                    <div class="top-menu__title"> My Waiting List </div>
+                </a>
+            </li>
+            <li>
+                <a href="https://ahc.snapplify.com/" class="top-menu" target='_blank'>
+                    <div class="top-menu__icon"> <i data-lucide="activity"></i> </div>
+                    <div class="top-menu__title"> Snapplify </div>
+                </a>
+            </li>  
+            <li>
+                <a href="{% url 'library:patron_online_journals' %}" class="top-menu">
+                    <div class="top-menu__icon"> <i data-lucide="activity"></i> </div>
+                    <div class="top-menu__title"> Journals </div>
+                </a>
+            </li> 
+        </ul>
+    </li>
+
+    <li>
+        <a href="{% url 'facilities:facility_booking_student_list' %}" class="top-menu top-menu{{ facilities_menu }}">
+            <div class="top-menu__icon"> <i data-lucide="building"></i> </div>
+            <div class="top-menu__title"> Facilities</div>
+        </a>
+    </li>
+
+    <li>
+        <a href="{% url 'resources:resource_booking_student_list' %}" class="top-menu top-menu{{ resources_menu }}">
+            <div class="top-menu__icon"> <i data-lucide="building"></i> </div>
+            <div class="top-menu__title"> Resources</div>
+        </a>
+    </li>      
+    
+</ul>

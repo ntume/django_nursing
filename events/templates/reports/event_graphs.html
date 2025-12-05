@@ -1,0 +1,196 @@
+{% extends 'base_vertical.html' %}
+
+{% block main-content %}
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          <nav aria-label="breadcrumb">
+              <ol class="breadcrumb bg-inverse-info">
+								<li class="breadcrumb-item" aria-current="page"><a href="{% url 'psycad:dashboard' %}">Dashboard</a></li>
+								<li class="breadcrumb-item" aria-current="page"><a href="{% url 'psycad:report_events' %}">Recruitment Programme Report</a></li>
+								<li class="breadcrumb-item  active" aria-current="page"><a>Graphs</a></li>
+              </ol>
+            </nav>
+
+            {% include 'messages.html' %}
+
+        </div>
+      </div>
+  </div>
+</div>
+
+  <div class="row">
+    <div class="col-md-12 grid-margin">
+      <div class="row">
+        <div class="col-12 col-xl-5 mb-4 mb-xl-0">
+          <h4 class="font-weight-normal mb-0">Recruitment Programme Reports</h4>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+	<div class="row">
+	  <div class="col-md-6 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          <p class="card-title">Recruitment Programme per type</p>
+          <p class="text-muted font-weight-light">Insight into recruitment programmes per type over a period of 6 months</p>
+          <div id="events_types-legend" class="chartjs-legend mt-4 mb-2"></div>
+          <canvas id="events_types-chart"></canvas>
+        </div>
+      </div>
+    </div>
+		<div class="col-md-6 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          <p class="card-title">Recruitment Programme per faculty</p>
+          <p class="text-muted font-weight-light">Insight into recruitment programmes per faculty over a period of 6 months</p>
+          <div id="events_faculties-legend" class="chartjs-legend mt-4 mb-2"></div>
+          <canvas id="events_faculties-chart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+{% endblock %}
+
+{% block js-content %}
+
+<script>
+
+var CVChartCanvas = $("#events_types-chart").get(0).getContext("2d");
+var CvChart = new Chart(CVChartCanvas, {
+  type: 'bar',
+  data: {
+    labels: ['{{ months_other.5|date:"M, Y" }}', '{{ months_other.4|date:"M, Y" }}', '{{ months_other.3|date:"M, Y" }}', '{{ months_other.2|date:"M, Y" }}', '{{ months_other.1|date:"M, Y" }}', '{{ months_other.0|date:"M, Y" }}'],
+    datasets: [
+      {% for item in item_events %}
+        {
+          label: '{{item.title}}',
+          data: [{{item.count.5.5}}, {{item.count.4.4}}, {{item.count.3.3}}, {{item.count.2.2}}, {{item.count.1.1}}, {{item.count.0.0}}],
+          backgroundColor: '{{item.colour}}'
+        },
+      {% endfor %}
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: true,
+    layout: {
+      padding: {
+        left: 0,
+        right: 0,
+        top: 20,
+        bottom: 0
+      }
+    },
+    scales: {
+      yAxes: [{
+        display: true,
+        gridLines: {
+          display: false,
+          drawBorder: false
+        },
+        ticks: {
+          display: true,
+          min: 0,
+          max: {{ ymax_eve_value }}
+        }
+      }],
+      xAxes: [{
+        stacked: false,
+        ticks: {
+          beginAtZero: true,
+          fontColor: "#9fa0a2"
+        },
+        gridLines: {
+          color: "rgba(0, 0, 0, 0)",
+          display: false
+        },
+        barPercentage: 1
+      }]
+    },
+    legend: {
+      display: false
+    },
+    elements: {
+      point: {
+        radius: 0
+      }
+    }
+  },
+});
+document.getElementById('events_types-legend').innerHTML = CvChart.generateLegend();
+
+
+var CVChartCanvas = $("#events_faculties-chart").get(0).getContext("2d");
+var CvChart = new Chart(CVChartCanvas, {
+  type: 'bar',
+  data: {
+    labels: ['{{ months_other.5|date:"M, Y" }}', '{{ months_other.4|date:"M, Y" }}', '{{ months_other.3|date:"M, Y" }}', '{{ months_other.2|date:"M, Y" }}', '{{ months_other.1|date:"M, Y" }}', '{{ months_other.0|date:"M, Y" }}'],
+    datasets: [
+      {% for item in item_events_f %}
+        {
+          label: '{{item.title}}',
+          data: [{{item.count.5.5}}, {{item.count.4.4}}, {{item.count.3.3}}, {{item.count.2.2}}, {{item.count.1.1}}, {{item.count.0.0}}],
+          backgroundColor: '{{item.colour}}'
+        },
+      {% endfor %}
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: true,
+    layout: {
+      padding: {
+        left: 0,
+        right: 0,
+        top: 20,
+        bottom: 0
+      }
+    },
+    scales: {
+      yAxes: [{
+        display: true,
+        gridLines: {
+          display: false,
+          drawBorder: false
+        },
+        ticks: {
+          display: true,
+          min: 0,
+          max: {{ ymax_eve_value_f }}
+        }
+      }],
+      xAxes: [{
+        stacked: false,
+        ticks: {
+          beginAtZero: true,
+          fontColor: "#9fa0a2"
+        },
+        gridLines: {
+          color: "rgba(0, 0, 0, 0)",
+          display: false
+        },
+        barPercentage: 1
+      }]
+    },
+    legend: {
+      display: false
+    },
+    elements: {
+      point: {
+        radius: 0
+      }
+    }
+  },
+});
+document.getElementById('events_faculties-legend').innerHTML = CvChart.generateLegend();
+
+</script>
+
+
+{% endblock %}

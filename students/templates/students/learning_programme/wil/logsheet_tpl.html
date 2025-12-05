@@ -1,0 +1,336 @@
+{% extends 'base_vertical.html' %}
+
+{% block breadcrumb-content %}
+<nav aria-label="breadcrumb" class="-intro-x h-full mr-auto">
+    <ol class="breadcrumb breadcrumb-light">
+        <li class="breadcrumb-item"><a href="{% url 'students:student_dashboard' %}">Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'students:student_learning_programmes' %}">Learning Programmes</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'students:student_learning_programme_registrations' registration.registration_period.learning_programme_cohort.learning_programme.id  %}">{{ registration.registration_period.learning_programme_cohort.learning_programme.programme_code }} Registrations</a></li>
+        
+        <li class="breadcrumb-item active" aria-current="page">{{ registration.registration_period.learning_programme_cohort.learning_programme.programme_code }} WIL Logsheets</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block main-content %}
+
+{% include 'messages.html' %}
+
+<div class="intro-y flex items-center mt-8">
+    <h2 class="text-lg font-medium mr-auto">
+        WIL Logsheet / Hours
+    </h2>
+</div>
+<div class="grid grid-cols-12 gap-6 mt-5">
+    <!-- BEGIN: Profile Menu -->
+    <div class="col-span-12 lg:col-span-3 2xl:col-span-3 flex lg:block flex-col-reverse">
+        <div class="intro-y box mt-5 lg:mt-0">
+            <div class="relative flex items-center p-5">
+                <div class="w-12 h-12 image-fit">
+                    {% if student.profile_pic %}
+                        <img alt="{{ student.first_name }}" class="rounded-full" src="{{ student.profile_pic.url }}">
+                    {% endif %}
+                </div>
+                <div class="ml-4 mr-auto">
+                    <div class="font-medium text-base">{{ student.first_name }} {{ student.last_name }}</div>
+                    <div class="text-slate-500">{{ student.id_number }}</div>
+                </div>
+             
+            </div>
+            <div class="p-5 border-t border-slate-200/60 dark:border-darkmode-400">
+                {% for block in simulated_blocks %}
+                    <a class="flex items-center mt-5 {% if block.id == programme_block.id %} text-primary font-medium{% endif %}" href="{% url 'students:simulated_wil_logsheets' registration.id block.id 1 %}"> <i data-lucide="activity" class="w-4 h-4 mr-2"></i> {{ block.block_code }} - {{ block.block_name }} </a>
+                {% endfor %}
+            </div>
+            <div class="p-5 border-t border-slate-200/60 dark:border-darkmode-400">
+                {% for block in non_simulated_blocks %}
+                    <a class="flex items-center mt-5 {% if block.id == programme_block.id %} text-primary font-medium{% endif %}" href="{% url 'students:non_simulated_wil_logsheets' registration.id block.id 1 %}"> <i data-lucide="activity" class="w-4 h-4 mr-2"></i> {{ block.block_code }} - {{ block.block_name }} </a>
+                {% endfor %}
+            </div>
+            <div class="p-5 border-t border-slate-200/60 dark:border-darkmode-400">
+                <a class="flex items-center mt-5 {% if summary %} text-primary font-medium{% endif %}" href="{% url 'students:wil_logsheet_hours' registration.id %}"> <i data-lucide="activity" class="w-4 h-4 mr-2"></i> Summary </a>
+            </div>
+            
+        </div>
+        <div class="intro-y box p-5 bg-primary text-white mt-5">
+            <div class="flex items-center">
+                <div class="font-medium text-lg">Important Update</div>
+                <div class="text-xs bg-white dark:bg-primary dark:text-white text-slate-700 px-1 rounded-md ml-auto">New</div>
+            </div>
+            <div class="mt-4">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.</div>
+            <div class="font-medium flex mt-5">
+                <button type="button" class="btn py-1 px-2 border-white text-white dark:text-slate-300 dark:bg-darkmode-400 dark:border-darkmode-400">Take Action</button>
+                <button type="button" class="btn py-1 px-2 border-transparent text-white dark:border-transparent ml-auto">Dismiss</button>
+            </div>
+        </div>
+    </div>
+    <!-- END: Profile Menu -->
+    <div class="col-span-12 lg:col-span-9 2xl:col-span-9">
+        <div class="grid grid-cols-12 gap-6">
+         
+            {% if simulated %}
+                {% include 'students/learning_programme/wil/simulated.html' %}
+            {% elif simulated == False %}
+                {% include 'students/learning_programme/wil/non-simulated.html' %}        
+            {% endif %}
+            {% if summary %}
+                {% include 'students/learning_programme/wil/wil_logsheet_hours.html' %}        
+            {% endif %}
+           
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block js-content %}
+
+<script type="text/javascript">
+    
+	$(document).ready(function(){
+
+        $('#id_ward').on('change', function(){
+
+            var ward_id = $('#id_ward').val();
+            $.ajax({ // ajax call starts
+                url: "{% url 'college:ajax_fetch_facility_ward_disciplines' %}", 
+                data: 'ward_id=' + ward_id, // Send value of the clicked button
+                dataType: 'json', // Choosing a JSON datatype
+              })
+              .done(function(data) { // Variable data contains the data we get from serverside              
+                   if(data.valid == 1){   
+                        var data = data 
+                        $('#id_discipline').empty();
+                        $('#id_discipline').append('<option></option>');
+                        for (var x = 0; x <= data.info.length - 1; x++) {
+                            $('#id_discipline').append('<option value="' + data.info[x].id + '">' + data.info[x].discipline + '</option>');
+                        }   
+                        
+                        $("#id_discipline").attr('required',true);
+                    }
+                    else{
+                        $("#id_discipline").attr('required',false);
+                        $('#id_discipline').empty();
+                    }
+              });
+            return false;          
+        });
+
+        
+        $('#id_discipline_old').on('change', function(){
+            
+            var discipline_id = $('#id_discipline').val();
+            $.ajax({ // ajax call starts
+                url: "{% url 'configurable:ajax_fetch_discipline_wards' %}", 
+                data: 'discipline_id=' + discipline_id, // Send value of the clicked button
+                dataType: 'json', // Choosing a JSON datatype
+              })
+              .done(function(data) { // Variable data contains the data we get from serverside              
+                   if(data.valid == 1){   
+                        var data = data 
+                        $('#id_ward').empty();
+                        $('#id_ward').append('<option></option>');
+                        for (var x = 0; x <= data.info.length - 1; x++) {
+                            $('#id_ward').append('<option value="' + data.info[x].id + '">' + data.info[x].ward + '</option>');
+                        }   
+                        
+                        $("#id_ward").attr('required',true);
+                    }
+                    else{
+                        $("#id_ward").attr('required',false);
+                        $('#id_ward').empty();
+                    }
+              });
+            return false;          
+        });
+
+        {% for entry in entries %}
+
+        $('#id_ward_{{ entry.id }}').on('change', function(){
+
+            var ward_id = $('#id_ward_{{ entry.id }}').val();
+            $.ajax({ // ajax call starts
+                url: "{% url 'college:ajax_fetch_facility_ward_disciplines' %}", 
+                data: 'ward_id=' + ward_id, // Send value of the clicked button
+                dataType: 'json', // Choosing a JSON datatype
+              })
+              .done(function(data) { // Variable data contains the data we get from serverside              
+                   if(data.valid == 1){   
+                        var data = data 
+                        $('#id_discipline_{{ entry.id }}').empty();
+                        $('#id_discipline_{{ entry.id }}').append('<option></option>');
+                        for (var x = 0; x <= data.info.length - 1; x++) {
+                            $('#id_discipline_{{ entry.id }}').append('<option value="' + data.info[x].id + '">' + data.info[x].discipline + '</option>');
+                        }   
+                        
+                        $("#id_discipline_{{ entry.id }}").attr('required',true);
+                    }
+                    else{
+                        $("#id_discipline_{{ entry.id }}").attr('required',false);
+                        $('#id_discipline_{{ entry.id }}').empty();
+                    }
+              });
+            return false;          
+        });
+        
+            $('#id_discipline_{{ entry.id }}_old').on('change', function(){
+                
+                var discipline_id = $('#id_discipline_{{ entry.id }}').val();
+                $.ajax({ // ajax call starts
+                    url: "{% url 'configurable:ajax_fetch_discipline_wards' %}", 
+                    data: 'discipline_id=' + discipline_id, // Send value of the clicked button
+                    dataType: 'json', // Choosing a JSON datatype
+                })
+                .done(function(data) { // Variable data contains the data we get from serverside              
+                    if(data.valid == 1){   
+                            var data = data 
+                            $('#id_ward_{{ entry.id }}').empty();
+                            $('#id_ward_{{ entry.id }}').append('<option></option>');
+                            for (var x = 0; x <= data.info.length - 1; x++) {
+                                $('#id_ward_{{ entry.id }}').append('<option value="' + data.info[x].id + '">' + data.info[x].ward + '</option>');
+                            }   
+                            
+                            $("#id_ward_{{ entry.id }}").attr('required',true);
+                        }
+                        else{
+                            $("#id_ward_{{ entry.id }}").attr('required',false);
+                            $('#id_ward_{{ entry.id }}').empty();
+                        }
+                });
+                return false;          
+            });
+
+            $('#id_date_{{ entry.id }}').on('change', function(){
+            
+                var id_date = $('#id_date_{{ entry.id }}').val();
+                $.ajax({ // ajax call starts
+                    url: "{% url 'students:ajax_student_fetch_facility_discipline_wards' registration.id %}", 
+                    data: 'start_date=' + id_date, // Send value of the clicked button
+                    dataType: 'json', // Choosing a JSON datatype
+                  })
+                  .done(function(data) { // Variable data contains the data we get from serverside              
+                       if(data.valid == 1){   
+                            var data = data 
+                            $('#id_ward_{{ entry.id }}').empty();
+                            $('#id_ward_{{ entry.id }}').append('<option></option>');
+                            for (var x = 0; x <= data.info.length - 1; x++) {
+                                $('#id_ward_{{ entry.id }}').append('<option value="' + data.info[x].id + '">' + data.info[x].ward + '</option>');
+                            }   
+                            
+                            $("#id_ward_{{ entry.id }}").attr('required',true);
+                            $('#edit_{{ entry.id }}').removeAttr('disabled');
+                            $('#id_error_message_{{ entry.id }}').html("")
+                            $('#id_facility_message_{{ entry.id }}').html(data.facility)
+                        }
+                        else{
+                            $("#id_ward_{{ entry.id }}").attr('required',false);
+                            $('#id_ward_{{ entry.id }}').empty();
+                            
+                            $('#id_error_message_{{ entry.id }}').html(data.message)
+                            $('#edit_{{ entry.id }}').attr('disabled','disabled');
+                            
+                        }
+                  });
+                return false;          
+            });
+
+            $('#id_end_date_{{ entry.id }}').on('change', function(){
+            
+                var id_date = $('#id_date_{{ entry.id }}').val();
+                var id_end_date = $('#id_end_date_{{ entry.id }}').val();
+    
+                if(id_end_date < id_date){
+                    $('#id_date_{{ entry.id }}').val("");
+                    $('#id_end_date_{{ entry.id }}').val("");
+                    $('#id_date_error_message_{{ entry.id }}').html("The start date cannot be after the end date, please amend your start and end date");
+                }else{
+                    $('#id_date_error_message_{{ entry.id }}').html("");
+                }
+               
+                return false;          
+            });
+
+        {% endfor %}
+     
+        $('#id_discipline_old').on('change', function(){
+            
+            var discipline_id = $('#id_discipline').val();
+            $.ajax({ // ajax call starts
+                url: "{% url 'configurable:ajax_fetch_discipline_wards' %}", 
+                data: 'discipline_id=' + discipline_id, // Send value of the clicked button
+                dataType: 'json', // Choosing a JSON datatype
+              })
+              .done(function(data) { // Variable data contains the data we get from serverside              
+                   if(data.valid == 1){   
+                        var data = data 
+                        $('#id_ward').empty();
+                        $('#id_ward').append('<option></option>');
+                        for (var x = 0; x <= data.info.length - 1; x++) {
+                            $('#id_ward').append('<option value="' + data.info[x].id + '">' + data.info[x].ward + '</option>');
+                        }   
+                        
+                        $("#id_ward").attr('required',true);
+                    }
+                    else{
+                        $("#id_ward").attr('required',false);
+                        $('#id_ward').empty();
+                    }
+              });
+            return false;          
+        });
+
+        $('#id_date').on('change', function(){
+            
+            var id_date = $('#id_date').val();
+            $.ajax({ // ajax call starts
+                url: "{% url 'students:ajax_student_fetch_facility_discipline_wards' registration.id %}", 
+                data: 'start_date=' + id_date, // Send value of the clicked button
+                dataType: 'json', // Choosing a JSON datatype
+              })
+              .done(function(data) { // Variable data contains the data we get from serverside              
+                   if(data.valid == 1){   
+                        var data = data 
+                        $('#id_ward').empty();
+                        $('#id_ward').append('<option></option>');
+                        for (var x = 0; x <= data.info.length - 1; x++) {
+                            $('#id_ward').append('<option value="' + data.info[x].id + '">' + data.info[x].ward + '</option>');
+                        }   
+                        
+                        $("#id_ward").attr('required',true);
+                        $('#id_add_logsheet').removeAttr('disabled');
+                        $('#id_error_message').html("")
+                        $('#id_facility_message').html(data.facility)
+                        
+                    }
+                    else{
+                        $("#id_ward").attr('required',false);
+                        $('#id_ward').empty();
+                        
+                        $('#id_error_message').html(data.message)
+                        $('#id_add_logsheet').attr('disabled','disabled');
+                        
+                    }
+              });
+            return false;          
+        });
+
+        $('#id_end_date').on('change', function(){
+            
+            var id_date = $('#id_date').val();
+            var id_end_date = $('#id_end_date').val();
+
+            if(id_end_date < id_date){
+                $('#id_date').val("");
+                $('#id_end_date').val("")
+                $('#id_date_error_message').html("The start date cannot be after the end date")
+            }else{
+                $('#id_date_error_message').html("");
+            }
+           
+            return false;
+        });
+    });
+
+</script>
+
+{% endblock %}

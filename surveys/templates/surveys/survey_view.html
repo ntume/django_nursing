@@ -1,0 +1,522 @@
+{% extends 'base_vertical.html' %}
+
+{% load bootstrap3 %}
+{% load static %}
+
+{% block css-content %}
+
+<style type="text/css">
+
+table.timecard {
+	margin: auto;
+	width: 100%;
+	border-collapse: collapse;
+	border: 1px solid #fff; /*for older IE*/
+	border-style: solid;
+}
+
+table.timecard caption {
+	background-color: #f79646;
+	color: #fff;
+  font-size: 0.875rem;
+	font-weight: normal;
+	letter-spacing: .4em;
+}
+
+table.timecard thead th {
+	padding: 8px;
+	background-color: #ffffff;
+	font-size: 0.875rem;
+  font-weight: bold;
+}
+
+table.timecard thead th#thDay {
+	width: 40%;
+}
+
+table.timecard thead th#thRegular, table.timecard thead th#thOvertime, table.timecard thead th#thTotal {
+	width: 20%;
+}
+
+table.timecard th, table.timecard td {
+	padding: 10px;
+	border-width: 1px;
+	border-style: solid;
+}
+
+table.timecard td {
+	text-align: left;
+  font-size: 0.875rem;
+}
+
+table.timecard tbody th {
+	text-align: left;
+	font-weight: normal;
+}
+
+table.timecard tfoot {
+	font-weight: bold;
+	font-size: 0.875rem;
+	background-color: #687886;
+	color: #fff;
+}
+
+table.timecard tr.even {
+	background-color: #008080;
+}
+</style>
+
+
+{% endblock %}
+
+{% block main-content %}
+
+
+
+<div class="row">
+  <div class="col-md-12 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          <nav aria-label="breadcrumb">
+              <ol class="breadcrumb bg-inverse-info">
+                {%  if user.is_authenticated and user.roles_id == 2  %}
+                  <li class="breadcrumb-item"><a href="{% url 'wil:dashboard' %}">Dashboard</a></li>
+                  <li class="breadcrumb-item"><a href="{% url 'wil:surveys' %}">Surveys</a></li>
+                  <li class="breadcrumb-item active" aria-current="page"><a>Edit Survey</a></li>
+                {% elif user.is_authenticated and user.roles_id == 10 or user.is_authenticated and user.roles_id == 11 %}
+                  <li class="breadcrumb-item"><a href="{% url 'psycad:dashboard' %}">Dashboard</a></li>
+                  <li class="breadcrumb-item"><a href="{% url 'psycad:surveys' %}">Surveys</a></li>
+                  <li class="breadcrumb-item active" aria-current="page"><a>Edit Survey</a></li>
+								{% elif user.is_authenticated and user.roles_id == 1 or user.is_authenticated and user.roles_id == 9 %}
+                  <li class="breadcrumb-item"><a href="{% url 'administrator:dashboard' %}">Dashboard</a></li>
+                  <li class="breadcrumb-item"><a href="{% url 'psycad:surveys' %}">Surveys</a></li>
+                  <li class="breadcrumb-item active" aria-current="page"><a>Edit Survey</a></li>
+                {% endif %}
+              </ol>
+            </nav>
+
+            {% include 'messages.html' %}
+
+        </div>
+      </div>
+  </div>
+</div>
+
+
+
+  <div class="col-12 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+
+          <div class="row">
+            <div class="col-md-10 mx-auto">
+              <H3>{{survey.title}}</H3>{{survey.category.category}}
+              <ul class="nav nav-pills nav-pills-custom" id="pills-tab-custom" role="tablist">
+                <li class="nav-item">
+                  <a class="nav-link active" id="pills-home-tab-custom" data-toggle="pill" href="#pills-tertiary" role="tab" aria-controls="pills-home" aria-selected="true">
+                    Questions
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" id="pills-profile-tab-custom" data-toggle="pill" href="#pills-school" role="tab" aria-controls="pills-profile" aria-selected="false">
+                    Stats
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" id="pills-contact-tab-custom" data-toggle="pill" href="#pills-skills" role="tab" aria-controls="pills-contact" aria-selected="false">
+                    Download
+                  </a>
+                </li>
+								<li class="nav-item">
+                  <a class="nav-link" id="pills-link-tab-custom" data-toggle="pill" href="#pills-link" role="tab" aria-controls="pills-link" aria-selected="false">
+                    Link
+                  </a>
+                </li>
+								<li class="nav-item">
+                  <a class="nav-link" id="pills-resp-tab-custom" data-toggle="pill" href="#pills-resp" role="tab" aria-controls="pills-resp" aria-selected="false">
+                    Respondents
+                  </a>
+                </li>
+              </ul>
+              <div class="tab-content tab-content-custom-pill" id="pills-tabContent-custom">
+              	<div class="tab-pane fade show active" id="pills-tertiary" role="tabpanel" aria-labelledby="pills-home-tab-custom">
+
+                  <button type="button" class="btn btn-primary btn-icon-text btn-rounded pull-right" data-toggle="modal" data-target="#add"> <i class="ti-plus btn-icon-prepend"></i>Add Question </button>
+                  <div class="modal fade" id="add" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title" id="ModalLabel">Add Question to survey: {{ survey.title }}</h5>
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                          </button>
+                        </div>
+                        <form action="{% url 'psycad:add_surveyquestion' survey.id  %}" method="POST" name="form_questions">
+                          {% csrf_token %}
+                        <div class="modal-body">
+                          <div class="form-group">
+                            <label for="question">Question</label>
+                            {% bootstrap_field form_questions.question show_label=False %}
+                          </div>
+
+                          <div class="form-group">
+                            <label for="time_visit">Question Type</label>
+                            <select name="form_questions-type" class="form-control" title="" required id="id_form_questions-type">
+                              {% for type in types %}
+                                <option value="{{ type.id }}">{{ type.type }}</option>
+                              {% endfor %}
+                            </select>
+                          </div>
+
+													<div class="form-group" id="div_many_one_choice" style="display: none;">
+														<label for="choice">How many answers to be chosen:</label>
+														<select name="form_questions-choice" id="form_questions-id_choice" class="form-control">
+																<option value="one">User can choose only one answer</option>
+																<option value="many">User can choose more than one answer</option>
+														</select>
+													</div>
+
+													<div class="form-group">
+														<label for="choice">Question Numbering</label>
+														<input type="number" name="question_number" id="id_question_number" class="form-control" value="" min="1">
+													</div>
+
+                        </div>
+                        <div class="modal-footer">
+                          <button type="submit" class="btn btn-success">Add Question</button>
+                          <button type="button" class="btn btn-light" data-dismiss="modal">Close</button>
+                        </div>
+                        </form>
+                      </div>
+                    </div>
+                  </div><br><br><br>
+
+
+                  <table class="timecard table-bordered table-striped">
+                    <thead>
+                      <tr>
+                        <th>#</th>
+                        <th>Question</th>
+                        <th>Type</th>
+                        <th>Options</th>
+												<th>Question Number</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for question in  question_list %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ question.question }}</td>
+                            <td>{{ question.type }}</td>
+                            <td>
+                              {% if question.type.options == 'Yes' %}
+
+                                {% for o in question.type.type_options.all %}
+                                  {{ o.option }} ,
+                                {% endfor %}
+																<br>
+																<i>User can choose {{ question.choice }}</i>
+
+                              {% endif %}
+                            </td>
+														<td>{{ question.question_number }}</td>
+                            <td>
+
+                              <button type="button" class="btn btn-success btn-rounded btn-icon" data-toggle="modal" data-target="#edit{{ question.id }}" > <i class="fa fa-edit"></i> </button>
+                              <button type="button" class="btn btn-danger btn-rounded btn-icon" data-toggle="modal" data-target="#del{{ question.id }}" > <i class="fa fa-trash-o"></i> </button>
+
+                              <div class="modal fade" id="del{{ question.id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel-3" aria-hidden="true">
+                                <div class="modal-dialog" role="document">
+                                  <div class="modal-content">
+                                    <div class="modal-header">
+                                      <h5 class="modal-title" id="exampleModalLabel-3">Remove this Question</h5>
+                                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                      </button>
+                                    </div>
+                                    <form action="{% url 'psycad:delete_surveyquestion' question.id  %}" method="POST" name="form_questions">
+                                      {% csrf_token %}
+                                    <div class="modal-body">
+                                      <p>Are you sure you want to delete this question from the survey?</p>
+                                    </div>
+                                    <div class="modal-footer">
+                                      <button type="submit" class="btn btn-success">Delete Question</button>
+                                      <button type="button" class="btn btn-light" data-dismiss="modal">Close</button>
+                                    </div>
+                                    </form>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div class="modal fade" id="edit{{ question.id }}" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true">
+                                <div class="modal-dialog" role="document">
+                                  <div class="modal-content">
+                                    <div class="modal-header">
+                                      <h5 class="modal-title" id="ModalLabel">Edit Question</h5>
+                                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                      </button>
+                                    </div>
+                                    <form action="{% url 'psycad:edit_surveyquestion' question.id  %}" method="POST" name="form_questions">
+                                      {% csrf_token %}
+                                    <div class="modal-body">
+                                      <div class="form-group">
+                                        <label for="question">Question</label>
+                                        <input type="text" name="question" id="id_question" class="form-control" value="{{ question.question }}"
+                                      </div>
+
+                                      <div class="form-group">
+                                        <label for="type">Question Type</label>
+                                        <select name="type" class="form-control" title="" required id="id_type">
+                                          {% for type in types %}
+                                           {% if type.id == question.type_id %}
+                                              <option value="{{ type.id }}" selected>{{ type.type }}</option>
+                                           {% else %}
+                                              <option value="{{ type.id }}">{{ type.type }}</option>
+                                           {% endif %}
+                                          {% endfor %}
+                                        </select>
+                                      </div>
+
+																			<div class="form-group" id="div_many_one_choice" {% if question.type.options == 'Yes' %} style="display: block;" {% else %} style="display: none;" {% endif %}>
+																				<label for="choice">How many answers to be chosen:</label>
+																				<select name="choice" id="id_choice" class="form-control">
+																					{% if question.choice == 'one' %}
+																						<option value="one" selected>User can choose only one answer</option>
+																						<option value="many">User can choose more than one answer</option>
+																					{% elif question.choice == 'many' %}
+																						<option value="one">User can choose only one answer</option>
+																						<option value="many" selected>User can choose more than one answer</option>
+																					{% else %}
+																						<option value="one">User can choose only one answer</option>
+																						<option value="many">User can choose more than one answer</option>
+																					{% endif %}
+																				</select>
+																			</div>
+
+																			<div class="form-group">
+																				<label for="choice">Question Numbering</label>
+																				<input type="number" name="question_number" id="id_question_number" class="form-control" value="{{ question.question_number }}" min="1">
+																			</div>
+
+                                    </div>
+                                    <div class="modal-footer">
+                                      <button type="submit" class="btn btn-success">Edit Question</button>
+                                      <button type="button" class="btn btn-light" data-dismiss="modal">Close</button>
+                                    </div>
+                                    </form>
+                                  </div>
+                                </div>
+                              </div>
+
+
+                            </td>
+
+                            </td>
+                        </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+                <div class="tab-pane fade" id="pills-school" role="tabpanel" aria-labelledby="pills-profile-tab-custom">
+
+                  <div class="mt-4">
+                    <div class="accordion accordion-solid-header" id="accordion-4" role="tablist">
+                      {% for stats in qn_stats %}
+                        <div class="card">
+                        <div class="card-header" role="tab" id="heading-10">
+                          <h6 class="mb-0">
+                            <a data-toggle="collapse" href="#collapse-{{ forloop.counter }}" aria-expanded="true" aria-controls="collapse-10">
+                              {{ stats.qn }}
+                            </a>
+                          </h6>
+                        </div>
+                        <div id="collapse-{{ forloop.counter }}" class="collapse" role="tabpanel" aria-labelledby="heading-10" data-parent="#accordion-4">
+                          <div class="card-body">
+                            <div class="row">
+                              <div class="col-12">
+                                <div class="table-responsive mb-3 mb-md-0">
+                                  <table class="table table-borderless report-table">
+                                    {% for answer in stats.options %}
+                                      <tr>
+                                        <td class="text-muted">{{ answer.option }}</td>
+                                        <td class="w-100 px-0">
+                                          <div class="progress progress-lg mx-4">
+                                            <div class="progress-bar bg-success" role="progressbar" style="width: {{ answer.percentage }}%" aria-valuenow="{{ answer.value }}" aria-valuemin="0" aria-valuemax="{{ answer.total }}">{{ answer.percentage }}%</div>
+                                          </div>
+                                        </td>
+                                        <td><h5 class="font-weight-bold mb-0">{{ answer.value }}</h5></td>
+                                      </tr>
+                                     {% endfor %}
+                                  </table>
+                                </div>
+
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      {% endfor %}
+                    </div>
+                  </div>
+
+                </div>
+                <div class="tab-pane fade" id="pills-skills" role="tabpanel" aria-labelledby="pills-contact-tab-custom">
+
+                    <a href="{% url 'psycad:export_survey_csv' survey.id %}" type="button" class="btn btn-primary btn-lg btn-block">Download CSV
+                      <i class="ti-download float-right"></i>
+                    </a>
+
+                    <a href="{% url 'psycad:export_survey_xls' survey.id %}" type="button" class="btn btn-warning btn-lg btn-block">Download XLS
+                      <i class="ti-download float-right"></i>
+                    </a>
+
+
+                </div>
+								<div class="tab-pane fade" id="pills-link" role="tabpanel" aria-labelledby="pills-link-tab-custom">
+									{% if survey.role == 6 %}
+                    <a href="https://ujcareerwiz.co.za/student/surveys/view/{{ survey.id }}">https://ujcareerwiz.co.za/student/surveys/view/{{ survey.id }}</a>
+									{% else %}
+                    <a href="https://ujcareerwiz.co.za/company/contact/surveys/view/{{ survey.id }}">https://ujcareerwiz.co.za/company/contact/surveys/view/{{ survey.id }}</a>
+									{% endif %}
+                </div>
+								<div class="tab-pane fade" id="pills-resp" role="tabpanel" aria-labelledby="pills-resp-tab-custom">
+
+                  <table class="timecard table-bordered table-striped">
+                    <thead>
+                      <tr>
+                        <th>#</th>
+                        <th>Type</th>
+                        <th>Designation</th>
+                        <th>Name</th>
+												<th>Date</th>
+                        <th>View Response</th>
+												<th>Delete</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for resp in respondents %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ resp.type }}</td>
+                            <td>{{ resp.designation }}</td>
+														<td>{{ resp.name }}</td>
+														<td>{{ resp.date }}</td>
+                            <td>
+
+                              <button type="button" class="btn btn-success btn-rounded btn-icon" data-toggle="modal" data-target="#view{{ resp.id }}" > <i class="fa fa-edit"></i> </button>
+
+															<div class="modal fade" id="view{{ resp.id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+						                    <div class="modal-dialog modal-lg" role="document">
+						                      <div class="modal-content">
+						                        <div class="modal-header">
+						                          <h5 class="modal-title" id="exampleModalLabel">Respondent:{{ resp.name }} - {{ resp.designation }} </h5>
+						                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						                            <span aria-hidden="true">&times;</span>
+						                          </button>
+						                        </div>
+						                        <div class="modal-body">
+
+																			<table class="timecard table-bordered table-striped">
+										                    <thead>
+										                      <tr>
+										                        <th>Question</th>
+										                        <th>Answer</th>
+																					</tr>
+																				</thead>
+																				<tbody>
+																					{% for a in resp.answers %}
+																						<tr>
+																							<td>{{ a.question }}</td>
+																							<td>{{ a.answer }}</td>
+																						</tr>
+																					{% endfor %}
+																				</tbody>
+																			</table>
+
+						                        </div>
+						                        <div class="modal-footer">
+						                          <button type="button" class="btn btn-light" data-dismiss="modal">Close</button>
+						                        </div>
+						                      </div>
+						                    </div>
+						                  </div>
+														</td>
+														<td>
+
+                              <button type="button" class="btn btn-danger btn-rounded btn-icon" data-toggle="modal" data-target="#del{{ resp.id }}" > <i class="fa fa-trash-o"></i> </button>
+
+                              <div class="modal fade" id="del{{ resp.id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel-3" aria-hidden="true">
+                                <div class="modal-dialog" role="document">
+                                  <div class="modal-content">
+                                    <div class="modal-header">
+                                      <h5 class="modal-title" id="exampleModalLabel-3">Remove this Response?</h5>
+                                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                      </button>
+                                    </div>
+                                    <form action="{% url 'psycad:delete_survey_response_answer' survey.id resp.id  %}" method="POST">
+                                      {% csrf_token %}
+                                    <div class="modal-body">
+                                      <p>Are you sure you want to delete this response from the survey?</p>
+                                    </div>
+                                    <div class="modal-footer">
+                                      <button type="submit" class="btn btn-success">Delete Response</button>
+                                      <button type="button" class="btn btn-light" data-dismiss="modal">Close</button>
+                                    </div>
+                                    </form>
+                                  </div>
+                                </div>
+                              </div>
+
+                            </td>
+                        </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+
+        </div>
+      </div>
+    </div>
+
+{% endblock %}
+
+{% block js-content %}
+
+
+<script type="text/javascript">
+
+    $(document).ready(function() {
+        $('.js-company-single').select2({
+          placeholder: 'Select an option',
+          width: '100%'
+        });
+    });
+
+    $(document).ready(function(){
+      $('#id_form_questions-type').on('change', function(){
+
+        {% for t in types %}
+          if(this.value == {{ t.id }}){
+            {% if t.options ==  "Yes" %}
+              document.getElementById("div_many_one_choice").style.display = "block";
+              $("#id_choice").attr("required", true);
+            {% else %}
+              document.getElementById("div_many_one_choice").style.display = "none";
+              $("#id_choice").attr("required", false);
+            {% endif %}
+          }
+        {% endfor %}
+         // or $(this).val()
+        return false; // keeps the page from not refreshing
+      });
+    });
+  </script>
+{% endblock %}

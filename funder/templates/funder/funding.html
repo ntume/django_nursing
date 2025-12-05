@@ -1,0 +1,290 @@
+{% extends 'base_vertical.html' %}
+
+{% block main-content %}
+<div class="row">
+  <div class="col-md-12 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          <nav aria-label="breadcrumb">
+              <ol class="breadcrumb bg-inverse-info">
+                  <li class="breadcrumb-item"><a href="{% url 'wil:dashboard' %}">Dashboard</a></li>
+                  <li class="breadcrumb-item active" aria-current="page"><a>{{funder.funder}}</a></li>
+              </ol>
+            </nav>
+
+            {% include 'messages.html' %}
+
+        </div>
+      </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-lg-12 grid-margin">
+              <div class="card">
+                <div class="card-body">
+                  <h4 class="card-title">List of all Funding from {{funder.funder}}</h4>
+                  <p class="card-description">
+                    <div class="row">
+                      <div class="col-md-5">
+
+                      </div>
+                      <div class="col-md-7 pull-right">
+                        <button type="button" class="btn btn-primary btn-icon-text btn-rounded pull-right" data-toggle="modal" data-target="#addnew"> <i class="ti-plus btn-icon-prepend"></i>Add Funding to: {{funder.funder}}</button>
+                        <div class="modal fade" id="addnew" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true">
+                          <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                              <div class="modal-header">
+                                <h5 class="modal-title" id="ModalLabel">Add Funding</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                  <span aria-hidden="true">&times;</span>
+                                </button>
+                              </div>
+                              <form action="{% url 'wil:addfunding' funder.id %}" method="POST">
+                                {% csrf_token %}
+                              <div class="modal-body">
+
+                                  <div class="form-group">
+                                    <label for="student_number">Amount (required)</label>
+                                    <input id="amount" class="form-control" name="amount" type="number" required>
+                                  </div>
+                                  <div class="form-group">
+                                    <label for="fullname">Description (required)</label>
+                                    <textarea class="form-control" id="description" name="description" required></textarea>
+                                  </div>
+                                  <div class="form-group">
+                                    <label for="contact_number">Start (required)</label>
+                                    <input id="start" class="form-control" name="start" type="date" required>
+                                  </div>
+                                  <div class="form-group">
+                                    <label for="email">End (required)</label>
+                                    <input id="end" class="form-control" name="end" type="date" required>
+                                  </div>
+                                  <div class="form-group">
+                                    <label for="email">Number of Students (required)</label>
+                                    <input id="number_of_students" class="form-control" name="number_of_students" type="number" required>
+                                  </div>
+                              </div>
+                              <div class="modal-footer">
+                                <button type="submit" class="btn btn-success">Add Funding</button>
+                                <button type="button" class="btn btn-light" data-dismiss="modal">Close</button>
+                              </div>
+                              </form>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </p>
+                  <div class="table-responsive">
+                    <table class="table table-bordered">
+                      <thead>
+                        <tr>
+                          <th>Amount</th>
+                          <th>Description</th>
+                          <th>Duration</th>
+                          <th>#Students</th>
+                          <th>File</th>
+                          <th>Date Added</th>
+                          <th>Stats</th>
+                          <th>Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for fund in funding %}
+                            <tr>
+                              <td>{{fund.amount}}</td>
+                              <td>{{fund.description}}</td>
+                              <td>{{fund.start}} to {{fund.end}}</td>
+                              <td>{{fund.number_of_students}}</td>
+                              <td>{{fund.file}}</td>
+                              <td>{{fund.created_at}}</td>
+                              <td><a href="{% url 'wil:funding_students' funder.id fund.id %}">Toatal Students: {{fund.students.count}}</a></td>
+                              <td>
+
+                                <button type="button" class="btn btn-info btn-rounded btn-icon" data-toggle="modal" data-target="#edit{{ fund.id }}" > <i class="fa fa-edit"></i> </button>
+
+                                <div class="modal fade" id="edit{{ fund.id }}" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true">
+                                  <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                      <div class="modal-header">
+                                        <h5 class="modal-title" id="ModalLabel">Edit Funding</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                          <span aria-hidden="true">&times;</span>
+                                        </button>
+                                      </div>
+                                      <form action="{% url 'wil:editfunding' funder.id fund.id %}" method="POST">
+                                        {% csrf_token %}
+                                      <div class="modal-body">
+
+                                          <div class="form-group">
+                                            <label for="student_number">Amount (required)</label>
+                                            <input id="amount" class="form-control" name="amount" type="number" value="{{fund.amount}}" required>
+                                          </div>
+                                          <div class="form-group">
+                                            <label for="fullname">Description (required)</label>
+                                            <textarea class="form-control" id="description" name="description" required>{{fund.description}}</textarea>
+                                          </div>
+                                          <div class="form-group">
+                                            <label for="contact_number">Start (required)</label>
+                                            <input id="start" class="form-control" name="start" type="date" value="{{fund.start|date:'Y-m-d'}}" required>
+                                          </div>
+                                          <div class="form-group">
+                                            <label for="email">End (required)</label>
+                                            <input id="end" class="form-control" name="end" type="date" value="{{fund.end|date:'Y-m-d'}}" required>
+                                          </div>
+                                          <div class="form-group">
+                                            <label for="email">Number of Students (required)</label>
+                                            <input id="number_of_students" class="form-control" name="number_of_students" value="{{fund.number_of_students}}" type="number" required>
+                                          </div>
+                                      </div>
+                                      <div class="modal-footer">
+                                        <button type="submit" class="btn btn-success">Edit Funding</button>
+                                        <button type="button" class="btn btn-light" data-dismiss="modal">Close</button>
+                                      </div>
+                                      </form>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                <button type="button" class="btn btn-danger btn-rounded btn-icon" data-toggle="modal" data-target="#delete{{ fund.id }}" > <i class="fa fa-trash-o"></i> </button>
+
+                                <div class="modal fade" id="delete{{ fund.id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel-3" aria-hidden="true">
+                                  <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                      <div class="modal-header">
+                                        <h5 class="modal-title" id="exampleModalLabel-3">Delete Funding</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                          <span aria-hidden="true">&times;</span>
+                                        </button>
+                                      </div>
+                                      <form action="{% url 'wil:deletefunding' funder.id fund.id %}" method="POST">
+                                        {% csrf_token %}
+                                      <div class="modal-body">
+                                        <p>Are you sure you want to delete this funding?</p>
+                                      </div>
+                                      <div class="modal-footer">
+                                        <button type="submit" class="btn btn-success">Yes</button>
+                                        <button type="button" class="btn btn-light" data-dismiss="modal">No</button>
+                                      </div>
+                                      </form>
+                                    </div>
+                                  </div>
+                                </div>
+
+                              </td>
+                            </tr>
+                        {% empty %}
+                            <tr><td colspan="8">Sorry no funding added</td></tr>
+                        {% endfor %}
+                      </tbody>
+                    </table>
+
+<!--
+                  <nav>
+                  {% if is_paginated %}
+                    <ul class="pagination flex-wrap pagination-rounded">
+                      <li class="page-item"><a class="page-link" href="#"><i class="ti-angle-left"></i></a></li>
+                      {% if page_obj.has_previous %}
+                        <li class="page-item"><a  class="page-link" href="?page={{ page_obj.previous_page_number }}">&laquo;</a></li>
+                      {% else %}
+                        <li class="disabled page-link"><span>&laquo;</span></li>
+                      {% endif %}
+                      {% for i in paginator.page_range %}
+                        {% if page_obj.number == i %}
+                          <li class="active page-link"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+                        {% else %}
+                          <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+                        {% endif %}
+                      {% endfor %}
+                      {% if page_obj.has_next %}
+                        <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">&raquo;</a></li>
+                      {% else %}
+                        <li class="disabled page-link"><span>&raquo;</span></li>
+                      {% endif %}
+                      <li class="page-item"><a class="page-link" href="#"><i class="ti-angle-right"></i></a></li>
+                    </ul>
+                  {% endif %}
+                  </nav>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-lg-12 grid-margin stretch-card">
+                  <div class="card">
+                    <div class="card-body">
+
+                      {% if companies.has_other_pages %}
+                        <ul class="pagination  flex-wrap pagination-rounded">
+                          {% if companies.has_previous %}
+                            <li class="page-item"><a class="page-link" href="?page={{ users.previous_page_number }}&search_phrase={{ search_phrase }}">&laquo;</a></li>
+                          {% else %}
+                            <li class="disabled page-link"><span>&laquo;</span></li>
+                          {% endif %}
+                          {% for i in companies.paginator.page_range %}
+                            {% if companies.number == i %}
+                              <li class="active page-link"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+                            {% else %}
+                              <li class="page-item"><a class="page-link" href="?page={{ i }}&search_phrase={{ search_phrase }}">{{ i }}</a></li>
+                            {% endif %}
+                          {% endfor %}
+                          {% if companies.has_next %}
+                            <li class="page-item"><a class="page-link" href="?page={{ users.next_page_number }}&search_phrase={{ search_phrase }}">&raquo;</a></li>
+                          {% else %}
+                            <li class="disabled page-link"><span>&raquo;</span></li>
+                          {% endif %}
+                        </ul>
+                      {% endif %}
+
+                    </div>
+                  </div>
+              </div>
+            </div>-->
+</div>
+{% endblock %}
+
+{% block js-content %}
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/jszip-2.5.0/dt-1.10.18/b-1.5.6/b-colvis-1.5.6/b-html5-1.5.6/b-print-1.5.6/cr-1.5.0/r-2.2.2/sl-1.3.0/datatables.min.css"/>
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/v/dt/jszip-2.5.0/dt-1.10.18/b-1.5.6/b-colvis-1.5.6/b-html5-1.5.6/b-print-1.5.6/cr-1.5.0/r-2.2.2/sl-1.3.0/datatables.min.js"></script>
+
+<script>
+  $(document).ready( function () {
+    $('#table_id').DataTable({
+
+      dom: 'B<"clear">lfrtip',
+      buttons: {
+        name: 'primary',
+        buttons: [
+            {
+                extend: 'copyHtml5',
+                exportOptions: {
+                    columns: [ 0, ':visible' ]
+                }
+            },
+            {
+                extend: 'excelHtml5',
+                exportOptions: {
+                    columns: ':visible'
+                }
+            },
+            {
+                extend: 'pdfHtml5',
+                exportOptions: {
+                    columns: ':visible'
+                }
+            },
+            'colvis'
+        ]
+      }}
+    );
+  });
+
+</script>
+
+
+
+{% endblock %}

@@ -1,0 +1,131 @@
+{% extends 'base_vertical.html' %}
+
+{% block breadcrumb-content %}
+    <nav aria-label="breadcrumb" class="-intro-x h-full mr-auto">
+        <ol class="breadcrumb breadcrumb-light">
+            <li class="breadcrumb-item"><a href="{% url 'students:student_dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'library:patron_book_list' %}">Library Management System</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Waiting List</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block main-content %}
+
+{% include 'messages.html' %}
+
+
+    <div class="intro-y flex flex-col sm:flex-row items-center mt-8">
+        <h2 class="text-lg font-medium mr-auto">
+            Books - Waiting List
+        </h2>       
+    </div>
+
+   
+
+    <div class="intro-y p-5 mt-5">
+        
+        <div class="overflow-x-auto">
+            <table class="table table-report -mt-2">
+                <thead>
+                    <tr>
+                        <th class="whitespace-nowrap">#</th>     
+                        <th class="whitespace-nowrap"></th>               
+                        <th class="whitespace-nowrap">Title</th>
+                        <th class="whitespace-nowrap">Category</th>
+                        <th class="whitespace-nowrap">Authors</th>
+                        <th class="whitespace-nowrap">Status</th>
+                        <th class="whitespace-nowrap">Date Added</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in items %}
+                    <tr class="intro-x">
+                        <td class="w-40">
+                            {{ forloop.counter }}
+                        </td>
+                        <td class="w-40">
+                            {% if r.book.thumbnail %}
+                                <img alt="AHC SIMS" src="{{ r.book.thumbnail.url }}" data-action="zoom" class="w-full rounded-md">
+                            {% endif %}
+                        </td>
+                        <td>
+                            {{ r.book.title }}
+                        </td>
+                        <td>
+                            {{ r.book.category.category }}
+                        </td>
+                        <td>  
+                            {% for author in r.book.authors.all %}
+                                <b> {{ author.first_name }} {{ author.last_name }} </b>                               
+                                <hr>
+                            {% endfor %}
+                        </td>
+                        <td>    
+                            {{ r.status }}
+                        </td>
+                        <td>    
+                            {{ r.created_at }}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr class="intro-x"><td colspan='7'>Nothing added yet</td></tr>
+                    {% endfor %}
+                    
+                <tbody>
+            </table>
+        </div>
+
+        <!-- BEGIN: Pagination -->
+    <div class="intro-y col-span-12 overflow-x-auto scrollbar-hidden items-center">
+        <nav class="w-full sm:w-auto sm:mr-auto">
+            {% if is_paginated %}
+                <ul class="pagination">
+                    <li class="page-item"><a class="page-link" href="#"> <i class="w-4 h-4" data-lucide="chevrons-left"></i> </a></li>
+                    {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}"> <i class="w-4 h-4" data-lucide="chevron-left"></i> </a>
+                        </li>
+                    {% endif %}
+                    {% for i in paginator.page_range %}
+                        {% if page_obj.number == i %}
+                        <li class="active page-item"> <a class="page-link" href="#">{{ i }}</a> </li>
+                        {% else %}
+                        <li class="active page-item"> <a href="?page={{ i }}" class="page-link">{{ i }}</a> </li>
+                        {% endif %}
+                    {% endfor %}
+                    {% if page_obj.has_next %}               
+                        <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}"> <i class="w-4 h-4" data-lucide="chevron-right"></i> </a></li>
+                    {% endif %}
+                </ul>
+            {% endif %}           
+        </nav>  
+        
+        <nav class="w-full sm:w-auto sm:mr-auto">
+            {% if items.has_other_pages %}
+                <ul class="pagination">
+                    {% if items.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ items.previous_page_number }}&pk={{period.id}}&filter={{filter}}"> <i class="w-4 h-4" data-lucide="chevron-left"></i> </a>
+                        </li>
+                  
+                    {% endif %}
+                    {% for i in items.paginator.page_range %}
+                        {% if items.number == i %}
+                        <li class="active page-item"> <a class="page-link" href="#">{{ i }}</a> </li>
+                        {% else %}
+                        <li class="page-item"> <a href="?page={{ i }}&pk={{ period.id }}&filter={{filter}}" class="page-link">{{ i }}</a> </li>
+                        {% endif %}
+                    {% endfor %}
+                    {% if items.has_next %}               
+                        <li class="page-item"><a class="page-link" href="?page={{ items.next_page_number }}&pk={{period.id}}&filter={{filter}}"> <i class="w-4 h-4" data-lucide="chevron-right"></i> </a></li>
+                   
+                    {% endif %}
+                </ul>
+            {% endif %}           
+        </nav>
+    </div>
+    <!-- END: Pagination -->
+    </div>
+
+{% endblock %}

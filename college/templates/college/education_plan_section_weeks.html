@@ -1,0 +1,54 @@
+{% extends 'base_tpl.html' %}
+
+
+{% block breadcrumb-content %}
+    <nav aria-label="breadcrumb" class="-intro-x mr-auto hidden sm:flex">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'administration:dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'college:education_plans' period.id %}">Educational Plans</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Educational Plan Weeks</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block main-content %}
+
+{% include 'messages.html' %}
+
+
+    <div class="intro-y flex flex-col sm:flex-row items-center mt-8">
+        <h2 class="text-lg font-medium mr-auto">
+            {{ section.education_plan_year.year }} {{ section.section }} Weeks
+        </h2>
+        
+    </div>
+
+    <div class="intro-y box p-5 mt-5">
+        
+        <div class="overflow-x-auto">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th class="whitespace-nowrap">Week Number</th>
+                        <th class="whitespace-nowrap">Academic Week</th>
+                        <th class="whitespace-nowrap">Start Week</th>
+                        <th class="whitespace-nowrap">End Week</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in items %}
+                        <tr>
+                            <td>{{ item.week_number }}</td>
+                            <td>{{ item.academic_week_number }}</td>
+                            <td>{{ item.start_of_week }}</td>
+                            <td>{{ item.end_of_week }}</td>                            
+                        </tr>
+                    {% empty %}
+                    <tr><td colspan = '6'>No weeks added</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+{% endblock %}

@@ -1,0 +1,268 @@
+{% extends 'base_tpl.html' %}
+
+{% block breadcrumb-content %}
+    <nav aria-label="breadcrumb" class="-intro-x mr-auto hidden sm:flex">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'administration:dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'college:learning_programme_cohorts' learning_programme.id %}">{{ learning_programme.programme_code }} Cohorts</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ learning_programme_cohort.title }} {{  period.title}} Master Education Plan</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block main-content %}
+
+{% include 'messages.html' %}
+
+
+    <div class="intro-y flex flex-col sm:flex-row items-center mt-8">
+        <h2 class="text-lg font-medium mr-auto">
+            Educational Plans
+        </h2>
+        <div class="w-full sm:w-auto flex mt-4 sm:mt-0">
+            <button data-tw-toggle="modal" data-tw-target="#add-modal"  class="btn btn-primary shadow-md mr-2">Add Year Plan</button>
+
+            <div id="add-modal" class="modal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <form action="{% url 'college:education_plan_add' period.id %}" method="POST">
+                            {% csrf_token %}
+                            <!-- BEGIN: Modal Header -->
+                            <div class="modal-header">
+                                <h2 class="font-medium text-base mr-auto">Add Year</h2>                                             
+                            </div> <!-- END: Modal Header -->
+                            <!-- BEGIN: Modal Body -->
+                            <div class="modal-body grid grid-cols-12 gap-4 gap-y-3">
+                                <div class="col-span-12 sm:col-span-12"> 
+                                    <label for="modal-form-1" class="form-label">Year</label> 
+                                    <input id="year" name='year' type="number" class="form-control" value="{{ period.start_date.year }}" min='2025' required readonly> 
+                                </div>                                  
+                                <div class="col-span-12 sm:col-span-12"> 
+                                    <label for="physical_address_1" class="form-label">Start of Academic Week</label> 
+                                    <input id="academic_week_start" name='academic_week_start' type="number" class="form-control" placeholder="" min='1' required> 
+                                </div>                                                                         
+                            </div> <!-- END: Modal Body -->
+                            <!-- BEGIN: Modal Footer -->
+                            <div class="modal-footer"> 
+                                <button type="button" data-tw-dismiss="modal" class="btn btn-outline-secondary w-20 mr-1">Cancel</button> 
+                                <button type="submit" class="btn btn-primary w-80">Add Academic Year Plan</button> 
+                            </div> <!-- END: Modal Footer -->
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="intro-y box p-5 mt-5">
+        
+        <div class="overflow-x-auto">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th class="whitespace-nowrap">#</th>
+                        <th class="whitespace-nowrap">Year</th>
+                        <th class="whitespace-nowrap">Learning Programme </th>
+                        <th class="whitespace-nowrap">Start of Academic Week </th>
+                        <th class="whitespace-nowrap">Quarters </th>
+                        <th class="flex justify-center items-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in items %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td><a href="{% url 'college:education_plan_weeks' item.id %}">{{ item.year }}</a></td>
+                            <td>{{ period.learning_programme_cohort.learning_programme.programme_code }} </td>
+                            <td>{{ item.academic_week_start }}</td>
+                            <td>
+                                {% for p in item.sections.all %}
+                                <b>{{ p.section }} </b>
+                                <br><br>
+                                <a href="{% url 'college:education_plan_year_section_wil_requirements' item.id p.id %}" class='text-secondary'>WIL Requirements</a> |
+                                <a href="{% url 'college:education_plan_section_weeks' item.id p.id %}" class='text-success'>Weeks</a> |
+                                <a data-tw-toggle="modal" data-tw-target="#edit_period_{{ item.id }}_{{ p.id }}" class='text-primary'>Edit</a>&nbsp;|&nbsp;<a data-tw-toggle="modal" data-tw-target="#delete_period_{{ item.id }}_{{ p.id }}" class='text-danger'>Delete</a><br>
+                                <br><hr><br>
+                                <div id="edit_period_{{ item.id }}_{{ p.id }}" class="modal" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog modal-xl">
+                                        <form action="{% url 'college:education_plan_section_edit' p.id %}" method="POST">       
+                                            {% csrf_token %}                                  
+                                            <div class="modal-content">
+                                                <div class="modal-body p-5">
+                                                    <div class="mt-5 col-span-12 sm:col-span-12"> 
+                                                        <label for="id_beginning" class="form-label">Section</label> 
+                                                        <input type='text' name="section" id="section" class="form-control" value="{{ p.section }}" required maxlength='100'>
+                                                    </div>
+                                                    <div class="mt-5 col-span-12 sm:col-span-12"> 
+                                                        <label for="id_beginning" class="form-label">Start Date</label> 
+                                                        <input type='date' name="start_date" id="start_date" class="form-control" value="{{ p.start_date|date:'Y-m-d' }}" required>
+                                                    </div>  
+                                                    <div class="mt-5 col-span-12 sm:col-span-12"> 
+                                                        <label for="id_beginning" class="form-label">End Date</label> 
+                                                        <input type='date' name="end_date" id="end_date" class="form-control" value="{{ p.end_date|date:'Y-m-d' }}" required>
+                                                    </div>                                                  
+                                                    <br><br>
+                                                    <div class="px-5 pb-8 text-center"> 
+                                                        <button type="button" data-tw-dismiss="modal" class="btn btn-outline-secondary w-24 mr-1">Cancel</button> 
+                                                        <button type="submit" class="btn btn-success w-60 text-white">Edit</button> 
+                                                    </div>
+                                                    
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+
+                                <div id="delete_period_{{ item.id }}_{{ p.id }}" class="modal" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-body p-0">
+                                                <form action="{% url 'college:education_plan_section_delete' p.id %}" method="POST">
+                                                    {% csrf_token %}
+                                                    <div class="p-5 text-center">
+                                                        <i data-lucide="x-circle" class="w-16 h-16 text-danger mx-auto mt-3"></i> 
+                                                        <div class="text-3xl mt-5">Are you sure?</div>
+                                                        <div class="text-slate-500 mt-2">
+                                                            Do you really want to delete this record? 
+                                                            <br>
+                                                            This process cannot be undone.
+                                                        </div>
+                                                    </div>
+                                                    <div class="px-5 pb-8 text-center">
+                                                        <button type="button" data-tw-dismiss="modal" class="btn btn-outline-secondary w-24 mr-1">Cancel</button>
+                                                        <button type="submit" class="btn btn-danger w-24">Delete</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+
+                            <a class="btn btn-success w-60 ml-2 text-white mb-5" data-tw-toggle="modal" data-tw-target="#add_period_{{ item.id }}"> <i data-lucide="plus" class="w-4 h-4 mr-1"></i> Add Section</a>
+                            <div id="add_period_{{ item.id }}" class="modal" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog modal-xl">
+                                    <form action="{% url 'college:education_plan_section_add' item.id %}" method="POST">       
+                                        {% csrf_token %}                                  
+                                        <div class="modal-content">
+                                            <div class="modal-body p-5">
+                                                <div class="mt-5 col-span-12 sm:col-span-12"> 
+                                                    <label for="id_beginning" class="form-label">Section</label> 
+                                                    <input type='text' name="section" id="section" class="form-control" value="" required maxlength='100'>
+                                                </div>
+                                                <div class="mt-5 col-span-12 sm:col-span-12"> 
+                                                    <label for="id_beginning" class="form-label">Start Date</label> 
+                                                    <input type='date' name="start_date" id="start_date" class="form-control" value="" required>
+                                                </div>  
+                                                <div class="mt-5 col-span-12 sm:col-span-12"> 
+                                                    <label for="id_beginning" class="form-label">End Date</label> 
+                                                    <input type='date' name="end_date" id="end_date" class="form-control" value="" required>
+                                                </div>                                                           
+                                                <br><br>
+                                                <div class="px-5 pb-8 text-center"> 
+                                                    <button type="button" data-tw-dismiss="modal" class="btn btn-outline-secondary w-24 mr-1">Cancel</button> 
+                                                    <button type="submit" class="btn btn-success w-60 text-white">Add Section</button> 
+                                                </div>
+                                                
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                            </td>
+                            <td>
+                                <div class="flex justify-center items-center">
+                                    <a class="flex items-center text-primary" href="javascript:;" data-tw-toggle="modal" data-tw-target="#create_weeks-confirmation-modal_{{ item.id }}"> <i data-lucide="calendar" class="w-4 h-4 mr-1"></i> Create Weeks </a>
+                                    <div id="create_weeks-confirmation-modal_{{ item.id }}" class="modal" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-body p-0">
+                                                    <form action="{% url 'college:education_plan_weeks_create' item.id %}" method="POST">
+                                                        {% csrf_token %}
+                                                        <div class="p-5 text-center">
+                                                            <i data-lucide="x-circle" class="w-16 h-16 text-primary mx-auto mt-3"></i> 
+                                                            <div class="text-3xl mt-5">Creat Weeks?</div>
+                                                            <div class="text-slate-500 mt-2">
+                                                                Do you really want to create the weeks for all the sections/quarters? 
+                                                                
+                                                            </div>
+                                                        </div>
+                                                        <div class="px-5 pb-8 text-center">
+                                                            <button type="button" data-tw-dismiss="modal" class="btn btn-outline-secondary w-24 mr-1">Cancel</button>
+                                                            <button type="submit" class="btn btn-primary w-48">Create Weeks</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <a class="flex items-center mr-3" href="javascript:;" data-tw-toggle="modal" data-tw-target="#edit-modal_{{ item.id }}"> <i data-lucide="check-square" class="w-4 h-4 mr-1"></i> Edit </a>
+                                    <div id="edit-modal_{{ item.id }}" class="modal" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <form action="{% url 'college:education_plan_edit' item.id %}" method="POST">
+                                                    {% csrf_token %}
+                                                    <!-- BEGIN: Modal Header -->
+                                                    <div class="modal-header">
+                                                        <h2 class="font-medium text-base mr-auto">Edit Academic year</h2>                                             
+                                                    </div> <!-- END: Modal Header -->
+                                                    <!-- BEGIN: Modal Body -->
+                                                    <div class="modal-body grid grid-cols-12 gap-4 gap-y-3">
+                                                        <div class="col-span-12 sm:col-span-12"> 
+                                                            <label for="modal-form-1" class="form-label">Year</label> 
+                                                            <input id="year" name='year' type="number" class="form-control" value="{{ item.year }}" min='2025' required> 
+                                                        </div> 
+                                                         
+                                                        <div class="col-span-12 sm:col-span-12"> 
+                                                            <label for="physical_address_1" class="form-label">Start of Academic Week</label> 
+                                                            <input id="academic_week_start" name='academic_week_start' type="number" class="form-control" value="{{ item.academic_week_start }}" min='1' required> 
+                                                        </div>                                        
+                                                    </div> <!-- END: Modal Body -->
+                                                    <!-- BEGIN: Modal Footer -->
+                                                    <div class="modal-footer"> 
+                                                        <button type="button" data-tw-dismiss="modal" class="btn btn-outline-secondary w-20 mr-1">Cancel</button> 
+                                                        <button type="submit" class="btn btn-primary w-40">Edit</button> 
+                                                    </div> <!-- END: Modal Footer -->
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <a class="flex items-center text-danger" href="javascript:;" data-tw-toggle="modal" data-tw-target="#delete-confirmation-modal_{{ item.id }}"> <i data-lucide="trash-2" class="w-4 h-4 mr-1"></i> Delete </a>
+                                    <div id="delete-confirmation-modal_{{ item.id }}" class="modal" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-body p-0">
+                                                    <form action="{% url 'college:education_plan_delete' item.id %}" method="POST">
+                                                        {% csrf_token %}
+                                                        <div class="p-5 text-center">
+                                                            <i data-lucide="x-circle" class="w-16 h-16 text-danger mx-auto mt-3"></i> 
+                                                            <div class="text-3xl mt-5">Are you sure?</div>
+                                                            <div class="text-slate-500 mt-2">
+                                                                Do you really want to delete this record? 
+                                                                <br>
+                                                                This process cannot be undone.
+                                                            </div>
+                                                        </div>
+                                                        <div class="px-5 pb-8 text-center">
+                                                            <button type="button" data-tw-dismiss="modal" class="btn btn-outline-secondary w-24 mr-1">Cancel</button>
+                                                            <button type="submit" class="btn btn-danger w-24">Delete</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    {% empty %}
+                    <tr><td colspan = '6'>No education plans added, please add at least one</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+{% endblock %}

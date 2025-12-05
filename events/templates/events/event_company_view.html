@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block main-content %}
+{% include 'messages.html' %}
+<div class="row">
+
+    <div class="col-md-6 grid-margin grid-margin-md-0 stretch-card">
+  		<div class="card">
+  			<div class="card-body text-center">
+  				<div>
+  					<h4>{{event.title}}</h4>
+  					<p class="text-muted mb-0">{{event.type}}</p>
+  				</div>
+  				<p class="mt-2 card-text">
+  						{{event.description}}
+  				</p>
+          {% if past_events == False %}
+  				    <a id="{{event.id}}" class="btn btn-info btn-sm mt-3 mb-4">RSVP</a>
+          {% else %}
+              <a class="btn btn-secondary btn-sm mt-3 mb-4" data-toggle="tooltip" data-placement="bottom" title="You cannot RSVP to a past Event">RSVP</a>
+          {% endif %}
+  				<div class="border-top pt-3">
+  					<div class="row">
+  						<div class="col-4">
+  							<h6>{{event.event_date}}</h6>
+  							<p>Date</p>
+  						</div>
+  						<div class="col-4">
+  							<h6>{{event.event_time}}</h6>
+  							<p>Time</p>
+  						</div>
+  						<div class="col-4">
+  							<h6>{{event.registration}}</h6>
+  							<p>Registration</p>
+  						</div>
+  					</div>
+  				</div>
+          <div class="border-top pt-3">
+  					<div class="row">
+  						<p>{{event.location}}</p>
+  					</div>
+  				</div>
+          <div class="border-top pt-3">
+  					<div class="row">
+  						<p>{{event.extra_information}}</p>
+  					</div>
+  				</div>
+  			</div>
+  		</div>
+  	</div>
+
+    <div class="col-md-6 grid-margin grid-margin-md-0 stretch-card">
+  		<div class="card">
+  			<div class="card-body text-center">
+  				<div>
+  					<h4>Recruitment Program Media</h4>
+
+  				</div>
+
+
+  				<div class="border-top pt-3">
+  					<div class="row">
+
+              <div id="lightgallery" class="row lightGallery">
+                {% for media in event.media_files.all %}
+                  {% if media.type == 'image' %}
+                    <a href="{{ media.image.url }}" class="image-tile"><img src="{{ media.image.url }}" alt="{{ media.title }}"></a>
+                  {% endif %}
+                {% endfor %}
+              </div>
+  					</div>
+  				</div>
+          <div class="border-top pt-3">
+  					<div class="row">
+              <div id="video-gallery" class="row lightGallery">
+                {% for media in event.media_files.all %}
+                  {% if media.type == 'Video Link' %}
+                    <a class="image-tile col-xl-3 col-lg-3 col-md-3 col-md-4 col-6" href="{{ media.video_link }}">
+                      <img src="{% static 'images/lightbox/thumb-v-y-2.jpg' %}" alt="image" />
+                      <div class="demo-gallery-poster">
+                          <img src="{% static 'images/lightbox/play-button.png' %}" alt="image">
+                      </div>
+                    </a>
+                  {% endif %}
+                {% endfor %}
+              </div>
+  					</div>
+  				</div>
+          <div class="border-top pt-3">
+  					<div class="row">
+
+  					</div>
+  				</div>
+  			</div>
+  		</div>
+  	</div>
+
+</div>
+
+{% endblock %}
+
+{% block js-content %}
+
+
+{% endblock %}

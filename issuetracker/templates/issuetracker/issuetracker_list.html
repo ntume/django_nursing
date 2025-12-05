@@ -1,0 +1,236 @@
+{% extends 'base_vertical.html' %}
+{% load bootstrap3 %}
+
+{% block main-content %}
+
+<div class="row">
+  <div class="col-md-12 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          <nav aria-label="breadcrumb">
+              <ol class="breadcrumb bg-inverse-info">
+                {%  if user.is_authenticated and user.roles_id == 2  %}
+                  <li class="breadcrumb-item"><a href="{% url 'wil:dashboard' %}">Dashboard</a></li>
+                  <li class="breadcrumb-item active" aria-current="page"><a>Issue Tracker</a></li>
+                {% elif user.is_authenticated and user.roles_id == 10 %}
+                  <li class="breadcrumb-item"><a href="{% url 'psycad:dashboard' %}">Dashboard</a></li>
+                  <li class="breadcrumb-item active" aria-current="page"><a>Issue Tracker</a></li>
+                {% endif %}
+              </ol>
+            </nav>
+
+            {% include 'messages.html' %}
+
+        </div>
+      </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-lg-12 grid-margin stretch-card">
+              <div class="card">
+                <div class="card-body">
+                  <h4 class="card-title">Issue Tracker</h4>
+                  <p class="card-description">
+                    <button type="button" class="btn btn-success btn-icon-text btn-rounded pull-right" data-toggle="modal" data-target="#new_type"> <i class="ti-plus btn-icon-prepend"></i>Add New Issue track entry </button><br><br>
+                    <div class="modal fade" id="new_type" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true">
+                      <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="ModalLabel">Add Issue / Request / Comment</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                              <span aria-hidden="true">&times;</span>
+                            </button>
+                          </div>
+                          <form action="{% url 'psycad:add_issuetracker' %}" method="POST">
+                            {% csrf_token %}
+                          <div class="modal-body">
+
+                              <div class="form-group">
+                                <label for="period">Description (required)</label>
+                                {% bootstrap_field form.description show_label=False %}
+                              </div>
+
+                              <div class="form-group">
+                                <label for="period">Type (required)</label>
+                                {% bootstrap_field form.type show_label=False %}
+                              </div>
+
+                          </div>
+                          <div class="modal-footer">
+
+                            <button type="submit" class="btn btn-success">Add Record</button>
+                            <button type="button" class="btn btn-light" data-dismiss="modal">Close</button>
+                          </div>
+                          </form>
+                        </div>
+                      </div>
+                    </div>
+                  </p>
+                  <div class="table-responsive">
+                    <table class="table table-striped table-bordered">
+                      <thead>
+                        <tr>
+                          <th>#</th>
+                          <th>Type</th>
+                          <th>Description</th>
+                          <th>Status</th>
+                          <th>User</th>
+                          <th>Comments</th>
+                          <th>Date added</th>
+                          <th>Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for issue in issues %}
+                            <tr>
+                              <td class="py-1">{{ forloop.counter }}</td>
+                              <td>{{issue.type}}</td>
+                              <td>{{issue.description}}</td>
+                              <td>{{issue.status}}</td>
+                              <td>{{issue.user.first_name}} {{issue.user.last_name}}</td>
+                              <td>
+                                {% for comment in issue.comments.all %}
+                                  {{comment.comment}}<br>
+                                  {{comment.user.first_name}} {{comment.user.last_name}}<br>
+                                  <hr><br>
+                                {% empty %}
+                                  No comments added<br>
+                                {% endfor %}
+
+                                <button class="btn btn-inverse-primary btn-rounded btn-icon" data-toggle="modal" data-target="#comment{{ issue.id }}"> <i class="fa fa-plus-circle"></i></button>
+
+                                <div class="modal fade" id="comment{{ issue.id }}" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true">
+                                  <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                      <div class="modal-header">
+                                        <h5 class="modal-title" id="ModalLabel">Add Comment</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                          <span aria-hidden="true">&times;</span>
+                                        </button>
+                                      </div>
+                                      <form action="{% url 'psycad:add_issuetrackercomment' issue.id %}" method="POST">
+                                        {% csrf_token %}
+                                      <div class="modal-body">
+
+                                      <div class="form-group">
+                                          <label class="col-md-3 col-xs-12 control-label">Comment</label>
+                                          <div class="col-md-12 col-xs-12">
+                                              <textarea class="form-control" rows="5" name="comment"></textarea>
+                                          </div>
+                                      </div>
+
+                                      </div>
+                                      <div class="modal-footer">
+                                        <button type="submit" class="btn btn-success">Add Comment</button>
+                                        <button type="button" class="btn btn-light" data-dismiss="modal">Close</button>
+                                      </div>
+                                      </form>
+                                    </div>
+                                  </div>
+                                </div>
+
+                              </td>
+                              <td>{{issue.created_at}}</td>
+                              <td>
+                                {% if issue.user == user %}
+                                    <button type="button" class="btn btn-success btn-rounded btn-icon" data-toggle="modal" data-target="#edit{{ issue.id }}" > <i class="fa fa-edit"></i></button>
+
+                                    <button type="button" class="btn btn-danger btn-rounded btn-icon" data-toggle="modal" data-target="#del{{ issue.id }}" > <i class="fa fa-trash-o"></i> </button>
+
+                                    <div class="modal fade" id="edit{{ issue.id }}" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true">
+                                      <div class="modal-dialog" role="document">
+                                        <div class="modal-content">
+                                          <div class="modal-header">
+                                            <h5 class="modal-title" id="ModalLabel">Edit Issue Tracker Entry</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                              <span aria-hidden="true">&times;</span>
+                                            </button>
+                                          </div>
+                                          <form action="{% url 'psycad:edit_issuetracker' issue.id %}" method="POST">
+                                            {% csrf_token %}
+                                          <div class="modal-body">
+
+                                            <div class="form-group">
+                                              <label for="period">Description (required)</label>
+                                              <input class="form-control" type="text" name="description" id="description" value="{{issue.description}}">
+                                            </div>
+
+                                            <div class="form-group">
+                                              <label for="period">Type (required)</label>
+                                              <select class="form-control" name="type" id="type">
+                                                {% if issue.type == 'Request' %}
+                                                  <option value="Request" selected>Request</option>
+                                                  <option value="Issue">Issue</option>
+                                                  <option value="Comment">Comment</option>
+                                                  <option value="Experience">Experience</option>
+                                                {% elif issue.type == 'Issue' %}
+                                                  <option value="Request">Request</option>
+                                                  <option value="Issue" selected>Issue</option>
+                                                  <option value="Comment">Comment</option>
+                                                  <option value="Experience">Experience</option>
+                                                {% elif issue.type == 'Comment' %}
+                                                  <option value="Request">Request</option>
+                                                  <option value="Issue">Issue</option>
+                                                  <option value="Comment" selected>Comment</option>
+                                                  <option value="Experience">Experience</option>
+                                                {% elif issue.type == 'Experience' %}
+                                                  <option value="Request">Request</option>
+                                                  <option value="Issue">Issue</option>
+                                                  <option value="Comment">Comment</option>
+                                                  <option value="Experience" selected>Experience</option>
+                                                {% endif %}
+                                              </select>
+                                            </div>
+
+                                          </div>
+                                          <div class="modal-footer">
+                                            <input type="hidden" name="task" value="edit">
+                                            <button type="submit" class="btn btn-success">Edit Issue Tracker Entry</button>
+                                            <button type="button" class="btn btn-light" data-dismiss="modal">Close</button>
+                                          </div>
+                                          </form>
+                                        </div>
+                                      </div>
+                                    </div>
+
+                                    <div class="modal fade" id="del{{ issue.id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel-3" aria-hidden="true">
+                                      <div class="modal-dialog" role="document">
+                                        <div class="modal-content">
+                                          <div class="modal-header">
+                                            <h5 class="modal-title" id="exampleModalLabel-3">Delete Issue Tracker Entry</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                              <span aria-hidden="true">&times;</span>
+                                            </button>
+                                          </div>
+                                          <form action="{% url 'psycad:edit_issuetracker' issue.id %}" method="POST">
+                                            {% csrf_token %}
+                                          <div class="modal-body">
+                                            <p>Are you sure you want to delete this issue?</p>
+                                          </div>
+                                          <div class="modal-footer">
+                                            <input type="hidden" name="task" value="delete">
+                                            <button type="submit" class="btn btn-success">Yes</button>
+                                            <button type="button" class="btn btn-light" data-dismiss="modal">No</button>
+                                          </div>
+                                          </form>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  {% else %}
+                                      <button type="button" class="btn btn-secondary btn-rounded btn-icon" data-toggle="tooltip" data-placement="bottom" title="Sorry you do not have permission to edit this issue" data-custom-class="tooltip-danger"> <br><i class="fa fa-edit"></i></button>
+                                      <button type="button" class="btn btn-secondary btn-rounded btn-icon" data-toggle="tooltip" data-placement="bottom" title="Sorry you do not have permission to delete this issue" data-custom-class="tooltip-danger"> <i class="fa fa-trash-o"></i> </button>
+                                  {% endif %}
+                              </td>
+                            </tr>
+                        {% empty %}
+                            <tr><td colspan="8">Sorry no issues added</td></tr>
+                        {% endfor %}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+</div>
+{% endblock %}

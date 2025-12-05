@@ -1,0 +1,252 @@
+{% extends 'base_tpl.html' %}
+
+{% block breadcrumb-content %}
+    <nav aria-label="breadcrumb" class="-intro-x mr-auto hidden sm:flex">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'administration:dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'college:learning_programme_cohorts' learning_programme.id %}">{{ learning_programme.programme_code }} Cohorts</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ learning_programme_cohort.title }} Students</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block main-content %}
+
+{% include 'messages.html' %}
+
+
+    <div class="intro-y flex flex-col sm:flex-row items-center mt-8">
+        <h2 class="text-lg font-medium mr-auto">
+            {{ learning_programme.programme_code }} - {{ learning_programme_cohort.title }} Students
+        </h2>
+        <div class="w-full sm:w-auto flex mt-4 sm:mt-0">
+            <a href="{% url 'students:generate_cohort_student_cards' learning_programme_cohort.id %}"  class="btn btn-primary shadow-md mr-2">Generate Student Cards</a>
+            {% if learning_programme_cohort.student_cards %}
+                <a href="{{ learning_programme_cohort.student_cards.url }}"  class="btn btn-danger shadow-md mr-2">View Student Cards</a>
+            {% endif %}
+            
+            <a href="{% url 'students:cohort_all_learners_vaccinations' learning_programme_cohort.id %}"  class="btn btn-success shadow-md mr-2">Cohort Vaccination</a>
+            <a href="{% url 'students:request_group_on_boarding' learning_programme_cohort.id %}"  class="btn btn-warning shadow-md mr-2">Request Onboarding</a>
+
+            <button data-tw-toggle="modal" data-tw-target="#add-modal"  class="btn btn-primary shadow-md mr-2">Add Student</button>
+
+            <div id="add-modal" class="modal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-xl">
+                    <div class="modal-content">
+                        <form action="{% url 'students:add_learner_programme_cohort' learning_programme_cohort.id %}" method="POST"  onsubmit="addButton.disabled = true;addButton.innerHTML ='Verifying Learner...'; return true;">
+                            {% csrf_token %}
+                            <!-- BEGIN: Modal Header -->
+                            <div class="modal-header">
+                                <h2 class="font-medium text-base mr-auto">Add Learner</h2>                                             
+                            </div> <!-- END: Modal Header -->
+                            <!-- BEGIN: Modal Body -->
+                            <div class="modal-body">
+                                <div class="form-inline col-span-12 sm:col-span-12">
+                                    <label for="id_id_number" class="form-label w-48">ID Number*</label>
+                                    <input name='id_number' id="id_id_number" type="text" class="form-control" placeholder="ID Number" value='' required>
+                                    <button type="button" id='id_learner_search' class="btn btn-elevated-secondary w-48 mr-1 mb-2 self-center">Search Learner</button>
+                                </div>  
+                                <div style="display: none;" id = 'add_learner'>
+                                    <div class="form-inline col-span-12 sm:col-span-12 mt-5">
+                                        <label for="id_first_name" class="form-label w-48">Learner First Name</label>
+                                        <input name='first_name' id="id_first_name" type="text" class="form-control" placeholder="First Name" required>
+                                    </div>
+                                    <div class="form-inline col-span-12 sm:col-span-12 mt-5">
+                                        <label for="id_last_name" class="form-label w-48">Learner Last Name</label>
+                                        <input name='last_name' id="id_last_name" type="text" class="form-control" placeholder="Last Name" required>
+                                    </div> 
+                                    <div class="form-inline col-span-12 sm:col-span-12 mt-5">
+                                        <label for="id_email" class="form-label w-48">Learner Email</label>
+                                        <input name='email' id="id_email" type="email" class="form-control" placeholder="Email" required>
+                                    </div> 
+                                    <div class="form-inline col-span-12 sm:col-span-12 mt-5">
+                                        <label for="id_date_learner_entered" class="form-label w-48">Date Learner Started</label>
+                                        <input name='start_date' id="start_date" type="date" class="form-control" min="{{ learning_programme_cohort.start_date|date:"Y-m-d" }}" placeholder="Start Date" required>
+                                    </div> 
+                                    <div class="form-inline col-span-12 sm:col-span-12 mt-5">
+                                        <label for="id_date_programme_start" class="form-label w-48">End Date</label>
+                                        <input name='end_date' id="end_date" type="date" class="form-control" min="{{ learning_programme_cohort.end_date|date:"Y-m-d" }}" placeholder="End Date" required>
+                                    </div>
+                                </div>              
+                                                                
+                            </div> <!-- END: Modal Body -->
+                            <!-- BEGIN: Modal Footer -->
+                            <div class="modal-footer"> 
+                                <button type="button" data-tw-dismiss="modal" class="btn btn-outline-secondary w-20 mr-1">Cancel</button> 
+                                <button  name="addButton" type="submit" class="btn btn-primary w-60" id="id_confirm_learner">Add Learner</button> 
+                            </div> <!-- END: Modal Footer -->
+                        </form>
+                    </div>
+                </div>
+            </div> 
+
+        </div>
+    </div>
+
+    <div class="intro-y p-5 mt-5">
+        
+        <div class="overflow-x-auto">
+            <table class="table table-report -mt-2">
+                <thead>
+                    <tr>
+                        <th class="whitespace-nowrap">#</th>
+                        <th class="whitespace-nowrap">Student Number</th>
+                        <th class="whitespace-nowrap">ID Number</th>
+                        <th class="whitespace-nowrap">Full Name</th>                    
+                        <th class="whitespace-nowrap">Email</th>
+                        <th class="whitespace-nowrap">Status</th>
+                        <th class="whitespace-nowrap">onBoarded</th>
+                        <th class="whitespace-nowrap">Registrations</th>
+                        <th class="whitespace-nowrap">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for l in learners %}
+                    <tr class="intro-x">
+                        <td class="w-40">
+                            {% if l.student.profile_pic %}
+                            <img src="{{ l.student.profile_pic.url }}">
+                            {% endif %}
+                        </td>
+                        <td>{{ l.student.student_number }}</td>
+                        <td>
+                            {{ l.student.id_number }}
+                        </td>
+                        <td>
+                            {{ l.student.first_name }} {{ l.student.last_name }}
+                        </td>
+                        <td>
+                            {{ l.student.email }}
+                        </td>
+                        <td>
+                            {{ l.status }}
+                        </td>                    
+                        <td>
+                            {{ l.student.on_boarded }}
+                        </td>
+                        <td>
+                            {% for period in learning_programme_cohort.registration_periods.all %}
+                                <a href="{% url 'students:view_learner_programme_registration' l.id period.id %}"><b>{{ period.title }}</b></a>
+                                <hr>
+                            
+                            {% endfor %}
+                        </td>                      
+                        <td class="table-report__action">
+                           
+                            <div class="flex justify-center items-center">
+                                <div class="dropdown">
+                                    <button class="dropdown-toggle btn px-2 btn-warning" aria-expanded="false" data-tw-toggle="dropdown">
+                                        <span class="w-5 h-5 flex items-center justify-center text-white"> <i class="w-4 h-4" data-lucide="arrow-down"></i> </span>
+                                    </button>
+                                    <div class="dropdown-menu w-64">
+                                        <ul class="dropdown-content">
+                                            <li>
+                                                <a href="{% url 'students:view_learner_programme' l.id 1 %}" class="dropdown-item tooltip" title="Click to View Learner Details"> <i data-lucide="view" class="w-4 h-4 mr-2"></i> View</a>
+                                            </li>                                            
+                                            <li>
+                                                <a href="javascript:;" data-tw-toggle="modal" data-tw-target="#delete-confirmation-modal_{{ l.id }}" class="dropdown-item tooltip" title="Click to remove learner"><i data-lucide="trash-2" class="w-4 h-4 mr-2"></i> Remove Learner</a>
+                                            </li>
+                                            <li>
+                                                <a href="{% url 'students:cohort_learner_vaccinations' l.id %}" class="dropdown-item tooltip" title="Vaccinations"><i data-lucide="activity" class="w-4 h-4 mr-2"></i> Vaccinations</a>
+                                            </li>
+                                            <div id="delete-confirmation-modal_{{ l.id }}" class="modal" tabindex="-1" aria-hidden="true">
+                                                <div class="modal-dialog">
+                                                    <div class="modal-content">
+                                                        <div class="modal-body p-0">
+                                                            <form action="{% url 'students:remove_learner_programme' learning_programme_cohort.id l.id %}" method="POST">
+                                                                {% csrf_token %}
+                                                                <div class="p-5 text-center">
+                                                                    <i data-lucide="x-circle" class="w-16 h-16 text-danger mx-auto mt-3"></i> 
+                                                                    <div class="text-3xl mt-5">Are you sure?</div>
+                                                                    <div class="text-slate-500 mt-2">
+                                                                        Do you really want to remove this Learner?
+                                                                    </div><br> 
+                                                                    <div class="col-span-12 sm:col-span-12"> 
+                                                                        <label for="id_financial_year" class="form-label">Reason</label> 
+                                                                        <textarea class="form-control" name="reason" id="id_reason" placeholder="Reason" required></textarea>
+                                                                    </div>  <br>  
+                                                                    <div class="col-span-12 sm:col-span-12"> 
+                                                                        <label for="id_financial_year" class="form-label">Termination Date</label> 
+                                                                        <input type="date" name="termination_date" id="id_termination_date" class="form-control" placeholder="" required>
+                                                                    </div>     
+                                                                </div>
+                                                                <div class="px-5 pb-8 text-center">
+                                                                    <button type="button" data-tw-dismiss="modal" class="btn btn-outline-secondary w-24 mr-1">Cancel</button>
+                                                                    <button type="submit" class="btn btn-danger w-24">Remove</button>
+                                                                </div>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>  
+                                            <li>
+                                                <a href="{% url 'students:generate_student_card' l.id %}" class="dropdown-item tooltip" title="Generate Student Card"> <i data-lucide="user" class="w-4 h-4 mr-2"></i> Generate Student Card</a>
+                                            </li>
+                                            {% if l.student.student_card %}
+                                                <li>
+                                                    <a href="{{ l.student.student_card.url }}" class="dropdown-item tooltip" title="View Student Card"> <i data-lucide="activity" class="w-4 h-4 mr-2"></i> View Student Card</a>
+                                                </li>
+                                            {% endif %}
+                                             
+                                        </ul>
+                                    </div>
+                                </div>        
+                            </div>
+                            
+                        </td>
+                    </tr>
+                    {% empty %}
+                        <tr class="intro-x"><td colspan="8">Nothing added yet</td></tr>
+                    {% endfor %}
+                    
+                <tbody>
+            </table>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block js-content %}
+
+<script type="text/javascript">
+    
+	$(document).ready(function(){
+
+        $('#id_learner_search').on('click', function(){
+            var id_number = $( "#id_id_number" ).val();
+   
+            $.ajax({ // ajax call starts
+              url: "{% url 'students:ajax_validate_id_number' %}", // JQuery loads serverside.php
+              data: 'id_number=' + id_number, // Send value of the clicked button
+              dataType: 'json', // Choosing a JSON datatype
+            })
+            .done(function(data) { // Variable data contains the data we get from serverside
+          
+                 if(data.valid == 1){     
+                      Toastify({text: 'Successfully selected learner, click the confirmation button to proceed',duration: 6000,className: "info",}).showToast();                   
+                      $( "#id_first_name" ).val( data.first_name );
+                      $( "#id_last_name" ).val( data.last_name );
+                      $( "#id_email" ).val( data.email );
+                      $("#id_confirm_learner").attr("disabled", false);
+                      $("#id_first_name").attr("readonly", true);
+                      $("#id_last_name").attr("readonly", true);
+                      $("#id_email").attr("readonly", true);
+                      document.getElementById("add_learner").style.display = "block";
+                  }
+                 else if(data.valid == 0){
+                      Toastify({text: 'Unfortunately ',duration: 6000,className: "info",}).showToast();   
+                      $( "#id_first_name" ).val( "" );
+                      $( "#id_last_name" ).val( "" );
+                      $( "#id_email" ).val( "" );
+                      $("#id_confirm_learner").attr("disabled", false);
+                      document.getElementById("add_learner").style.display = "block";
+                 }
+            });
+          return false;          
+        });
+
+    });
+
+</script>
+
+{% endblock %}

@@ -1,0 +1,103 @@
+<div class="font-medium flex items-center border-b border-slate-200/60 dark:border-darkmode-400 pb-5"> <i data-lucide="chevron-down" class="w-4 h-4 mr-2"></i> Select Modules  </div>
+ 
+    <!-- BEGIN: Data List -->
+
+    <div class="intro-y col-span-12 overflow-x-auto scrollbar-hidden mt-5">
+        {% include 'messages.html' %}
+        <h2><b>Selected Modules</b></h2>
+        <table class="table table-bordered table-hover mt-5">
+            <thead>
+                <tr>
+                    <th>Module</th>
+                    <th>Module Code</th> 
+                    <th>Credits</th> 
+                    <th>Remove</th>
+                </tr>
+            </thead>
+            <tbody>
+       
+                {% for e in learner_registration.registered_modules.all %}
+                    <tr class="intro-x">
+                        
+                        <td>{{ e.module.module.module_name }}</td>
+                        <td>{{ e.module.module.module_code }} </td>
+                        <td>{{ e.module.module.credits }}</td> 
+                        <td>
+                            
+                                <a 
+                                    hx-get="{% url 'students:learner_programme_registration_module_remove' lp.id learner_registration.id e.id %}"
+                                    hx-target="#module_registration"
+                                    hx-confirm="Are you sure you want to remove this module from the student's registration?"
+                                    hx-on::before-request="checkverifyButton.disabled = true;checkverifyButton.innerHTML ='Removing Module....'; return true;"
+                                    hx-on::after-request="checkverifyButton.disabled = false;checkverifyButton.innerHTML ='Module Added'; return true;"
+                                    id='checkverifyButton'
+                                    href="#"
+                                    class="btn btn-danger mr-1 mb-2 text-white">
+                                    Remove Module
+                                </a>
+                           
+                        </td>                  
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="4">No Modules Selected</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <br><br>
+    <h2><b>Select Modules from List Below</b></h2>
+
+    
+   
+    <div class="intro-y col-span-12 overflow-x-auto scrollbar-hidden mt-5">
+
+        
+        <table class="table table-bordered table-hover mt-5">
+            <thead>
+                <tr>
+                    <th>Module</th>
+                    <th>Module Code</th> 
+                    <th>Credits</th> 
+                    <th>Completed</th> 
+                    <th>Results</th> 
+                    <th>Select Module</th>
+                </tr>
+            </thead>
+            <tbody>
+    
+                {% for e in module_list %}
+                    <tr class="intro-x">
+                        
+                        <td>{{ e.module.module.module_name }}</td>
+                        <td>{{ e.module.module.module_code }} </td>
+                        <td>{{ e.module.module.credits }}</td>
+                        <td>
+                            {% if e.module_registration %}
+                                {{ e.module_registration.completed }}
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if e.module_registration %}
+                                {{ e.module_registration.grade }}
+                            {% endif %}
+                        </td>
+                        <td> 
+                            {% if e.registered == 'No' %}
+                                <a 
+                                    hx-get="{% url 'students:learner_programme_registration_module_add' lp.id learner_registration.id e.module.id %}"
+                                    hx-target="#module_registration"
+                                    hx-confirm="Are you sure you want to add this module to the student's registration?"
+                                    hx-on::before-request="checkverifyButton.disabled = true;checkverifyButton.innerHTML ='Adding Module....'; return true;"
+                                    hx-on::after-request="checkverifyButton.disabled = false;checkverifyButton.innerHTML ='Module Added'; return true;"
+                                    id='checkverifyButton'
+                                    href="#"
+                                    class="btn btn-success mr-1 mb-2 text-white">
+                                    Add Module
+                                </a>
+                            {% endif %}                                            
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>

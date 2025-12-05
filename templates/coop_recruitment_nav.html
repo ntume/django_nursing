@@ -1,0 +1,528 @@
+<ul>
+  <li>
+      <a href="{% url 'psycad:dashboard' %}" class="side-menu {{ dash_menu }}">
+          <div class="side-menu__icon">
+              <i data-tw-merge="" data-lucide="home" class="stroke-1.5 w-5 h-5"></i>
+          </div>
+          <div class="side-menu__title">
+              Dashboard
+          </div>
+      </a>      
+  </li>
+
+  <li>
+      <a href="javascript:;" class="side-menu {{adv_menu}}">
+          <div class="side-menu__icon">
+              <i data-tw-merge="" data-lucide="shopping-bag" class="stroke-1.5 w-5 h-5"></i>
+          </div>
+          <div class="side-menu__title">
+              Adverts
+              <div class="side-menu__sub-icon ">
+                  <i data-tw-merge="" data-lucide="chevron-down" class="stroke-1.5 w-5 h-5"></i>
+              </div>
+          </div>
+      </a>
+      <ul class="">
+          <li>
+              <a href="{% url 'psycad:advert_create' %}" class="side-menu">
+                  <div class="side-menu__icon">
+                      <i data-tw-merge="" data-lucide="activity" class="stroke-1.5 w-5 h-5"></i>
+                  </div>
+                  <div class="side-menu__title">
+                      Create
+                  </div>
+              </a>
+          </li>
+          <li>
+              <a href="{% url 'psycad:advert_list_active' %}" class="side-menu">
+                  <div class="side-menu__icon">
+                      <i data-tw-merge="" data-lucide="activity" class="stroke-1.5 w-5 h-5"></i>
+                  </div>
+                  <div class="side-menu__title">
+                      List All
+                  </div>
+              </a>
+          </li>
+          <li>
+              <a href="{% url 'psycad:config_adverttypes' %}" class="side-menu">
+                  <div class="side-menu__icon">
+                      <i data-tw-merge="" data-lucide="activity" class="stroke-1.5 w-5 h-5"></i>
+                  </div>
+                  <div class="side-menu__title">
+                      Advert Types                      
+                  </div>
+              </a>             
+          </li>
+          <li>
+              <a href="{% url 'psycad:advert_announcement_list' %}" class="side-menu">
+                  <div class="side-menu__icon">
+                      <i data-tw-merge="" data-lucide="activity" class="stroke-1.5 w-5 h-5"></i>
+                  </div>
+                  <div class="side-menu__title">
+                      Announcements                     
+                  </div>
+              </a>             
+          </li>          
+      </ul>
+  </li>
+
+  <li>
+    <a href="javascript:;" class="side-menu {{eve_menu}}">
+        <div class="side-menu__icon">
+            <i data-tw-merge="" data-lucide="shopping-bag" class="stroke-1.5 w-5 h-5"></i>
+        </div>
+        <div class="side-menu__title">
+            Events
+            <div class="side-menu__sub-icon ">
+                <i data-tw-merge="" data-lucide="chevron-down" class="stroke-1.5 w-5 h-5"></i>
+            </div>
+        </div>
+    </a>
+    <ul class="">
+        <li>
+            <a href="{% url 'psycad:event_create' %}" class="side-menu">
+                <div class="side-menu__icon">
+                    <i data-tw-merge="" data-lucide="activity" class="stroke-1.5 w-5 h-5"></i>
+                </div>
+                <div class="side-menu__title">
+                    Create
+                </div>
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'psycad:event_list' %}" class="side-menu">
+                <div class="side-menu__icon">
+                    <i data-tw-merge="" data-lucide="activity" class="stroke-1.5 w-5 h-5"></i>
+                </div>
+                <div class="side-menu__title">
+                    List All
+                </div>
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'psycad:config_eventtypes' %}" class="side-menu">
+                <div class="side-menu__icon">
+                    <i data-tw-merge="" data-lucide="activity" class="stroke-1.5 w-5 h-5"></i>
+                </div>
+                <div class="side-menu__title">
+                    Event Types                      
+                </div>
+            </a>             
+        </li>
+        <li>
+            <a href="{% url 'psycad:event_announcement_list' %}" class="side-menu">
+                <div class="side-menu__icon">
+                    <i data-tw-merge="" data-lucide="activity" class="stroke-1.5 w-5 h-5"></i>
+                </div>
+                <div class="side-menu__title">
+                    Announcements                     
+                </div>
+            </a>             
+        </li>  
+        <li>
+          <a href="{% url 'psycad:event_emails' %}" class="side-menu">
+              <div class="side-menu__icon">
+                  <i data-tw-merge="" data-lucide="activity" class="stroke-1.5 w-5 h-5"></i>
+              </div>
+              <div class="side-menu__title">
+                  Communication                     
+              </div>
+          </a>             
+      </li>        
+    </ul>
+</li>
+
+
+<li>
+  <a href="javascript:;" class="side-menu {{workshop_menu}}">
+      <div class="side-menu__icon">
+          <i data-tw-merge="" data-lucide="shopping-bag" class="stroke-1.5 w-5 h-5"></i>
+      </div>
+      <div class="side-menu__title">
+          Workshops
+          <div class="side-menu__sub-icon ">
+              <i data-tw-merge="" data-lucide="chevron-down" class="stroke-1.5 w-5 h-5"></i>
+          </div>
+      </div>
+  </a>
+  <ul class="">
+      <li>
+          <a href="{% url 'psycad:workshop_create' %}" class="side-menu">
+              <div class="side-menu__icon">
+                  <i data-tw-merge="" data-lucide="activity" class="stroke-1.5 w-5 h-5"></i>
+              </div>
+              <div class="side-menu__title">
+                  Create
+              </div>
+          </a>
+      </li>
+      <li>
+          <a href="{% url 'psycad:workshop_list' %}" class="side-menu">
+              <div class="side-menu__icon">
+                  <i data-tw-merge="" data-lucide="activity" class="stroke-1.5 w-5 h-5"></i>
+              </div>
+              <div class="side-menu__title">
+                  List All
+              </div>
+          </a>
+      </li>
+      <li>
+          <a href="{% url 'psycad:config_workshoptypes' %}" class="side-menu">
+              <div class="side-menu__icon">
+                  <i data-tw-merge="" data-lucide="activity" class="stroke-1.5 w-5 h-5"></i>
+              </div>
+              <div class="side-menu__title">
+                  Workshop Types                      
+              </div>
+          </a>             
+      </li>                
+  </ul>
+</li>
+
+
+  <li>
+      <a href="{% url 'psycad:report_stud_engagment' %}" class="side-menu {{reports_stud_engagment_menu}}">
+          <div class="side-menu__icon">
+              <i data-tw-merge="" data-lucide="inbox" class="stroke-1.5 w-5 h-5"></i>
+          </div>
+          <div class="side-menu__title">
+            Student Engagement
+          </div>
+      </a>
+  </li>
+  <li>
+      <a href="{% url 'psycad:report_company_engagemnet' %}" class="side-menu {{reports_comp_engagment_menu}}">
+          <div class="side-menu__icon">
+              <i data-tw-merge="" data-lucide="hard-drive" class="stroke-1.5 w-5 h-5"></i>
+          </div>
+          <div class="side-menu__title">
+            Company Engagement
+          </div>
+      </a>
+  </li>
+  <li>
+      <a href="{% url 'psycad:report_events' %}" class="side-menu {{reports_event_menu}}">
+          <div class="side-menu__icon">
+              <i data-tw-merge="" data-lucide="credit-card" class="stroke-1.5 w-5 h-5"></i>
+          </div>
+          <div class="side-menu__title">
+              Events
+          </div>
+      </a>
+  </li>
+  <li>
+      <a href="{% url 'psycad:report_adverts' %}" class="side-menu {{reports_advert_menu}}">
+          <div class="side-menu__icon">
+              <i data-tw-merge="" data-lucide="message-square" class="stroke-1.5 w-5 h-5"></i>
+          </div>
+          <div class="side-menu__title">
+              Adverts
+          </div>
+      </a>
+  </li>
+  
+
+  <li>
+      <a href="{% url 'psycad:faculties' %}" class="side-menu {{faculties_menu}}">
+          <div class="side-menu__icon">
+              <i data-tw-merge="" data-lucide="users" class="stroke-1.5 w-5 h-5"></i>
+          </div>
+          <div class="side-menu__title">
+              Students
+          </div>
+      </a>
+  </li>
+  
+  <li class="my-6 side-nav__divider"></li>
+  <li>
+      <a href="javascript:;" class="side-menu {{company_menu}}">
+          <div class="side-menu__icon">
+              <i data-tw-merge="" data-lucide="edit" class="stroke-1.5 w-5 h-5"></i>
+          </div>
+          <div class="side-menu__title">
+              Companies
+              <div class="side-menu__sub-icon ">
+                  <i data-tw-merge="" data-lucide="chevron-down" class="stroke-1.5 w-5 h-5"></i>
+              </div>
+          </div>
+      </a>
+      <ul class="">
+          <li>
+              <a href="{% url 'psycad:company_create' %}" class="side-menu {{add_company_menu}}">
+                  <div class="side-menu__icon">
+                      <i data-tw-merge="" data-lucide="activity" class="stroke-1.5 w-5 h-5"></i>
+                  </div>
+                  <div class="side-menu__title">
+                      Add Company
+                  </div>
+              </a>
+          </li>
+          <li>
+              <a href="{% url 'psycad:company_list' %}" class="side-menu {{comp_menu}}">
+                  <div class="side-menu__icon">
+                      <i data-tw-merge="" data-lucide="activity" class="stroke-1.5 w-5 h-5"></i>
+                  </div>
+                  <div class="side-menu__title">
+                    All Companies
+                  </div>
+              </a>
+          </li>
+          <li>
+            <a href="{% url 'psycad:company_appointments' %}" class="side-menu">
+                <div class="side-menu__icon">
+                    <i data-tw-merge="" data-lucide="activity" class="stroke-1.5 w-5 h-5"></i>
+                </div>
+                <div class="side-menu__title">
+                    Company Appointments
+                </div>
+            </a>
+          </li>
+          <li>
+            <a href="{% url 'psycad:config_appointment_outcome' %}" class="side-menu">
+                <div class="side-menu__icon">
+                    <i data-tw-merge="" data-lucide="activity" class="stroke-1.5 w-5 h-5"></i>
+                </div>
+                <div class="side-menu__title">
+                  Appointment Outcomes
+                </div>
+            </a>
+        </li>
+        <li>
+          <a href="{% url 'psycad:company_interviews' %}" class="side-menu">
+              <div class="side-menu__icon">
+                  <i data-tw-merge="" data-lucide="activity" class="stroke-1.5 w-5 h-5"></i>
+              </div>
+              <div class="side-menu__title">
+                Interviews
+              </div>
+          </a>
+      </li>
+      <li>
+        <a href="{% url 'psycad:config_interview_outcome' %}" class="side-menu">
+            <div class="side-menu__icon">
+                <i data-tw-merge="" data-lucide="activity" class="stroke-1.5 w-5 h-5"></i>
+            </div>
+            <div class="side-menu__title">
+              Interview Outcomes
+            </div>
+        </a>
+      </li>
+      </ul>
+  </li>
+  <li>
+      <a href="javascript:;" class="side-menu {{blog_menu}}">
+          <div class="side-menu__icon">
+              <i data-tw-merge="" data-lucide="file-text" class="stroke-1.5 w-5 h-5"></i>
+          </div>
+          <div class="side-menu__title">
+              Blog
+              <div class="side-menu__sub-icon ">
+                  <i data-tw-merge="" data-lucide="chevron-down" class="stroke-1.5 w-5 h-5"></i>
+              </div>
+          </div>
+      </a>
+      <ul class="">
+          <li>
+              <a href="{% url 'psycad:blog_list' %}" class="side-menu">
+                  <div class="side-menu__icon">
+                      <i data-tw-merge="" data-lucide="activity" class="stroke-1.5 w-5 h-5"></i>
+                  </div>
+                  <div class="side-menu__title">
+                      Blog List
+                  </div>
+              </a>
+          </li>
+          <li>
+              <a href="{% url 'psycad:blog_create' %}" class="side-menu">
+                  <div class="side-menu__icon">
+                      <i data-tw-merge="" data-lucide="activity" class="stroke-1.5 w-5 h-5"></i>
+                  </div>
+                  <div class="side-menu__title">
+                      Create
+                  </div>
+              </a>
+          </li>          
+      </ul>
+  </li>
+  <li>
+      <a href="javascript:;" class="side-menu {{survey_menu}}">
+          <div class="side-menu__icon">
+              <i data-tw-merge="" data-lucide="trello" class="stroke-1.5 w-5 h-5"></i>
+          </div>
+          <div class="side-menu__title">
+              Profile
+              <div class="side-menu__sub-icon ">
+                  <i data-tw-merge="" data-lucide="chevron-down" class="stroke-1.5 w-5 h-5"></i>
+              </div>
+          </div>
+      </a>
+      <ul class="">
+          <li>
+              <a href="{% url 'psycad:surveys' %}" class="side-menu">
+                  <div class="side-menu__icon">
+                      <i data-tw-merge="" data-lucide="activity" class="stroke-1.5 w-5 h-5"></i>
+                  </div>
+                  <div class="side-menu__title">
+                      Surveys
+                  </div>
+              </a>
+          </li>
+          <li>
+              <a href="{% url 'psycad:config_survey_categories' %}" class="side-menu">
+                  <div class="side-menu__icon">
+                      <i data-tw-merge="" data-lucide="activity" class="stroke-1.5 w-5 h-5"></i>
+                  </div>
+                  <div class="side-menu__title">
+                      Categories
+                  </div>
+              </a>
+          </li>
+         
+      </ul>
+  </li>
+  <li>
+      <a href="{% url 'psycad:resources' %}" class="side-menu {{ resource_menu }}">
+          <div class="side-menu__icon">
+              <i data-tw-merge="" data-lucide="layout" class="stroke-1.5 w-5 h-5"></i>
+          </div>
+          <div class="side-menu__title">
+              Resources              
+          </div>
+      </a>     
+  </li>
+
+  <li>
+    <a href="{% url 'psycad:announcements' %}" class="side-menu {{ announcement_menu }}">
+        <div class="side-menu__icon">
+            <i data-tw-merge="" data-lucide="layout" class="stroke-1.5 w-5 h-5"></i>
+        </div>
+        <div class="side-menu__title">
+          Announcements              
+        </div>
+    </a>     
+</li>
+
+  <li class="my-6 side-nav__divider"></li>
+  <li>
+      <a href="javascript:;" class="side-menu {{config_menu}}">
+          <div class="side-menu__icon">
+              <i data-tw-merge="" data-lucide="inbox" class="stroke-1.5 w-5 h-5"></i>
+          </div>
+          <div class="side-menu__title">
+              Config
+              <div class="side-menu__sub-icon ">
+                  <i data-tw-merge="" data-lucide="chevron-down" class="stroke-1.5 w-5 h-5"></i>
+              </div>
+          </div>
+      </a>
+      <ul class="">
+          <li>
+              <a href="{% url 'psycad:config_eventtypes' %}" class="side-menu">
+                  <div class="side-menu__icon">
+                      <i data-tw-merge="" data-lucide="activity" class="stroke-1.5 w-5 h-5"></i>
+                  </div>
+                  <div class="side-menu__title">
+                    Recruitment Program Types
+                      
+                  </div>
+              </a>
+          </li>
+          <li>
+              <a href="{% url 'psycad:config_workshoptypes' %}" class="side-menu">
+                  <div class="side-menu__icon">
+                      <i data-tw-merge="" data-lucide="activity" class="stroke-1.5 w-5 h-5"></i>
+                  </div>
+                  <div class="side-menu__title">
+                    Workshop Types
+                     
+                  </div>
+              </a>
+            
+          </li>
+          <li>
+              <a href="{% url 'psycad:config_appointmentcategories' %}" class="side-menu">
+                  <div class="side-menu__icon">
+                      <i data-tw-merge="" data-lucide="activity" class="stroke-1.5 w-5 h-5"></i>
+                  </div>
+                  <div class="side-menu__title">
+                    Appointment Categories
+                  </div>
+              </a>
+          </li>
+          <li>
+              <a href="{% url 'psycad:config_appointment_recommendations' %}" class="side-menu">
+                  <div class="side-menu__icon">
+                      <i data-tw-merge="" data-lucide="activity" class="stroke-1.5 w-5 h-5"></i>
+                  </div>
+                  <div class="side-menu__title">
+                    Appointment Recommendations
+                  </div>
+              </a>
+          </li>
+          <li>
+              <a href="{% url 'psycad:config_blog_categories' %}" class="side-menu">
+                  <div class="side-menu__icon">
+                      <i data-tw-merge="" data-lucide="activity" class="stroke-1.5 w-5 h-5"></i>
+                  </div>
+                  <div class="side-menu__title">
+                    Blog Categories
+                  </div>
+              </a>
+          </li>
+          <li>
+              <a href="{% url 'psycad:config_survey_categories' %}" class="side-menu">
+                  <div class="side-menu__icon">
+                      <i data-tw-merge="" data-lucide="activity" class="stroke-1.5 w-5 h-5"></i>
+                  </div>
+                  <div class="side-menu__title">
+                    Survey Categories
+                  </div>
+              </a>
+          </li>
+          <li>
+              <a href="{% url 'psycad:config_resource_categories' %}" class="side-menu">
+                  <div class="side-menu__icon">
+                      <i data-tw-merge="" data-lucide="activity" class="stroke-1.5 w-5 h-5"></i>
+                  </div>
+                  <div class="side-menu__title">
+                    Resource Categories
+                  </div>
+              </a>
+          </li>
+          <li>
+              <a href="{% url 'psycad:config_question_types' %}" class="side-menu">
+                  <div class="side-menu__icon">
+                      <i data-tw-merge="" data-lucide="activity" class="stroke-1.5 w-5 h-5"></i>
+                  </div>
+                  <div class="side-menu__title">
+                    Question types
+                  </div>
+              </a>
+          </li>
+          <li>
+              <a href="{% url 'psycad:config_issuetracker' %}" class="side-menu">
+                  <div class="side-menu__icon">
+                      <i data-tw-merge="" data-lucide="activity" class="stroke-1.5 w-5 h-5"></i>
+                  </div>
+                  <div class="side-menu__title">
+                    Issue Tracker
+                  </div>
+              </a>
+          </li>
+          <li>
+              <a href="{% url 'psycad:config_interview_outcome' %}" class="side-menu">
+                  <div class="side-menu__icon">
+                      <i data-tw-merge="" data-lucide="activity" class="stroke-1.5 w-5 h-5"></i>
+                  </div>
+                  <div class="side-menu__title">
+                    Interview Outcomes
+                  </div>
+              </a>
+          </li>
+          
+      </ul>
+  </li>
+
+</ul>
+
+

@@ -1,0 +1,18 @@
+<!-- BEGIN: Page -->
+<div class="intro-y box col-span-12 2xl:col-span-6">
+    <div class="flex items-center px-5 py-5 sm:py-3 border-b border-slate-200/60 dark:border-darkmode-400">
+        <h2 class="font-medium text-base mr-auto">
+            Profile Picture
+        </h2>
+    </div>
+    <div class="p-5">
+        <form data-file-types="image/jpeg|image/png|image/jpg" action="{% url 'students:edit_profile_picture' student.id %}" class="dropzone">
+            {% csrf_token %}
+            <div class="fallback"> <input name="profile_pic" type="file" /> </div>
+            <div class="dz-message" data-dz-message>
+                <div class="text-lg font-medium">Drop files here or click to upload.</div>
+                <div class="text-slate-500"> This is just a demo dropzone. Selected files are <span class="font-medium">not</span> actually uploaded. </div>
+            </div>
+        </form>
+    </div>
+</div>

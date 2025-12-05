@@ -1,0 +1,257 @@
+<div class="border border-slate-200/60 dark:border-darkmode-400 rounded-md p-5 mt-5">
+    <div class="font-medium flex items-center border-b border-slate-200/60 dark:border-darkmode-400 pb-5"> <i data-lucide="chevron-down" class="w-4 h-4 mr-2"></i> Learner Details </div>
+
+    <form 
+            hx-post="{% url 'students:edit_learner_programme_details' lp.id %}"
+            hx-trigger="submit"
+            hx-target="#messages_learner_details"
+            action="#"                    
+            hx-on::before-request="btn_learner_details.disabled = true;btn_learner_details.innerHTML ='Saving....'; return true;"
+            hx-on::after-request="btn_learner_details.disabled = false;btn_learner_details.innerHTML ='Saved!'; return true;">
+
+        {% csrf_token %}
+        <div class="grid grid-cols-2 gap-4">
+            <div class="flex flex-col mb-4 md:w-1/2">
+                <label for="id_title" class="form-label w-full">Title*</label>
+                <select name="title" id="id_title" class="form-select" required {{ lp_edit }}>
+                    <option></option>
+                    {% if lp.student.title == "Mr" %}
+                        <option value="Mr" selected>Mr</option>
+                        <option value="Mrs">Mrs</option>
+                        <option value="Ms">Ms</option>
+                        <option value="Dr">Dr</option>
+                        <option value="Adv">Adv</option>
+                        <option value="Hon">Hon</option>
+                    {% elif lp.student.title == "Mrs" %}
+                        <option value="Mr">Mr</option>
+                        <option value="Mrs" selected>Mrs</option>
+                        <option value="Ms">Ms</option>
+                        <option value="Dr">Dr</option>
+                        <option value="Adv">Adv</option>
+                        <option value="Hon">Hon</option>
+                    {% elif lp.student.title == "Ms" %}
+                        <option value="Mr">Mr</option>
+                        <option value="Mrs">Mrs</option>
+                        <option value="Ms" selected>Ms</option>
+                        <option value="Dr">Dr</option>
+                        <option value="Adv">Adv</option>
+                        <option value="Hon">Hon</option>
+                    {% elif lp.student.title == "Dr" %}
+                        <option value="Mr">Mr</option>
+                        <option value="Mrs">Mrs</option>
+                        <option value="Ms">Ms</option>
+                        <option value="Dr" selected>Dr</option>
+                        <option value="Adv">Adv</option>
+                        <option value="Hon">Hon</option>
+                    {% elif lp.student.title == "Adv" %}
+                        <option value="Mr">Mr</option>
+                        <option value="Mrs">Mrs</option>
+                        <option value="Ms">Ms</option>
+                        <option value="Dr">Dr</option>
+                        <option value="Adv" selected>Adv</option>
+                        <option value="Hon">Hon</option>
+                    {% elif lp.student.title == "Hon" %}
+                        <option value="Mr">Mr</option>
+                        <option value="Mrs">Mrs</option>
+                        <option value="Ms">Ms</option>
+                        <option value="Dr">Dr</option>
+                        <option value="Adv">Adv</option>
+                        <option value="Hon" selected>Hon</option>
+                    {% else %}
+                        <option value="Mr">Mr</option>
+                        <option value="Mrs">Mrs</option>
+                        <option value="Ms">Ms</option>
+                        <option value="Dr">Dr</option>
+                        <option value="Adv">Adv</option>
+                        <option value="Hon">Hon</option>
+                    {% endif %}
+                </select>
+            </div> 
+            <div class="flex flex-col mb-4 md:w-1/2">
+                <label for="id_first_name" class="form-label w-full">First Name*</label>
+                <input name='first_name' id="id_first_name" type="text" class="form-control" placeholder="First Name" value='{{ lp.student.first_name|default_if_none:""  }}' required {{ lp_edit }}>
+            </div>  
+            <div class="flex flex-col mb-4 md:w-1/2">
+                <label for="id_last_name" class="form-label w-full">Last Name*</label>
+                <input name='last_name' id="id_last_name" type="text" class="form-control" placeholder="Last Name" value='{{ lp.student.last_name|default_if_none:""  }}' required {{ lp_edit }}>
+            </div>   
+            <div class="flex flex-col mb-4 md:w-1/2">
+                <label for="id_middle_name" class="form-label w-full">Middle Name</label>
+                <input name='middle_name' id="id_middle_name" type="text" class="form-control" placeholder="Middle Name" value='{{ lp.student.middle_name|default_if_none:""  }}' {{ lp_edit }}>
+            </div>
+            <div class="flex flex-col mb-4 md:w-1/2">
+                <label for="id_previous_last_name" class="form-label w-full">Previous Last Name</label>
+                <input name='previous_last_name' id="id_previous_last_name" type="text" class="form-control" placeholder="Previous Last Name" value='{{ lp.student.previous_last_name|default_if_none:""  }}' {{ lp_edit }}>
+            </div>
+            <div class="flex flex-col mb-4 md:w-1/2">
+                <label for="id_nationality" class="form-label w-full">Nationality*</label>
+                <select name="nationality" id="id_nationality" class="tom-select" required  {{ lp_edit }}>
+                        <option></option>                      
+                        {% for nationality in nationalities  %}
+                            {% if lp.student.nationality_id == nationality.id %}
+                                <option value="{{ nationality.id }}" selected>{{ nationality.nationality }}</option>
+                            {% else %}
+                                <option value="{{ nationality.id }}">{{ nationality.nationality }}</option>
+                            {% endif %}      
+                        {% endfor %}         
+                </select>
+            </div>
+            <div class="flex flex-col mb-4 md:w-1/2">
+                <label for="id_id_number" class="form-label w-full">Type of ID*</label>
+                <select name="type_of_id" id="id_type_of_id" class="form-select" required  {{ lp_edit }}>
+                    <option></option>
+                    {% for t in type_of_ids %}
+                        {% if t.id == 2 or t.id == 5 %}
+                            {% if t == lp.student.type_of_id %}
+                                <option value="{{ t.id }}" selected>{{ t.type_of_id }}</option>
+                            {% else %}
+                                <option value="{{ t.id }}">{{ t.type_of_id }}</option>
+                            {% endif %}  
+                        {% endif %}
+                    {% endfor %}                
+                </select>
+            </div> 
+            <div class="flex flex-col mb-4 md:w-1/2">
+                <label for="id_dob" class="form-label w-full">Date of Birth*</label>
+                <input name='dob' id="id_dob" type="date" class="form-control" placeholder="Date of Birth" value='{{ lp.student.dob|date:"Y-m-d" }}' required {{ lp_edit }}>
+            </div>    
+            <div class="flex flex-col mb-4 md:w-1/2">
+                <label for="id_id_number" class="form-label w-full">ID Number*</label>
+                <input name='id_number' id="id_id_number" type="text" class="form-control" placeholder="ID Number" value='{{ lp.student.id_number|default_if_none:"" }}' required {{ lp_edit }}>
+            </div> 
+            <div class="flex flex-col mb-4 md:w-1/2">
+                <label for="id_residence_status" class="form-label w-full">Residence Status*</label>
+                <select name="residence_status" id="id_residence_status" class="form-select" required  {{ lp_edit }}>
+                    <option></option>
+                    {% for r in residentrial_statuses %}
+                        {% if lp.student.residence_status == r %}
+                            <option value='{{ r.id }}' selected>{{ r.status }}</option>
+                        {% else %}
+                            <option value ='{{ r.id }}'>{{ r.status }}</option>
+                        {% endif %}
+                    {% endfor %}                    
+                </select>
+            </div> 
+            <div class="flex flex-col mb-4 md:w-1/2">
+                <label for="id_marital_status" class="form-label w-full">Marital Status*</label>
+                <select name="marital_status" id="id_marital_status" class="form-select" required  {{ lp_edit }}>
+                        <option></option>
+                    {% if lp.student.marital_status == "Unknown" %}
+                        <option value="Unknown" selected>Unknown</option>
+                        <option value="Single">Single</option>
+                        <option value="Married">Married</option>
+                        <option value="Divorced">Divorced</option>
+                    {% elif lp.student.marital_status == "Single" %}
+                        <option value="Unknown">Unknown</option>
+                        <option value="Single" selected>Single</option>
+                        <option value="Married">Married</option>
+                        <option value="Divorced">Divorced</option>
+                    {% elif lp.student.marital_status == "Married" %}
+                        <option value="Unknown">Unknown</option>
+                        <option value="Single">Single</option>
+                        <option value="Married" selected>Married</option>
+                        <option value="Divorced">Divorced</option>
+                    {% elif lp.student.marital_status == "Divorced" %}
+                        <option value="Unknown">Unknown</option>
+                        <option value="Single">Single</option>
+                        <option value="Married">Married</option>
+                        <option value="Divorced" selected>Divorced</option>
+                    {% else %}
+                        <option value="Permanent Resident">Permanent Resident</option>
+                        <option value="South Africa">South Africa</option>
+                        <option value="Married">Married</option>
+                        <option value="Divorced">Divorced</option>
+                    {% endif %}                
+                </select>
+            </div>
+
+            <div class="flex flex-col mb-4 md:w-1/2">
+                <label for="id_gender" class="form-label w-full">Gender*</label>
+                <select name="gender" id="id_gender" class="form-select" required  {{ lp_edit }}>
+                            <option></option>
+                    {% for g in gender %}
+                        {% if lp.student.gender_id == g.id %}
+                            <option value = "{{ g.id }}" selected>{{ g.gender }}</option>
+                        {% else %}
+                            <option value = "{{ g.id }}">{{ g.gender }}</option>
+                        {% endif %}                
+                    {% endfor %}
+                </select>
+            </div>   
+
+            <div class="flex flex-col mb-4 md:w-1/2">
+                <label for="id_race" class="form-label w-full">Race*</label>
+                <select name="race" id="id_race" class="form-select" required  {{ lp_edit }}>
+                            <option></option>
+                    {% for r in race %}
+                        {% if lp.student.race_id == r.id %}
+                            <option value = "{{ r.id }}" selected>{{ r.race }}</option>
+                        {% else %}
+                            <option value = "{{ r.id }}">{{ r.race }}</option>
+                        {% endif %}                
+                    {% endfor %}
+                </select>
+            </div> 
+
+            <div class="flex flex-col mb-4 md:w-1/2">
+                <label for="id_disability" class="form-label w-full">Disability*</label>
+                <select name="disability" id="id_disability" class="form-select" required  {{ lp_edit }}>
+                            <option></option>
+                        {% if lp.student.disability == "Yes" %}
+                            <option value = "Yes" selected>Yes</option>
+                            <option value = "No">No</option>
+                        {% elif lp.student.disability == "No" %}
+                            <option value = "Yes">Yes</option>
+                            <option value = "No" selected>No</option>
+                        {% else %}
+                            <option value = "Yes">Yes</option>
+                            <option value = "No">No</option>
+                        {% endif %}                
+                
+                </select>
+            </div>
+
+            <div class="flex flex-col mb-4 md:w-1/2" id = "div_disability_specify" {% if lp.student.disability == "Yes" %} style='display:block'  {% else %} style='display:none' {% endif %}>
+                <label for="id_disability_specify" class="form-label w-full">Specify Disability*</label>
+                <select name='disability_specify' id='id_disability_specify' class = 'form-select' {{ lp_edit }}>
+                    {% for d in disabilities %}
+                        {% if d.id == lp.student.disability_specify_id %}
+                            <option value="{{ d.id }}" selected>{{ d.disability }}</option>
+                        {% else %}
+                            <option value="{{ d.id }}">{{ d.disability }}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+            </div>    
+            
+            <div class="flex flex-col mb-4 md:w-1/2">
+                <label for="id_age" class="form-label w-full"> Age*</label>
+                <input name='age' id="id_age" type="number" class="form-control" placeholder="Age" value='{{ lp.student.age|default_if_none:""  }}' required {{ lp_edit }} min='0'>
+            </div>  
+
+            
+            <div class="flex flex-col mb-4 md:w-1/2">
+                <label for="id_language" class="form-label w-full">Language*</label>
+                <select name="language" id="id_language" class="form-select"  {{ lp_edit }}>
+                    <option></option>
+                    {% for lang in languages %}
+                        {% if lp.student.language == lang %}
+                            <option value={{ lang.id }} selected>{{ lang.language }}</option>
+                        {% else %}
+                            <option value={{ lang.id }}>{{ lang.language }}</option>
+                        {% endif %}
+                    {% endfor %}                
+                </select>
+            </div>
+
+
+        </div>
+            <div class="grid grid-cols-2">
+                <div></div>
+                <div class="items-center mt-10">
+                    <button type="submit" id="btn_learner_details" class="btn btn-elevated-primary w-48 mr-1 mb-2 self-center">Save Details</button>
+                </div>
+            </div>
+    </form>
+    <div id='messages_learner_details'></div>
+</div>

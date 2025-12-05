@@ -1,0 +1,796 @@
+{% extends 'base_vertical.html' %}
+
+{% load bootstrap3 %}
+{% load static %}
+
+{% block main-content %}
+
+
+
+<div class="row">
+  <div class="col-md-12 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          <nav aria-label="breadcrumb">
+              <ol class="breadcrumb bg-inverse-info">
+                {%  if user.is_authenticated and user.roles_id == 2  %}
+                  <li class="breadcrumb-item"><a href="{% url 'wil:dashboard' %}">Dashboard</a></li>
+                  <li class="breadcrumb-item"><a href="{% url 'wil:event_list' %}">Recruitment Programs</a></li>
+                  <li class="breadcrumb-item active" aria-current="page"><a>Edit Recruitment Program</a></li>
+                {% elif user.is_authenticated and user.roles_id == 10 %}
+                  <li class="breadcrumb-item"><a href="{% url 'psycad:dashboard' %}">Dashboard</a></li>
+                  <li class="breadcrumb-item"><a href="{% url 'psycad:event_list' %}">Recruitment Programs</a></li>
+                  <li class="breadcrumb-item active" aria-current="page"><a>Edit Recruitment Program</a></li>
+                {% endif %}
+              </ol>
+            </nav>
+
+            {% include 'messages.html' %}
+
+        </div>
+      </div>
+  </div>
+</div>
+
+
+
+  <div class="col-12 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+
+          <div class="row">
+            <div class="col-md-12 mx-auto">
+              <ul class="nav nav-pills nav-pills-custom" id="pills-tab-custom" role="tablist">
+                <li class="nav-item">
+                  <a class="nav-link active" id="pills-home-tab-custom" data-toggle="pill" href="#pills-tertiary" role="tab" aria-controls="pills-home" aria-selected="true">
+                    Edit Recruitment Program
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" id="pills-profile-tab-custom" data-toggle="pill" href="#pills-school" role="tab" aria-controls="pills-profile" aria-selected="false">
+                    Recruitment Program Media
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" id="pills-contact-tab-custom" data-toggle="pill" href="#pills-skills" role="tab" aria-controls="pills-contact" aria-selected="false">
+                    RSVPs
+                  </a>
+                </li>
+              </ul>
+              <div class="tab-content tab-content-custom-pill" id="pills-tabContent-custom">
+                <div class="tab-pane fade show active" id="pills-tertiary" role="tabpanel" aria-labelledby="pills-home-tab-custom">
+                  <h4 class="card-title">Edit Recruitment Program</h4>
+                  <p class="card-description">
+                    Please fill in the information below
+                  </p>
+                  <form class="forms-sample" method="POST">
+                    {% csrf_token %}
+                    <div class="row">
+                      <div class="col-md-12">
+                        <div class="form-group row">
+                          <label class="col-sm-2 col-form-label">Title</label>
+                          <div class="col-sm-10">
+                            <input type="text" name="title" id="id_title" value="{{ event.title }}" class="form-control" required>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-12">
+                        <div class="form-group row">
+                          <label class="col-sm-2 col-form-label">Description</label>
+                          <div class="col-sm-10">
+                            <textarea name="description" id="id_description" class="form-control" required>{{ event.description }}</textarea>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-12">
+                        <div class="form-group row">
+                          <label class="col-sm-2 col-form-label">Who to Invite</label>
+                          <div class="col-sm-10">
+                            {% bootstrap_field form.invitees show_label=False %}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="row">
+                      <div class="col-md-12">
+                        <div class="form-group row">
+                          <label class="col-sm-2 col-form-label">Recruitment Program Type</label>
+                          <div class="col-sm-10">
+                            {% bootstrap_field form.type show_label=False %}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-12">
+                        <div class="form-group row">
+                          <label class="col-sm-2 col-form-label">Registration</label>
+                          <div class="col-sm-10">
+                            {% bootstrap_field form.registration show_label=False %}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div {% if event.invitees == "2" or event.invitees == "3" %} style="display: block;"{% else %}  style="display: none;" {% endif %} id = 'div_registration_form'>
+                        <div class="row">
+                          <div class="col-md-12">
+                            <div class="form-group row">
+                              <label class="col-sm-2 col-form-label">Registration form for companies</label>
+                              <div class="col-sm-10">
+                                <select name="registration_form" id="id_registration_form" class="form-control" placeholder="Select an Option">
+                                  <option></option>
+                                  {% for regform in event.type.registration_forms.all %}
+                                    {% if regform.id == event.registration_form.id %}
+                                      <option value="{{ regform.id }}" selected>{{ regform.title }}</option>
+                                    {% else %}
+                                      <option value="{{ regform.id }}">{{ regform.title }}</option>
+                                    {% endif %}
+                                  {% endfor %}
+                                </select>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-12">
+                        <div class="form-group row">
+                          <label class="col-sm-2 col-form-label">Recruitment Program Date</label>
+                          <div class="col-sm-4">
+                            <input type="date" class="form-control" name="event_date" id="id_event_date" value="{{ event.event_date|date:'Y-m-d' }}" required>
+                          </div>
+                          <label class="col-sm-1 col-form-label">To</label>
+                          <div class="col-sm-5">
+                            <input type="date" class="form-control" name="event_date_end" id="id_event_date_end" value="{{ event.event_date_end|date:'Y-m-d' }}" required>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-12">
+                        <div class="form-group row">
+                          <label class="col-sm-2 col-form-label">Recruitment Program Time</label>
+                          <div class="col-sm-4">
+                            <input type="time" class="form-control" name="event_time" id="id_event_time" value="{{ event.event_time|date:'H:i' }}" required>
+                          </div>
+                          <label class="col-sm-1 col-form-label">To</label>
+                          <div class="col-sm-5">
+                            <input type="time" class="form-control" name="event_time_end" id="id_event_time_end" value="{{ event.event_time_end|date:'H:i' }}" required>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-12">
+                        <div class="form-group row">
+                          <label class="col-sm-2 col-form-label">Location</label>
+                          <div class="col-sm-10">
+                            {% bootstrap_field form.location show_label=False %}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div {% if event.invitees == '1' or event.invitees == '3' %}  style="display: block;" {% else %} style="display: none;" {% endif %} id = 'div_extra_students'>
+                    <div class="row">
+                      <div class="col-md-12">
+                        <div class="form-group row">
+                          <label class="col-sm-2 col-form-label">Extra Information for Students</label>
+                          <div class="col-sm-10">
+                            <textarea name="extra_information" id="id_extra_information" class="form-control">{{ event.extra_information }}</textarea>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div {% if event.invitees == '2' or event.invitees == '3' %}  style="display: block;" {% else %} style="display: none;" {% endif %} id = 'div_extra_companies'>
+                    <div class="row">
+                      <div class="col-md-12">
+                        <div class="form-group row">
+                          <label class="col-sm-2 col-form-label">Extra Information for Companies</label>
+                          <div class="col-sm-10">
+                            <textarea name="extra_information_company" id="id_extra_information_company" class="form-control">{{ event.extra_information_company }}</textarea>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                    <div class="row">
+                      <div class="col-md-12">
+                        <div class="form-group row">
+                          <label class="col-sm-2 col-form-label">Published</label>
+                          <div class="col-sm-10">
+                            <select name="published" id="id_published" class="form-control">
+                              {% if event.published == 'Yes' %}
+                                <option value="Yes" selected>Yes</option>
+                                <option value="No">No</option>
+                              {% else %}
+                                <option value="Yes">Yes</option>
+                                <option value="No" selected>No</option>
+                              {% endif %}
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="row">
+                      <div class="col-md-12">
+                        <div class="form-group row">
+                          <label class="col-sm-2 col-form-label">Organized by a Company?</label>
+                          <div class="col-sm-10">
+                            <select name="company_organized" id="id_company_organized" class="form-control" placeholder="Select an Option" required>
+                              {% if event.company_organized == 'No' %}
+                                <option value="No" selected>No</option>
+                                <option value="Yes">Yes</option>
+                              {% else %}
+                                <option value="No">No</option>
+                                <option value="Yes" selected>Yes</option>
+                              {% endif %}
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row" {% if event.company_organized == 'No' %} style="display: none;" {% else %}  style="display: block;" {% endif %} id="div_company_field">
+                      <div class="col-md-12">
+                        <div class="form-group row">
+                          <label class="col-sm-2 col-form-label">Company</label>
+                          <div class="col-sm-10">
+                            <select name="company" id="id_company" class="js-company-single">
+                              {% for c in companies %}
+                                {% if c.id == event.company_id %}
+                                  <option value="{{ c.id }}" selected>{{ c.company_name }}</option>
+                                {% else %}
+                                  <option value="{{ c.id }}">{{ c.company_name }}</option>
+                                {% endif %}
+                              {% endfor %}
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-12">
+                        <div class="form-group row">
+                          <label class="col-sm-2 col-form-label">Campus</label>
+                          <div class="col-sm-10">
+                            <select name="campus" id="id_campus" class="form-control">
+                              <option></option>
+                              {% for c in campuses %}
+                                {% if c.id == event.campus_id %}
+                                  <option value="{{ c.id }}" selected>{{ c.campus }}</option>
+                                {% else %}
+                                  <option value="{{ c.id }}">{{ c.campus }}</option>
+                                {% endif %}
+                              {% endfor %}
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary mr-2">Edit</button>
+                    <button class="btn btn-light">Cancel</button>
+                  </form>
+                </div>
+                <div class="tab-pane fade" id="pills-school" role="tabpanel" aria-labelledby="pills-profile-tab-custom">
+                  <h4 class="card-title">Recruitment Program Media</h4>
+                  <p class="card-description">
+                    Use this space to add any event media such as Images of the event or youtube video links
+                  </p>
+                  <form class="forms-sample" method="POST" action="{% url 'psycad:event_add_media' event.id %}" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="form-group">
+                      <label class="control-label" for="id_event_date">Title</label>
+                      <input type="text" name="title" class="form-control" placeholder="Title" required id="id_title_media">
+                    </div>
+
+                    <div class="form-group">
+                      <label class="control-label" for="id_event_date">Media Type</label>
+                      <select name="type" id="id_type_media" class="form-control">
+                        <option value="">Select Type of Media</option>
+                        <option value="Video Link">Video</option>
+                        <option value="image">Image</option>
+                        <option value="PDF file">PDF file</option>
+                      </select>
+                    </div>
+
+                    <div class="form-group" id="div_image_field" style="display: none;">
+                      <label class="control-label" for="id_image">Image File</label>
+                      <input type="file" name="image" id="id_image" class="form-control">
+                    </div>
+                    <div class="form-group" id="div_file_field" style="display: none;">
+                      <label class="control-label" for="id_file">PDF File</label>
+                      <input type="file" name="file" id="id_file" class="form-control">
+                    </div>
+                    <div class="form-group" id="div_link_field" style="display: none;">
+                      <label class="control-label" for="id_video_link">Video</label>
+                      <input type="file" name="file" id="id_file" class="form-control">
+                    </div>
+                    <button type="submit" class="btn btn-primary mr-2">Add Media</button>
+                    <button class="btn btn-light">Cancel</button>
+                  </form>
+                  <br>
+                  <table class="table table-bordered">
+                    <thead>
+                      <tr>
+                        <th>#</th>
+                        <th>Title</th>
+                        <th>Item</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for media in event.media_files.all %}
+                        <tr>
+                          <td>{{ forloop.counter }}</td>
+                          <td>{{ media.title }}</td>
+                          <td>
+                            {% if media.type == 'image' %}
+                              {% if media.image %}
+                                <div id="open_image_{{ media.id }}" class="">
+                                      <a href="{{ media.image.url }}" class="image-tile"><img src="{{ media.image.url }}" alt="{{ media.title }}" width='300' height='200'></a>
+                                </div>
+                              {% endif %}
+                            {% elif media.type == 'Video Link' %}
+                              {% if media.file %}
+                                <video width="220" height="140" controls>
+                                    <source src="{{ media.file.url }}" type="video/mp4">
+                                    Your browser does not support the video tag.
+                                </video>
+                              {% endif %}
+                            {% elif media.type == "PDF file" %}
+                              {% if media.file %}
+                                  <a data-iframe="true" id="open-pdf_{{ media.id }}" data-src="{{ media.file.url }}"><i class="fa fa-file-pdf-o icon-lg text-primary"></i></a>
+                              {% endif %}
+                            {% endif %}
+                          </td>
+                          <td>
+                            <button type="button" class="btn btn-danger btn-rounded btn-icon" data-toggle="modal" data-target="#delete{{ media.id }}" > <i class="fa fa-trash-o"></i> </button>
+
+                            <div class="modal fade" id="delete{{ media.id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel-3" aria-hidden="true">
+                              <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                  <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLabel-3">Delete Media: {{media.title}}</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                      <span aria-hidden="true">&times;</span>
+                                    </button>
+                                  </div>
+                                  <form action="{% url 'psycad:event_media_delete' event.id media.id %}" method="POST">
+                                    {% csrf_token %}
+                                  <div class="modal-body">
+                                    <p>Are you sure you want to delete this media file?</p>
+                                  </div>
+                                  <div class="modal-footer">
+                                    <button type="submit" class="btn btn-success">Yes</button>
+                                    <button type="button" class="btn btn-light" data-dismiss="modal">No</button>
+                                  </div>
+                                  </form>
+                                </div>
+                              </div>
+                            </div>
+                          </td>
+                        </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+
+                </div>
+                <div class="tab-pane fade" id="pills-skills" role="tabpanel" aria-labelledby="pills-contact-tab-custom">
+                  {% if user.is_authenticated and user.roles_id == 2 %}
+                    <form action="{% url 'wil:send_message_rsvps' event.id %}" method="POST" name="frmnotify">
+                  {% elif user.is_authenticated and user.roles_id == 10 %}
+                    <form action="{% url 'psycad:send_message_rsvps' event.id %}" method="POST" name="frmnotify">
+                  {% endif %}
+                  {% csrf_token %}
+                  <input  type = "hidden" name = "userscustomLoop" value = "{{ rsvps|length  }}">
+                    <div class="card-body">
+                      <h4 class="card-title">Recruitment Program: {{event.title}}</h4>
+                      <p class="card-description">
+
+                        <div class="form-group">
+                          <label for="subject">Subject</label>
+                          <input type="text" class="form-control" id="subject" name="subject" placeholder="Message Subject">
+                        </div>
+
+                        <div class="form-group">
+                          <label for="message">Message</label>
+                          <textarea name="message" class="form-control" id="message" placeholder="Email Message"></textarea>
+                        </div>
+
+                        <button type="button" class="btn btn-warning btn-icon-text btn-rounded pull-right" onclick="sendNotifications()"> <i class="ti-email btn-icon-prepend"></i>Send Message</button>
+
+                      </p><br><br><br>
+                      <div class="table-responsive">
+                        <table class="table table-bordered">
+                          <thead>
+                            <tr>
+                              <th><input type="checkbox" name="toggle" value="all" class="form-control" onclick = "checkall()">ALL</th>
+                              <th>Student Details</th>
+                              <th>Contacts</th>
+                              <th>Gender</th>
+                              <th>Race</th>
+                              <th>Nationality</th>
+                              <th>Employed</th>
+                              <th>View Student</th>
+                              <th>Status</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {% for selectee in rsvps %}
+                                <tr>
+                                  <td class="py-1">
+                                    <input type="checkbox" name="students[]" value="{{ selectee.student.id }}">
+                                  </td>
+                                  <td>
+                                    <b>{{selectee.student.student_number}}</b><br><br>
+                                    {{selectee.student.name}} {{selectee.student.surname}}
+                                  </td>
+                                  <td>
+                                    <b>Email:</b> {{selectee.student.email}}<br><br>
+                                    <b>Cellphone:</b> {{selectee.student.contact_number}}
+                                  </td>
+                                  <td>
+
+                                      {% if selectee.student.gender == 1 %}
+                                        Male
+                                      {% else %}
+                                        Female
+                                      {% endif %}
+
+                                  </td>
+                                  <td>
+                                    {% if selectee.student.race == 1 %}Black{% elif selectee.student.race == 2 %}COLOURED{% elif selectee.student.race == 3 %}ASIAN{% elif selectee.student.race == 4 %}WHITE{% endif %}
+                                  </td>
+
+                                  <td> {{ selectee.student.nationality.countryName }} </td>
+                                  <td>
+                                    {% if selectee.student.employed == 1 %}
+                                        <button type="button" class="btn btn-outline-success btn-rounded btn-icon">
+                                          <i class="ti-check"></i>
+                                        </button>
+                                    {% else %}
+                                        <button type="button" class="btn btn-outline-danger btn-rounded btn-icon">
+                                          <i class="ti-close"></i>
+                                        </button>
+                                    {% endif %}
+                                  </td>
+                                  <td>
+                                    <a href="{% url 'mentor:print_cv' selectee.student.id %}" class="btn btn-outline-primary btn-rounded btn-icon" target="_blank" style="target-new: tab;">
+                                      <br><i class="fa fa-file-pdf-o"></i>
+                                    </a> | <a class="btn btn-outline-success  btn-rounded btn-icon" href="{% url 'cv:view_resume' selectee.student.id selectee.student.name %}" target="_blank" style="target-new: tab;">
+                                      <br><i class="ti-world"></i>
+                                    </a>
+                                  </td>
+                                  <td>
+                                    {% if selectee.status == 'Pending' %}
+                                      <button type="button" class="btn btn-outline-secondary btn-rounded btn-icon" data-toggle="modal" data-target="#status{{ selectee.id }}" >
+                                        <i class="ti-help"></i>
+                                      </button>
+                                    {% elif selectee.status == 'Yes' %}
+                                      <button type="button" class="btn btn-outline-secondary btn-rounded btn-icon" data-toggle="modal" data-target="#status{{ selectee.id }}" >
+                                        <i class="ti-check"></i>
+                                      </button>
+                                    {% elif selectee.status == 'No' %}
+                                      <button type="button" class="btn btn-outline-secondary btn-rounded btn-icon" data-toggle="modal" data-target="#status{{ advert.id }}" >
+                                        <i class="ti-close"></i>
+                                      </button>
+                                    {% endif %}
+
+                                    <div class="modal fade" id="status{{ selectee.id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel-3" aria-hidden="true">
+                                      <div class="modal-dialog" role="document">
+                                        <div class="modal-content">
+                                          <div class="modal-header">
+                                            <h5 class="modal-title" id="exampleModalLabel-3">Applicants Outcome</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                              <span aria-hidden="true">&times;</span>
+                                            </button>
+                                          </div>
+                                          {% if user.is_authenticated and user.roles_id == 2 %}
+                                            <form action="{% url 'wil:applicants_outcome' selectee.id %}" method="POST">
+                                          {% elif user.is_authenticated and user.roles_id == 10 %}
+                                            <form action="{% url 'psycad:applicants_outcome' selectee.id %}" method="POST">
+                                          {% endif %}
+                                            {% csrf_token %}
+                                          <div class="modal-body">
+
+                                            <div class="form-group">
+                                              <label for="date_visit">Message</label>
+                                              <textarea name="message" id="message" class="form-control">{{selectee.message}}</textarea>
+                                            </div>
+
+                                            <div class="form-group">
+                                              <label for="lecturer_id">Applicants Outcome</label>
+                                              <select class="form-control select" name="status" id="status">
+
+                                                  {% if status == 'Pending' %}
+                                                    <option value="Pending" selected>Pending</option>
+                                                    <option value="Yes">Selected - Approved</option>
+                                                    <option value="No">Not Selected</option>
+                                                  {% elif status == 'Yes' %}
+                                                    <option value="Pending">Pending</option>
+                                                    <option value="Yes" selected>Selected - Approved</option>
+                                                    <option value="No">Not Selected</option>
+                                                  {% elif status == 'No' %}
+                                                    <option value="Pending">Pending</option>
+                                                    <option value="Yes">Selected - Approved</option>
+                                                    <option value="No" selected>Not Selected</option>
+                                                  {% else %}
+                                                    <option value="Pending">Pending</option>
+                                                    <option value="Yes">Selected - Approved</option>
+                                                    <option value="No">Not Selected</option>
+                                                  {% endif %}
+
+                                              </select>
+                                            </div>
+
+                                          </div>
+                                          <div class="modal-footer">
+                                            <button type="submit" class="btn btn-success">Submit</button>
+                                            <button type="button" class="btn btn-warning" data-dismiss="modal">Cancel</button>
+                                          </div>
+                                          </form>
+                                        </div>
+                                      </div>
+                                    </div>
+
+                                  </td>
+                                </tr>
+                            {% empty %}
+                                <tr><td colspan="10">Sorry no students have rsvp</td></tr>
+                            {% endfor %}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                </form>
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+
+        </div>
+      </div>
+    </div>
+
+{% endblock %}
+
+{% block js-content %}
+
+<script type="text/javascript">
+
+    $(document).ready(function() {
+        $('.js-company-single').select2({
+          placeholder: 'Select an option',
+          width: '100%'
+        });
+    });
+
+    $(document).ready(function(){
+      $('#id_company_organized').on('change', function(){
+        if(this.value == "Yes"){
+          document.getElementById("div_company_field").style.display = "block";
+          $("#id_company").attr("required", true);
+        }
+        else{
+          document.getElementById("div_company_field").style.display = "none";
+          $("#id_company").attr("required", false);
+        }
+         // or $(this).val()
+        return false; // keeps the page from not refreshing
+      });
+    });
+
+    $(document).ready(function(){
+      $('#id_type').on('change', function(){
+        var invitee = $('#id_invitees').val();
+        if(invitee == 2 || invitee == 3){
+        if(this.value > 0){
+          $.ajax({ // ajax call starts
+            url: "{% url 'events:ajax_fetch_reg_forms' %}",
+            data: 'type_id=' + this.value, // Send value of the clicked button
+            dataType: 'json', // Choosing a JSON datatype
+          })
+          .done(function(data) { // Variable data contains the data we get from serversid
+            var len = data.length;
+            if(len > 0){
+              document.getElementById("div_registration_form").style.display = "block";
+              $("#id_registration_form").empty();
+              $("#id_registration_form").append("<option value=''>Select Form</option>");
+              for( var i = 0; i<len; i++){
+                var id = data[i]['id'];
+                var title = data[i]['title'];
+
+                $("#id_registration_form").append("<option value='"+id+"'>"+title+"</option>");
+                return false; // keeps the page from not refreshing
+              }
+            }
+            else{
+              document.getElementById("div_registration_form").style.display = "none";
+            }
+          });
+        }
+      }
+    });
+  });
+
+  $(document).ready(function(){
+    $('#id_invitees').on('change', function(){
+      if(this.value == 1){
+        document.getElementById("div_extra_students").style.display = "block";
+        document.getElementById("div_extra_companies").style.display = "none";
+        document.getElementById("div_registration_form").style.display = "none";
+      }
+      else if(this.value == 2) {
+        document.getElementById("div_extra_students").style.display = "none";
+        document.getElementById("div_extra_companies").style.display = "block";
+      }
+      else if(this.value == 3) {
+        document.getElementById("div_extra_students").style.display = "block";
+        document.getElementById("div_extra_companies").style.display = "block";
+      }
+       // or $(this).val()
+      return false; // keeps the page from not refreshing
+    });
+  });
+  </script>
+
+<script type="text/javascript">
+    $(document).ready(function(){
+      $('#id_type_media').on('change', function(){
+        if(this.value == "Video Link"){
+          document.getElementById("div_link_field").style.display = "block";
+          document.getElementById("div_file_field").style.display = "none";
+          document.getElementById("div_image_field").style.display = "none";
+
+          $("#id_image").attr("required", false);
+          $("#id_video_link").attr("required", true);
+          $("#id_file").attr("required", false);
+        }
+        else if(this.value == "image"){
+          document.getElementById("div_link_field").style.display = "none";
+          document.getElementById("div_file_field").style.display = "none";
+          document.getElementById("div_image_field").style.display = "block";
+
+          $("#id_image").attr("required", true);
+          $("#id_video_link").attr("required", false);
+          $("#id_file").attr("required", false);
+        }
+        else if(this.value == "PDF file"){
+          document.getElementById("div_link_field").style.display = "none";
+          document.getElementById("div_file_field").style.display = "block";
+          document.getElementById("div_image_field").style.display = "none";
+
+          $("#id_image").attr("required", false);
+          $("#id_video_link").attr("required", false);
+          $("#id_file").attr("required", true);
+        }
+        else{
+          document.getElementById("div_link_field").style.display = "none";
+          document.getElementById("div_file_field").style.display = "none";
+          document.getElementById("div_image_field").style.display = "none";
+
+          $("#id_image").attr("required", false);
+          $("#id_video_link").attr("required", false);
+          $("#id_file").attr("required", false);
+        }
+         // or $(this).val()
+        return false; // keeps the page from not refreshing
+      });
+    });
+
+
+      function checkall(){
+        var loop = document.frmnotify.userscustomLoop.value;
+
+        if (loop > 1){
+          for(i=0;i<loop;i++){
+              if(document.forms["frmnotify"].elements["students[]"][i].checked == true )
+                 document.forms["frmnotify"].elements["students[]"][i].checked = false;
+               else if(document.forms["frmnotify"].elements["students[]"][i].checked == false)
+                 document.forms["frmnotify"].elements["students[]"][i].checked = true;
+          }
+        }
+        else{
+          if(document.forms["frmnotify"].elements["students[]"].checked == true )
+             document.forms["frmnotify"].elements["students[]"].checked = false;
+           else if(document.forms["frmnotify"].elements["students[]"].checked == false)
+             document.forms["frmnotify"].elements["students[]"].checked = true;
+        }
+      }
+
+      function sendNotifications(){
+          var loop = document.frmnotify.userscustomLoop.value;
+          var message = document.frmnotify.message.value;
+          var subject = document.frmnotify.subject.value;
+          var tocheck = false;
+
+
+          if (loop > 1){
+            for (i = 0; i < loop; i++) {
+               if (document.forms["frmnotify"].elements["students[]"][i].checked == true)
+                 tocheck = true;
+            }
+          }
+          else{
+            if (document.forms["frmnotify"].elements["students[]"].checked == true)
+              tocheck = true;
+          }
+
+          if(tocheck == true && subject != "" && message != ""){
+                document.frmnotify.submit();
+          }
+          else if(tocheck == false || subject == "" || message == "")
+              alert('Pease select atleast one student to send message to \nMake sure to fill the subject and message box as well');
+    	}
+
+      function selectStudents(){
+          var loop = document.frmnotify.userscustomLoop.value;
+          var message = document.frmnotify.message.value;
+          var subject = document.frmnotify.subject.value;
+          var tocheck = false;
+
+
+          if (loop > 1){
+            for (i = 0; i < loop; i++) {
+               if (document.forms["frmnotify"].elements["students[]"][i].checked == true)
+                 tocheck = true;
+            }
+          }
+          else{
+            if (document.forms["frmnotify"].elements["students[]"].checked == true)
+              tocheck = true;
+          }
+
+          if(tocheck == true && subject == "" && message == ""){
+                document.frmnotify.task.value = 'select';
+                document.frmnotify.submit();
+          }
+          else if(tocheck == false)
+              alert('Pease select atleast one student');
+          else if(subject != "" || message != "")
+              alert('You have written a message or subject, if you want to send an email to the students, please click the Send Message button, otherwise, clear the Message and Subject');
+
+      }
+
+      function sendMsgCompStuds(){
+          var loop = document.frmnotify.userscustomLoop.value;
+          var tocheck = false;
+          for (i = 0; i < loop; i++) {
+             if (document.forms["frmnotify"].elements["cbid[]"][i].checked == true)
+               tocheck = true;
+          }
+
+          if(tocheck == true){
+                document.frmnotify.submit();
+          }
+          else if(tocheck == false)
+              alert('Pease select atleast one student to notify');
+      }
+</script>
+
+
+<script type="text/javascript">
+    $(document).ready(function(){
+      {% for media in event.media_files.all %}
+        {% if media.type == 'PDF file' %}
+            $('#open-pdf_{{ media.id }}').lightGallery({
+              selector: 'this'
+            });
+        {% elif media.type == "image" %}
+            $('#open_image_{{ media.id }}').lightGallery();
+        {% endif %}
+      {% endfor %}
+    });
+</script>
+
+
+
+{% endblock %}

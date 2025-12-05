@@ -1,0 +1,101 @@
+{% extends 'base_vertical.html' %}
+{% load bootstrap3 %}
+
+{% block main-content %}
+<div class="row">
+  <div class="col-md-12 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          <nav aria-label="breadcrumb">
+              <ol class="breadcrumb bg-inverse-info">
+                  <li class="breadcrumb-item"><a href="{% url 'wil:dashboard' %}">Dashboard</a></li>
+                  <li class="breadcrumb-item"><a href="{% url 'wil:fetch_appointments' 1 %}">Appointments</a></li>
+                  <li class="breadcrumb-item active" aria-current="page"><a>Calendar Events</a></li>
+              </ol>
+            </nav>
+
+            {% include 'messages.html' %}
+
+        </div>
+      </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-lg-12 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          <h4 class="card-title">List of Appointment Categories</h4>
+          <p class="card-description">
+            View Calendar
+          </p>
+          <div class="row">
+            <div class="col-md-3">
+              <div class="fc-external-events">
+                <div class='fc-event'>
+                  <p>WIL Subject Appointments</p>
+                  <p class="small-text"></p>
+                  <!--<p class="text-muted mb-0">Georgia</p>-->
+                </div>
+                <div class='fc-event'>
+                  <p>Departmental Events</p>
+                  <p class="small-text"></p>
+                <!--  <p class="text-muted mb-0">Canada</p>-->
+                </div>
+              </div>
+            </div>
+            <div class="col-md-9">
+              <div class="card">
+                <div class="card-body">
+                  <h4 class="card-title">Fullcalendar</h4>
+                  <div id="calendar" class="full-calendar"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+</div>
+{% endblock %}
+
+
+{% block js-content  %}
+
+  <script type="text/javascript">
+    (function($) {
+      'use strict';
+      $(function() {
+        if ($('#calendar').length) {
+          $('#calendar').fullCalendar({
+            header: {
+              left: 'prev,next today',
+              center: 'title',
+              right: 'month,basicWeek,basicDay'
+            },
+            defaultDate: '{{ today }}',
+            navLinks: true, // can click day/week names to navigate views
+            editable: true,
+            eventLimit: true, // allow "more" link when too many events
+            events: [
+              {% for visit in visit_list %}
+                {
+                  title: '{{visit.studentsubject.student.name}} {{ visit.studentsubject.student.surname }}\n{{ visit.studentsubject.company.company_name }}',
+                  start: '{{ visit.date_visit|date:'Y-m-d' }}T{{ visit.time_visit|date:'h:i:s' }}',
+                  color: 'blue'
+                },
+              {% endfor %}
+              {% for event in event_list %}
+                {
+                  title: '{{event.title}}',
+                  start: '{{ event.event_date|date:'Y-m-d' }}T{{ event.event_time|date:'h:i:s' }}',
+                  color: 'green'
+                },
+              {% endfor %}
+            ]
+          })
+        }
+      });
+    })(jQuery);
+  </script>
+
+{% endblock %}

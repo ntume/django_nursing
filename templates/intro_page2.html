@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en" >
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Your Career. Reimagined</title>
+	<!--Core CSS -->
+	<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="{% static 'comingsoon/css/css/animate.css' %}">
+    <link href="{% static 'comingsoon/css/bootstrap.min.css' %}" rel="stylesheet">
+	 <!-- Custom styles for this template -->
+    <link href="{% static 'comingsoon/style.css' %}" rel="stylesheet">
+    <link href="{% static 'comingsoon/css/style-responsive.css' %}" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/lightgallery/1.7.2/css/lightgallery.min.css" rel="stylesheet">
+    <link rel="shortcut icon" href="{% static 'images/favicon.ico' %}" />
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <style type="text/css">
+
+    /* Style the navigation menu */
+.topnav {
+ overflow: hidden;
+ background-color: #4C4368;
+ position: relative;
+}
+
+/* Hide the links inside the navigation menu (except for logo/home) */
+.topnav #myLinks {
+ display: none;
+}
+
+/* Style navigation menu links */
+.topnav a {
+ color: white;
+ padding: 14px 16px;
+ text-decoration: none;
+ font-size: 17px;
+ display: block;
+}
+
+/* Style the hamburger menu */
+.topnav a.icon {
+ background: black;
+ display: block;
+ position: absolute;
+ right: 0;
+ top: 0;
+}
+
+/* Add a grey background color on mouse-over */
+.topnav a:hover {
+ background-color: #ddd;
+ color: black;
+}
+
+/* Style the active link (or home/logo) */
+.active {
+ background-color: #4CAF50;
+ color: white;
+}
+
+
+    </style>
+  </head>
+  <body >
+  <!-- Header Section Start -->
+	<header id="header_part">
+		<div class="header_part" id="head">
+			<div class="overlay">
+				<div class="start_part">
+						<div class="container">
+              <div class="row">
+
+                <div class="topnav">
+					<div class="row"><div class="col-md-4"><a href="{% url 'accounts:student_signup' %}" class="active">STUDENTS REGISTER HERE</a> </div><div class="col-md-4"> <a class="active" href="{% url 'accounts:company_sign_up' %}">COMPANIES REGISTER HERE</a> </div><div class="col-md-4"> <a class="active" href="{% url 'accounts:login' %}">LOGIN HERE</a></div></div>
+                  
+                  <!--<a href="{% url 'accounts:student_signup' %}" class="active">STUDENTS REGISTER HERE</a> 
+                   Navigation links (hidden by default) 
+                  <div id="myLinks">
+                    <a href="{% url 'accounts:company_sign_up' %}">COMPANIES REGISTER HERE</a>
+                    <a href="{% url 'accounts:login' %}">Login Here</a>
+                  </div>
+                   "Hamburger menu" / "Bar icon" to toggle the navigation links 
+                  <a href="javascript:void(0);" class="icon" onclick="myFunction()">
+                    <i class="fa fa-bars"></i>
+                  </a>-->
+                </div>
+
+              </div><br>
+							<div class="row">
+								<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+									<div class="row">
+										<!-- Logo Start -->
+										<div class="col-md-offset-3">
+											<img src="{% static 'comingsoon/images/banner.jpg' %}" alt="" title="" class="align-items-center justify-content-center" width="450" />
+										</div><br><br>
+										<!-- Logo End-->
+										<!-- Site Title start-->
+										<div class="site_title row">
+                      <div class="col-lg-6 site_title">
+                      
+						<p>Welcome to the UJCareerWiz Platform!<br><br>
+
+							Keep updated with the latest job posts and career related announcements and explore your future career and potential career path!</p>			
+    									
+                      </div>
+                      <div class="col-lg-6 error-page-divider text-lg-right pl-lg-4">
+                        <div id="video-gallery">
+                            <video width="100%" height="100%" controls>
+								<source src="{% static 'videos/UJ_General_Career_Fair_Day.mp4' %}" type="video/mp4">
+								Your browser does not support the video tag.
+							</video>
+                          </div>
+                      </div>
+										</div>
+                    <div class="site_title row">
+                      <div class="col-lg-12 site_title">
+
+                        
+                      </div>
+
+										</div>
+										<!-- Site Title end-->
+										<!-- Countdown start
+										<div class="countdown wow bounceInUp">
+											<div class="defaultCountdown"></div>
+										</div>
+										<!-- Countdown end-->
+									</div>
+								</div>
+							</div>
+						</div>
+				</div>
+				<!-- Menu Start -->
+				<div class="menu_area" id="stick_menu">
+					<div class="container">
+						<div class="row">
+							<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+								<nav class="navbar navbar-default" role="navigation">
+									<div class="container-fluid">
+										<div class="collapse navbar-collapse mainnavmenu" id="bs-example-navbar-collapse-1">
+										<div id="menu-center">
+											<ul class="nav navbar-nav navbar-right mainnav">
+												<li><a href="#header_part" >Intro</a></li>
+                        <li><a href="{% url 'accounts:login' %}">Login here</a></li>
+                        <li><a href="{% url 'accounts:student_signup' %}">STUDENTS REGISTER HERE</a></li>
+                        <li><a href="{% url 'accounts:company_sign_up' %}">COMPANIES REGISTER HERE</a></li>
+											</ul>
+										</div>
+										</div>
+									</div>
+								</nav>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- Menu End-->
+			</div>
+		</div>
+	</header>
+  <!-- Header Section End -->
+  <!-- About Section Start -->
+	<section id="welcome_section">
+		<div class="welcome_section">
+			<div class="container">
+				<div class="row">
+					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+						<div class="row">
+						<!-- About text start -->
+							<div class="section-title">
+								<h2>Students</h2>
+
+                <!--<p>  PsyCaD offers students a variety of services, <a href="https://wilms-uj-media.s3-eu-west-1.amazonaws.com/static/images/services.jpg" style="color: #4C4368"> click here </a> to view complete list</p>-->
+
+								<p>The Career Services Unit offers various FREE career counselling and consulting services to all registered students on all four UJ campuses.<br>
+                  The following services are offered to support and develop you as you embark on your career journey:</p>
+							</div>
+						<!-- About text end -->
+						</div>
+						<!-- About service part start-->
+						<div class="row">
+								<div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
+									<div class="welcome_part wow fadeInLeft">
+										<div class="welcome_icon">
+											<i class="fa fa-check fa-4x"></i>
+										</div>
+										<h2>Career Assements</h2>
+										<p>…to assist students in their study and career decision making. Feedback discussions are conducted by professionals experienced in career development.</p>
+									</div>
+								</div>
+							<div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
+								<div class="welcome_part wow fadeInUp">
+									<div class="welcome_icon">
+										<i class="fa fa-calendar fa-4x"></i>
+									</div>
+									<h2>Career Counselling</h2>
+									<p>…focuses on guidance and facilitation in decision making regarding study and career choice. This is often used in combination with career assessment to facilitate a holistic intervention.</p>
+								</div>
+							</div>
+							<div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
+								<div class="welcome_part wow fadeInDown">
+									<div class="welcome_icon">
+										<i class="fa fa-building fa-4x"></i>
+									</div>
+									<h2>Career Advisory and Walk-In Service</h2>
+									<p>…to assist students that arrive without a scheduled appointment. During an advisory session a student is seen by a career consultant for a brief 15 to 20 minutes.</p>
+								</div>
+							</div>
+							<div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
+								<div class="welcome_part wow fadeInRight">
+									<div class="welcome_icon">
+										<i class="fa fa-graduation-cap fa-4x"></i>
+									</div>
+									<h2>Career Consulting</h2>
+									<p>…that provides students with practical skills for becoming a part of the working world, such as CV writing, job hunting, how to prepare for job interviews and much more!</p>
+								</div>
+							</div>
+						</div>
+						<!-- About service part end-->
+            <div class="row">
+								<div class="col-xs-12 col-sm-12 col-md-3 col-lg-4">
+									<div class="welcome_part wow fadeInLeft">
+										<div class="welcome_icon">
+											<i class="fa fa-briefcase fa-4x"></i>
+										</div>
+										<h2>Workplace-Readiness  Workshops</h2>
+										<p>…to equip students with skills for writing CVs and cover letters, interview skills, job searching skills, personal branding tools and much, much more.</p>
+									</div>
+								</div>
+							<div class="col-xs-12 col-sm-12 col-md-3 col-lg-4">
+								<div class="welcome_part wow fadeInUp">
+									<div class="welcome_icon">
+										<i class="fa fa-archive fa-4x"></i>
+									</div>
+									<h2>Career Resource Centres</h2>
+									<p>…where students may access a variety of printed and electronic career and company information resources.</p>
+								</div>
+							</div>
+							<div class="col-xs-12 col-sm-12 col-md-3 col-lg-4">
+								<div class="welcome_part wow fadeInDown">
+									<div class="welcome_icon">
+										<i class="fa fa-building fa-4x"></i>
+									</div>
+									<h2>Graduate Recruitment Programme</h2>
+									<p>…that is well supported by a variety of top national and international companies.</p>
+								</div>
+							</div>
+						</div>
+            <div class="section-title">
+            <p>We encourage our students to connect with us − visit our offices, view our website, sign up on the portal, and engage with our online service!</p>
+          </div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+  <!-- About Section End -->
+  <!-- Subscriber Section Start -->
+	<section id="email_subscribe_section">
+		<div class="email_subscribe_section" >
+			<div class="container">
+				<div class="row">
+          <div class="section-title">
+            <h2>Companies / Employers</h2>
+            <p>We have a variety of services that we will offer companies on the new platform, such as...</p>
+          </div>
+        <!-- About text end -->
+        </div>
+        <!-- About service part start-->
+        <div class="row">
+            <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
+              <div class="welcome_part wow fadeInLeft">
+                <div class="welcome_icon">
+                  <i class="fa fa-users fa-4x"></i>
+                </div>
+                <h2>Graduate Recruitment Programme</h2>
+                <p>The Recruitment Programme of PsyCaD Career Services aims to facilitate graduate recruitment through dissemination of information and networking opportunities between employers and graduates.</p>
+              </div>
+            </div>
+          <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
+            <div class="welcome_part wow fadeInUp">
+              <div class="welcome_icon">
+                <i class="fa fa-calendar fa-4x"></i>
+              </div>
+              <h2>Events / Career Fairs</h2>
+              <p>Career Services features a number of on-campus events and online programmes. This is a great way for students and employers to network, engage and connect, an opportunity to ask questions and for employers to give tips to students seeking to land their next career position.</p>
+            </div>
+          </div>
+          <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
+            <div class="welcome_part wow fadeInDown">
+              <div class="welcome_icon">
+                <i class="fa fa-laptop fa-4x"></i>
+              </div>
+              <h2>Job Portal</h2>
+              <p>The Career Services portal is our one-stop graduate-employer career portal. The Career portal creates a platform for students to connect with potential employers in order to address all career-related needs in one, convenient, online location.</p>
+            </div>
+          </div>
+          <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
+            <div class="welcome_part wow fadeInRight">
+              <div class="welcome_icon">
+                <i class="fa fa-clipboard fa-4x"></i>
+              </div>
+              <h2>Annual Recruitment Guide</h2>
+              <p>The Career Services Recruitment Guide is an annual publication and is created for the purposes of the UJ Recruitment Programme. The guide is jam-packed with various career/job-related resources in order for students to be able to prepare themselves thoroughly for recruitment opportunities within industries.</p>
+            </div>
+          </div>
+        </div>
+        <!-- About service part end-->
+      </div>
+			</div>
+		</div>
+	</section>
+
+
+	<section id="welcome_section">
+		<div class="welcome_section">
+			<div class="container">
+				<div class="row">
+					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+					<div class="row">
+						<div class="section-title">
+							<h2>Top employers..</h2>
+							<p></p>
+						</div>
+						</div>
+						<div class="row">
+
+                <div class="site_title row">
+                  <div class="col-lg-12 site_title">
+                    <div class="site_logo">
+						{% for company in companies %}
+							{% if company.logo %}
+								<a href="{% if company.website %}{{ company.website }}{% endif %}" target="_blank"><img src="{{ company.logo.url }}" alt="" width="200"></a>
+							{% endif %}	
+						{% endfor %}							
+					</div>
+				</div>
+			</div>
+
+								</div>
+							</div>
+					</div>
+				</div>
+			</div>
+			</div>
+		</div>
+	</section>
+
+  <!-- Subscriber Section End -->
+  <!-- Contact Section Start -->
+	<section id="contact_section">
+		<div class="contact_section">
+			<div class="container">
+				<div class="row">
+					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+					<div class="row">
+						<div class="section-title">
+							<h2>Contact Us.</h2>
+							<p></p>
+						</div>
+						</div>
+						<div class="row">
+							<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+							<div class="address_part">
+								<div class="address">
+									Student can make contact with us via Social Media
+								</div>
+								<!--<div class="phone">
+									Send us information in terms of personal details, as well as date, time and platform of preference
+								</div>
+								<div class="email">
+									We then book an appointment with a consultant
+								</div>-->
+								<div class="social_icons">
+											<ul>
+												<li><a href="https://www.facebook.com/PsyCaDCareerServices/" data-toggle="tooltip" data-placement="top" title="Facebook" data-rel="tooltip" class="icon_fb" ><img src="{% static 'images/Facebook.png' %}" alt=""  width="102" height="102"></a></li>
+												<li><a href="https://twitter.com/ujcareerservice" data-toggle="tooltip" data-placement="top" title="Twitter" data-rel="tooltip" class="icon_twitter"><img src="{% static 'images/Twitter.png' %}" alt=""  width=102 height="102"></a></li>
+                        <li><a href="https://www.instagram.com/uj_career_services/" data-toggle="tooltip" data-placement="top" title="Instagram" data-rel="tooltip" class="icon_gplus"><img src="{% static 'images/Instagram.png' %}" alt=""  width=102 height="102"></a></li>
+											</ul>
+
+								</div>
+							</div>
+							</div>
+						<!--	<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+								<div class="contact_form">
+									<div id="show_contact_msg"></div>
+								<!-- Contact Form Start
+									<form method="POST" id="mySuggestionForm" action="" >
+                    {% csrf_token %}
+										<input type="text" id="id_name" name="name" class="form-control contact_input_box wow fadeInUp" placeholder="Name" required/>
+										<input type="email" id="id_email" name="email" class="form-control contact_input_box wow fadeInUp" placeholder="E-mail" required/>
+                    <textarea id="contact_text" name="message" rows="5" cols="30" class="form-control contact_input_box wow fadeInUp" placeholder="Message" required></textarea>
+                    <input type="text" id="id_test_captcha" name="test_captcha" class="form-control contact_input_box wow fadeInUp" placeholder="To make sure you are human and not a bot, please answer: 5 + 10 + 3" required/>
+										<button type="button" class="btn btn-primary contact_button wow fadeInUp"> <i class="fa fa-send-o"></i> Send</button>
+									</form>
+								 Contact Form End -->
+								</div>
+							</div>
+					</div>
+				</div>
+			</div>
+			</div>
+		</div>
+	</section>
+  <!-- Contact Section End -->
+   <!--Core js-->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="{% static 'comingsoon/js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'comingsoon/js/jquery.smooth-scroll.js' %}"></script>
+    <script src="{% static 'comingsoon/js/wow.min.js' %}"></script>
+    <script src="{% static 'comingsoon/js/jquery.nicescroll.min.js' %}"></script>
+    <script src="{% static 'comingsoon/js/jquery.countdown.min.js' %}"></script>
+    <script src="{% static 'comingsoon/js/script.js' %}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lightgallery/1.7.2/js/lightgallery-all.min.js"></script>
+	<!--common script init for all pages-->
+
+	<script>
+
+  /* Toggle between showing and hiding the navigation menu links when the user clicks on the hamburger menu / bar icon */
+function myFunction() {
+  var x = document.getElementById("myLinks");
+  if (x.style.display === "block") {
+    x.style.display = "none";
+  } else {
+    x.style.display = "block";
+  }
+}
+
+	/* ==============================================
+	Ajax Submiting For Email Subscriber Form.
+	=====================================================================*/
+	$("#subscriber_form").submit(function(e)
+	{
+	$('#show_subscriber_msg').html('<div class=gen>Submiting..</div>');
+	var subscriberemail = $('#subscriberemail').val();
+		var formURL = $(this).attr("action");
+		var data = {
+					subscriberemail:subscriberemail
+				   }
+		$.ajax(
+		{
+			url : formURL,
+			type: "POST",
+			data : data,
+
+		 success: function (res) {
+								 if(res=='1'){
+									$('#show_subscriber_msg').html('<div class=gen>Thank you very much, We will notify you when we lunch</div>');
+								 }
+
+								 if(res=='5'){
+								 $('#show_subscriber_msg').html('<div class=err>Please enter a valid email address</div>');
+								 }
+							}
+		});
+		e.preventDefault();	//STOP default action
+	});
+	/* ==============================================
+	Ajax Submiting For Email Contact Form.
+	=====================================================================*/
+	$("#contact_form").submit(function(e)
+	{
+	$('#show_contact_msg').html('<div class=gen>Submiting..</div>');
+	var username = $('#contact_name').val();
+	var useremail = $('#contact_email').val();
+	var commenttext = $('#contact_text').val();
+		var formURL = $(this).attr("action");
+		var data = {
+					username:username,
+					useremail:useremail,
+					commenttext:commenttext,
+				   }
+		$.ajax(
+		{
+			url : formURL,
+			type: "POST",
+			data : data,
+
+		 success: function (res) {
+								 if(res=='1'){
+									$('#show_contact_msg').html('<div class=gen>Thank you very much, We will notify you when we lunch</div>');
+								 }
+
+								 if(res=='5'){
+								 $('#show_contact_msg').html('<div class=err>Please enter a valid email address</div>');
+								 }
+							}
+		});
+		e.preventDefault();	//STOP default action
+	});
+	</script>
+
+  <script type="text/javascript">
+  $(document).ready(function(){
+    $('#submitsuggestion').on('click', function(){ // This event fires when a button is clicked
+        var captcha_check = $( "#id_test_captcha" ).val();
+        var name = $( "#id_name" ).val();
+        var email = $( "#id_email" ).val();
+        var student_number = $( "#id_student_number" ).val();
+        var new_app_name = $( "#id_new_app_name" ).val();
+
+        if(name != "" && email != "" && student_number != "" && new_app_name != ""){
+          if(captcha_check == 18){
+            document.getElementById("mySuggestionForm").submit();
+          } else{
+            alert("Wrong answer submitted, please calculate again: 5 + 10 + 3");
+          }
+        } else{
+          alert("Please make sure to fill all the fields, thank you");
+        }
+
+
+
+       // or $(this).val()
+      return false; // keeps the page from not refreshing
+    });
+
+    $('#video-gallery').lightGallery();
+
+  });
+  </script>
+
+  </body>
+</html>

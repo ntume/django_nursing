@@ -1,0 +1,104 @@
+{% extends 'base_tpl.html' %}
+
+{% block breadcrumb-content %}
+    <nav aria-label="breadcrumb" class="-intro-x mr-auto hidden sm:flex">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'administration:dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'college:learning_programme_cohorts' learning_programme.id %}">{{ learning_programme.programme_code }} Cohorts</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'students:learning_programme_cohort_registrations' learning_programme_cohort.id learning_programme_cohort_period.id %}">{{ learning_programme_cohort.title }} Students</a></li>            
+            <li class="breadcrumb-item active" aria-current="page">WIL Hours</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block main-content %}
+
+{% include 'messages.html' %}
+
+
+    <div class="intro-y flex flex-col sm:flex-row items-center mt-8">
+        <h2 class="text-lg font-medium mr-auto">
+            {{ learning_programme.programme_code }} - {{ learning_programme_cohort.title }} - {{ learning_programme_cohort_period.title }} Registered Students WIL Hours
+        </h2>
+        <div class="w-full sm:w-auto flex mt-4 sm:mt-0">
+            <a href="{% url 'students:print_learner_wil_hours_list_excel' learning_programme_cohort.id learning_programme_cohort_period.id %}" class="btn btn-success shadow-md mr-2">Print</a>
+        </div>
+        
+    </div>
+
+    <div class="intro-y p-5 mt-5">
+        
+        <div class="overflow-x-auto">
+            <table class="table table-report -mt-2">
+                <thead>
+                    <tr>
+                        <th class="whitespace-nowrap"></th>
+                        <th class="whitespace-nowrap"></th>
+                        <th class="whitespace-nowrap"></th> 
+                        {% for d in disciplines %}              
+                            <th class="whitespace-nowrap" colspan='4'>{{ d.discipline }}</th>
+                        {% endfor %}                     
+                    </tr>
+                    <tr>
+                        <th class="whitespace-nowrap">#</th>
+                        <th class="whitespace-nowrap">Student Number</th>
+                        <th class="whitespace-nowrap">Full Name</th> 
+                        {% for d in disciplines %}              
+                            <th class="whitespace-nowrap">Total Hours</th>
+                            <th class="whitespace-nowrap">Total Required Hours</th>
+                            <th class="whitespace-nowrap">Quarterly Hours</th>                            
+                            <th class="whitespace-nowrap">Total Required Quarterly Hours</th>
+                        {% endfor %}                     
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for l in students %}
+                    <tr class="intro-x">
+                        <td class="w-40">
+                            {{ forloop.counter }}
+                        </td>
+                        <td>
+                            {{ l.registration.student_learning_programme.student.id_number }}
+                        </td>
+                        <td>
+                            {{ l.registration.student_learning_programme.student.first_name }} {{ l.registration.student_learning_programme.student.last_name }}
+                        </td>
+                        {% for d in l.discipline_hours %}
+                            <td>
+                                {{ d.hours }}
+                            </td>
+                            <td>
+                                {{ d.total_required_hours }}
+                            </td>
+                            <td>
+                                {{ d.total_quarter_hours }}
+                            </td>
+                            <td>
+                                {{ d.total_required_quarter_hours }}
+                            </td>
+                        {% endfor %}
+                                     
+                    </tr>
+                    {% empty %}
+                        <tr class="intro-x"><td colspan="8">Nothing added yet</td></tr>
+                    {% endfor %}
+                    
+                <tbody>
+            </table>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block js-content %}
+
+<script type="text/javascript">
+    
+	$(document).ready(function(){
+
+
+    });
+
+</script>
+
+{% endblock %}

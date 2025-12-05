@@ -1,0 +1,269 @@
+{% extends 'base_vertical.html' %}
+{% load bootstrap3 %}
+
+{% block css-content %}
+
+<style type="text/css">
+
+table.timecard {
+	margin: auto;
+	width: 100%;
+	border-collapse: collapse;
+	border: 1px solid #fff; /*for older IE*/
+	border-style: solid;
+}
+
+table.timecard caption {
+	background-color: #f79646;
+	color: #fff;
+	font-size: x-large;
+	font-weight: bold;
+	letter-spacing: .3em;
+}
+
+table.timecard thead th {
+	padding: 8px;
+	background-color: #008080;
+	font-size: medium;
+}
+
+table.timecard thead th#thDay {
+	width: 40%;
+}
+
+table.timecard thead th#thRegular, table.timecard thead th#thOvertime, table.timecard thead th#thTotal {
+	width: 20%;
+}
+
+table.timecard th, table.timecard td {
+	padding: 10px;
+	border-width: 1px;
+	border-style: solid;
+	border-color: #008080 #ccc;
+}
+
+table.timecard td {
+	text-align: left;
+  font-size: medium;
+}
+
+table.timecard tbody th {
+	text-align: left;
+	font-weight: normal;
+}
+
+table.timecard tfoot {
+	font-weight: bold;
+	font-size: medium;
+	background-color: #687886;
+	color: #fff;
+}
+
+table.timecard tr.even {
+	background-color: #008080;
+}
+</style>
+
+
+{% endblock %}
+
+{% block main-content %}
+
+<div class="row">
+  <div class="col-md-12 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          <nav aria-label="breadcrumb">
+              <ol class="breadcrumb bg-inverse-info">
+                {%  if user.is_authenticated and user.roles_id == 2  %}
+                  <li class="breadcrumb-item"><a href="{% url 'wil:dashboard' %}">Dashboard</a></li>
+                  <li class="breadcrumb-item active" aria-current="page"><a>Email Templates</a></li>
+                {% elif user.is_authenticated and user.roles_id == 10 %}
+                  <li class="breadcrumb-item"><a href="{% url 'psycad:dashboard' %}">Dashboard</a></li>
+                  <li class="breadcrumb-item active" aria-current="page"><a>Email Templates</a></li>
+                {% elif user.is_authenticated and user.roles_id == 11 %}
+                  <li class="breadcrumb-item"><a href="{% url 'psycad:dashboard' %}">Dashboard</a></li>
+                  <li class="breadcrumb-item active" aria-current="page"><a>Email Templates</a></li>
+                {% elif user.is_authenticated and user.roles_id == 9 %}
+                  <li class="breadcrumb-item"><a href="{% url 'psycad:dashboard' %}">Dashboard</a></li>
+                  <li class="breadcrumb-item active" aria-current="page"><a>Email Templates</a></li>
+                {% endif %}
+              </ol>
+            </nav>
+
+            {% include 'messages.html' %}
+
+        </div>
+      </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-lg-12 grid-margin stretch-card">
+              <div class="card">
+                <div class="card-body">
+                  <h4 class="card-title">List of Email Templates</h4>
+                  <p class="card-description">
+                    <button type="button" class="btn btn-primary btn-icon-text btn-rounded pull-right" data-toggle="modal" data-target="#new_type"> <i class="ti-plus btn-icon-prepend"></i>Add New Email Template </button><br><br>
+                    <div class="modal fade" id="new_type" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true">
+                      <div class="modal-dialog modal-lg" role="document">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="ModalLabel">Add Email Template</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                              <span aria-hidden="true">&times;</span>
+                            </button>
+                          </div>
+                          {%  if user.is_authenticated and user.roles_id == 2  %}
+                            <form action="{% url 'wil:email_templates' %}" method="POST">
+                          {% else %}
+                            <form action="{% url 'psycad:email_templates' %}" method="POST">
+                          {% endif %}
+                            {% csrf_token %}
+                          <div class="modal-body">
+
+                              <div class="form-group">
+                                <label for="period">subject (required)</label>
+                                {% bootstrap_field form.subject show_label=False %}
+                              </div>
+
+                              <div class="form-group">
+                                <label for="period">Email (required)</label>
+                                <textarea id="summernote" name="email" required></textarea>
+                              </div>
+
+                          </div>
+                          <div class="modal-footer">
+                            <button type="submit" class="btn btn-success">Add Email Template</button>
+                            <button type="button" class="btn btn-light" data-dismiss="modal">Close</button>
+                          </div>
+                          </form>
+                        </div>
+                      </div>
+                    </div>
+                  </p>
+                  <div class="table-responsive">
+                    <table class="timecard table-bordered">
+                      <thead>
+                        <tr>
+                          <th>#</th>
+                          <th>Subject</th>
+                          <th>Email</th>
+                          <th>Date Added</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for item in user.email_templates.all %}
+                            <tr>
+                              <td class="py-1">{{ forloop.counter }}</td>
+                              <td>{{ item.subject }}</td>
+                              <td>{{ item.email|safe }}</td>
+                              <td>
+																{%  if user.is_authenticated and user.roles_id == 2  %}
+																	<form action="{% url 'wil:test_email_templates' item.id %}" method="GET">
+																{% else %}
+																	<form action="{% url 'psycad:test_email_templates' item.id %}" method="GET">
+																{% endif %}
+																  <button type="submit" class="btn btn-primary btn-rounded btn-icon"> <i class="fa fa-envelope-open-o"></i></button>
+																	<button type="button" class="btn btn-success btn-rounded btn-icon" data-toggle="modal" data-target="#edit{{ item.id }}" > <i class="fa fa-edit"></i></button>
+
+	                                <button type="button" class="btn btn-danger btn-rounded btn-icon" data-toggle="modal" data-target="#del{{ item.id }}" > <i class="fa fa-trash-o"></i> </button>
+																</form>
+
+
+                                <div class="modal fade" id="edit{{ item.id }}" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true">
+                                  <div class="modal-dialog modal-lg" role="document">
+                                    <div class="modal-content">
+                                      <div class="modal-header">
+                                        <h5 class="modal-title" id="ModalLabel">Edit Template</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                          <span aria-hidden="true">&times;</span>
+                                        </button>
+                                      </div>
+                                      {%  if user.is_authenticated and user.roles_id == 2  %}
+                                        <form action="{% url 'wil:update_email_template' item.id %}" method="POST">
+                                      {% else %}
+                                        <form action="{% url 'psycad:update_email_template' item.id %}" method="POST">
+                                      {% endif %}
+                                        {% csrf_token %}
+                                      <div class="modal-body">
+
+                                          <div class="form-group">
+                                            <label for="period">Subject (required)</label>
+                                            <input id="id_subject" class="form-control" name="subject" type="text" value="{{ item.subject }}" required>
+                                          </div>
+
+                                          <div class="form-group">
+                                            <label for="period">Email (required)</label>
+                                            <textarea id="summernote_{{ item.id }}" name="email" required>{{ item.email }}</textarea>
+                                          </div>
+
+                                      </div>
+                                      <div class="modal-footer">
+                                        <input type="hidden" name="task" value="edit">
+                                        <button type="submit" class="btn btn-success">Edit Email Template</button>
+                                        <button type="button" class="btn btn-light" data-dismiss="modal">Close</button>
+                                      </div>
+                                      </form>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                <div class="modal fade" id="del{{ item.id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel-3" aria-hidden="true">
+                                  <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                      <div class="modal-header">
+                                        <h5 class="modal-title" id="exampleModalLabel-3">Delete Email Template Entry</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                          <span aria-hidden="true">&times;</span>
+                                        </button>
+                                      </div>
+                                      {%  if user.is_authenticated and user.roles_id == 2  %}
+                                        <form action="{% url 'wil:delete_email_template' item.id %}" method="POST">
+                                      {% else %}
+                                        <form action="{% url 'psycad:delete_email_template' item.id %}" method="POST">
+                                      {% endif %}
+                                        {% csrf_token %}
+                                      <div class="modal-body">
+                                        <p>Are you sure you want to delete this item?</p>
+                                      </div>
+                                      <div class="modal-footer">
+                                        <input type="hidden" name="task" value="delete">
+                                        <button type="submit" class="btn btn-success">Yes</button>
+                                        <button type="button" class="btn btn-light" data-dismiss="modal">No</button>
+                                      </div>
+                                      </form>
+                                    </div>
+                                  </div>
+                                </div>
+
+                              </td>
+                            </tr>
+                        {% empty %}
+                            <tr><td colspan="8">Sorry no email templates added</td></tr>
+                        {% endfor %}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+</div>
+{% endblock %}
+
+{% block js-content %}
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.12/summernote.js"></script>
+
+<script>
+    $(document).ready(function() {
+        $('#summernote').summernote();
+
+        {% for item in user.email_templates.all %}
+          $('#summernote_{{ item.id }}').summernote();
+        {% endfor %}
+
+    });
+  </script>
+
+{% endblock %}

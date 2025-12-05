@@ -1,0 +1,383 @@
+{% extends 'base_tpl.html' %}
+
+{% block breadcrumb-content %}
+<nav aria-label="breadcrumb" class="-intro-x mr-auto hidden sm:flex">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'administration:dashboard' %}">Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'college:education_plans' period.id %}">Educational Plans</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'college:education_plan_weeks' week.education_plan_year_section.education_plan_year_id %}">All Weeks</a></li>
+        
+        <li class="breadcrumb-item active" aria-current="page">{{ week.start_of_week }} to {{ week.end_of_week }} Days</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block main-content %}
+{% include 'messages.html' %}
+
+
+    <div class="intro-y flex flex-col sm:flex-row items-center mt-8">
+        <h2 class="text-lg font-medium mr-auto">
+            <b>Week:</b> {{ week.start_of_week }} to {{ week.end_of_week }}<br>
+            <b>Block:</b> {{ week.block.block_name }}<br>
+        </h2>    
+        <div class="w-full sm:w-auto flex mt-4 sm:mt-0">
+            <a href="{% url 'college:print_education_plan_week' week.id %}" class="btn btn-success shadow-md mr-2">Print Week's Timetable</a>
+                      
+    
+        </div>
+    </div>
+
+
+<div class="grid grid-cols-12 gap-6 mt-5">
+
+    {% for r in week.days.all %}
+
+        <a class="btn btn-warning shadow-md mr-2 w-48" href="javascript:;" data-tw-toggle="modal" data-tw-target="#add-modal_{{ r.id }}"> Add Session </a>
+        <div id="add-modal_{{ r.id }}" class="modal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form action="{% url 'college:save_education_plan_day_session' r.id %}" method="POST">
+                        {% csrf_token %}
+                        <!-- BEGIN: Modal Header -->
+                        <div class="modal-header">
+                            <h2 class="font-medium text-base mr-auto">Add Session</h2>                                             
+                        </div> <!-- END: Modal Header -->
+                        <!-- BEGIN: Modal Body -->
+                        <div class="modal-body grid grid-cols-12 gap-4 gap-y-3">
+                            
+                            <div class="col-span-12 sm:col-span-12"> 
+                                <label for="modal-form-1" class="form-label">Session</label> 
+                                <select id="session" name='session' class="form-control" required> 
+                                    <option></option>                                    
+                                    {% for session in sessions %}
+                                       <option value="{{ session.id }}">{{ session.title }}</option>                                        
+                                    {% endfor %}                                                                                          
+                                </select>
+                            </div> 
+                            {% if week.block.block_name == 'Theory Block' %}
+                                <div class="col-span-12 sm:col-span-12"> 
+                                    <label for="modal-form-1" class="form-label">Module</label> 
+                                    <select id="id_module_{{ r.id }}" name='module' class="form-control" required> 
+                                        <option></option>
+                                        {% for module in modules %}
+                                            <option value="{{ module.id }}">{{ module.module.module_code }}</option>
+                                        {% endfor %}                                                        
+                                    </select>
+                                </div>
+                                <div class="col-span-12 sm:col-span-12"> 
+                                    <label for="modal-form-1" class="form-label">Study Units</label> 
+                                    <select id="id_study_unit_{{ r.id }}" name='study_unit' class="form-control" required> 
+                                        <option></option>
+                                                                                              
+                                    </select>
+                                </div>
+                                <div class="col-span-12 sm:col-span-12"> 
+                                    <label for="modal-form-1" class="form-label">Credits</label> 
+                                    <input type='number' min='0' class='form-control'  name='credits'>
+                                </div>
+                            {% endif %} 
+                            {% if week.block.block_name == 'Simulation' %}
+                                <div class="col-span-12 sm:col-span-12"> 
+                                    <label for="modal-form-1" class="form-label">Type of Procedure</label> 
+                                    <select id="type_procedure" name='type_procedure' class="form-control" required> 
+                                        <option></option>                                  
+                                        <option value="Demonstration">Demonstration</option>
+                                        <option value="Practice">Practice</option>                                                                                                            
+                                    </select>
+                                </div>           
+                                <div class="col-span-12 sm:col-span-12"> 
+                                    <label for="modal-form-1" class="form-label">Procedures</label> 
+                                    <select id="procedures" name='procedures[]' class="tom-select" multiple required> 
+                                        <option></option>
+                                        {% for procedure in procedures %}
+                                            <option value="{{ procedure.id }}">{{ procedure.procedure.task }}</option>
+                                        {% endfor %}                                                        
+                                    </select>
+                                </div>
+                            {% endif %}  
+                            <div class="col-span-12 sm:col-span-12"> 
+                                <label for="modal-form-1" class="form-label">Staff</label> 
+                                <select id="staff_selected" name='staff_selected[]' class="tom-select" multiple required> 
+                                    <option></option>
+                                    {% for staff in staffs %}
+                                        <option value="{{ staff.id }}">{{ staff.first_name }} {{ staff.last_name }}</option>
+                                    {% endfor %}                                                        
+                                </select>
+                            </div>                                                             
+                        </div> <!-- END: Modal Body -->
+                        <!-- BEGIN: Modal Footer -->
+                        <div class="modal-footer"> 
+                            <button type="button" data-tw-dismiss="modal" class="btn btn-outline-secondary w-20 mr-1">Cancel</button> 
+                            <button type="submit" class="btn btn-primary w-60">Add Session</button> 
+                        </div> <!-- END: Modal Footer -->
+                    </form>
+                </div>
+            </div>
+        </div>
+    
+        <!-- BEGIN: Data List -->
+        <div class="intro-y col-span-12 overflow-auto lg:overflow-visible">
+            <h2>{{ r.day }} </h2>
+            <table class="table table-report -mt-2">
+                <thead>
+                    <tr>
+                        <th class="whitespace-nowrap">#</th>  
+                        <th class="whitespace-nowrap">Session</th>
+                        <th class="whitespace-nowrap">Time</th>
+                        {% if week.block.block_name == 'Theory Block' %}
+                            <th class="whitespace-nowrap">Module</th>
+                            <th class="whitespace-nowrap">Study Unit</th>  
+                            <th class="whitespace-nowrap">Credits</th>                   
+                        {% elif week.block.block_name == 'Simulation' %}
+                            <th class="whitespace-nowrap">Type</th>
+                            <th class="whitespace-nowrap">Procedures</th>
+                        {% endif %}
+                        <th class="whitespace-nowrap">Staff</th>
+                        <th class="whitespace-nowrap">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for x in r.timetable_sessions.all %}
+                    <tr class="intro-x">
+                        <td>{{ forloop.counter }}</td>                            
+                        <td>{{ x.session.title }}</td>
+                        <td>{{ x.session.start_time }} to {{ x.session.end_time }}</td>
+                        {% if week.block.block_name == 'Theory Block' %}
+                            <td>{{ x.module.module.module_code }}</td>    
+                            <td>{{ x.study_unit.study_unit_name }}</td>  
+                            <td>{{ x.credits }}</td> 
+                        {% elif week.block.block_name == 'Simulation' %}   
+                            <td>{{ x.type_procedure }}</td>                     
+                            <td>
+                                {% for p in x.procedures.all  %}
+                                    {{ p.procedure.task }}<br>
+                                {% endfor %}
+                            </td> 
+                        {% endif %}
+                        <td>
+                            {% for p in x.lecturers.all  %}
+                                {{ p.first_name }} {{ p.last_name }}<br>
+                            {% endfor %}
+                        </td> 
+                        <td>
+                            <div class="flex justify-center items-center">
+                                <a class="flex items-center text-primary" href="javascript:;" data-tw-toggle="modal" data-tw-target="#edit-confirmation-modal_{{ r.id }}_{{ x.id }}"> <i data-lucide="edit" class="w-4 h-4 mr-1"></i> Edit </a>
+                                <div id="edit-confirmation-modal_{{ r.id }}_{{ x.id }}" class="modal" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <form action="{% url 'college:edit_education_plan_day_session' r.id x.id %}" method="POST">
+                                                {% csrf_token %}
+                                                <!-- BEGIN: Modal Header -->
+                                                <div class="modal-header">
+                                                    <h2 class="font-medium text-base mr-auto">Edit Session</h2>                                             
+                                                </div> <!-- END: Modal Header -->
+                                                <!-- BEGIN: Modal Body -->
+                                                <div class="modal-body grid grid-cols-12 gap-4 gap-y-3">
+                                                    
+                                                    <div class="col-span-12 sm:col-span-12"> 
+                                                        <label for="modal-form-1" class="form-label">Session</label> 
+                                                        <select id="session" name='session' class="form-control" required> 
+                                                            <option></option>                                    
+                                                            {% for session in sessions %}
+                                                                {% if x.session == session %}
+                                                                    <option value="{{ session.id }}" selected>{{ session.title }}</option> 
+                                                                {% else %}
+                                                                    <option value="{{ session.id }}">{{ session.title }}</option> 
+                                                                {% endif %}
+                                                                                                      
+                                                            {% endfor %}                                                                                          
+                                                        </select>
+                                                    </div> 
+                                                    {% if week.block.block_name == 'Theory Block' %}
+                                                        <div class="col-span-12 sm:col-span-12"> 
+                                                            <label for="modal-form-1" class="form-label">Module</label> 
+                                                            <select id="id_module_{{ r.id }}_{{ x.id }}" name='module' class="form-control" required> 
+                                                                <option></option>
+                                                                {% for module in modules %}
+                                                                    {% if x.module == module %}
+                                                                        <option value="{{ module.id }}" selected>{{ module.module.module_code }}</option>
+                                                                    {% else %}
+                                                                        <option value="{{ module.id }}">{{ module.module.module_code }}</option>
+                                                                    {% endif %}
+                                                                    
+                                                                {% endfor %}                                                        
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-span-12 sm:col-span-12"> 
+                                                            <label for="modal-form-1" class="form-label">Study Units</label> 
+                                                            <select id="id_study_unit_{{ r.id }}_{{ x.id }}" name='study_unit' class="form-control" required> 
+                                                                <option></option>
+                                                                                                                      
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-span-12 sm:col-span-12"> 
+                                                            <label for="modal-form-1" class="form-label">Credits</label> 
+                                                            <input type='number' min='0' class='form-control' value="{{ x.credits }}" name='credits'>
+                                                        </div> 
+                                                    {% endif %} 
+                                                    {% if week.block.block_name == 'Simulation' %}
+                                                        <div class="col-span-12 sm:col-span-12"> 
+                                                            <label for="modal-form-1" class="form-label">Type of Procedure</label> 
+                                                            <select id="type_procedure" name='type_procedure' class="form-control" required> 
+                                                                <option></option>     
+                                                                {% if x.type_procedure == "Demonstration" %}
+                                                                    <option value="Demonstration" selected>Demonstration</option>
+                                                                    <option value="Practice">Practice</option>
+                                                                {% elif x.type_procedure == "Practice" %}
+                                                                    <option value="Demonstration">Demonstration</option>
+                                                                    <option value="Practice" selected>Practice</option>
+                                                                {% else %}
+                                                                    <option value="Demonstration">Demonstration</option>
+                                                                    <option value="Practice">Practice</option>
+                                                                {% endif %}                                                                                                  
+                                                            </select>
+                                                        </div>           
+                                                        <div class="col-span-12 sm:col-span-12"> 
+                                                            <label for="modal-form-1" class="form-label">Procedures</label> 
+                                                            <select id="procedures" name='procedures[]' class="tom-select" multiple required> 
+                                                                <option></option>
+                                                                {% for procedure in procedures %}                                                                    
+                                                                    <option value="{{ procedure.id }}" {% if procedure in x.procedures.all %}selected{% endif %}>
+                                                                        {{ procedure.procedure.task }}
+                                                                    </option>
+                                                                {% endfor %}                                                        
+                                                            </select>
+                                                        </div>
+                                                    {% endif %}  
+                                                    <div class="col-span-12 sm:col-span-12"> 
+                                                        <label for="modal-form-1" class="form-label">Staff</label> 
+                                                        <select id="staff_selected" name='staff_selected[]' class="tom-select" multiple required> 
+                                                            <option></option>
+                                                            {% for staff in staffs %}
+                                                                <option value="{{ staff.id }}" {% if staff in x.lecturers.all %}selected{% endif %}>{{ staff.first_name }} {{ staff.last_name }}</option>
+                                                            {% endfor %}                                                        
+                                                        </select>
+                                                    </div>   
+
+                                                </div> <!-- END: Modal Body -->
+                                                <!-- BEGIN: Modal Footer -->
+                                                <div class="modal-footer"> 
+                                                    <button type="button" data-tw-dismiss="modal" class="btn btn-outline-secondary w-20 mr-1">Cancel</button> 
+                                                    <button type="submit" class="btn btn-primary w-60">Edit Session</button> 
+                                                </div> <!-- END: Modal Footer -->
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a class="flex items-center text-danger" href="javascript:;" data-tw-toggle="modal" data-tw-target="#delete-confirmation-modal_{{ r.id }}_{{ x.id }}"> <i data-lucide="trash-2" class="w-4 h-4 mr-1"></i> Delete </a>
+                                <div id="delete-confirmation-modal_{{ r.id }}_{{ x.id }}" class="modal" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-body p-0">
+                                                <form action="{% url 'college:delete_education_plan_day_session' r.id x.id %}" method="POST">
+                                                    {% csrf_token %}
+                                                    <div class="p-5 text-center">
+                                                        <i data-lucide="x-circle" class="w-16 h-16 text-danger mx-auto mt-3"></i> 
+                                                        <div class="text-3xl mt-5">Are you sure?</div>
+                                                        <div class="text-slate-500 mt-2">
+                                                            Do you really want to delete this record? 
+                                                            <br>
+                                                            This process cannot be undone.
+                                                        </div>
+                                                    </div>
+                                                    <div class="px-5 pb-8 text-center">
+                                                        <button type="button" data-tw-dismiss="modal" class="btn btn-outline-secondary w-24 mr-1">Cancel</button>
+                                                        <button type="submit" class="btn btn-danger w-24">Delete</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td> 
+                    </tr>
+                    {% empty %}
+                    <tr class="intro-x"><td colspan='8'>No Sessions Added Yet</td></tr>
+                    {% endfor %}
+                    
+                <tbody>
+            </table>
+        </div>
+
+    {% endfor %}
+</div>
+
+
+{% endblock %}
+
+{% block js-content %}
+
+<script type="text/javascript">
+    
+    function checkall(source){
+        var loop = document.frmnotify.userscustomLoop.value;        
+        checkboxes = document.getElementsByName('days_selected[]');
+        for(var i=0, n=checkboxes.length;i<n;i++) {
+            checkboxes[i].checked = source.checked;
+        }
+      }
+
+    
+    $(document).ready(function(){   
+
+        {% for r in week.days.all %}
+            $('#id_module_{{ r.id }}').on('change', function(){
+                var module_id = $('#id_module_{{ r.id }}').val();
+                
+                $.ajax({ // ajax call starts
+                    url: "{% url 'college:ajax_fetch_study_units' %}", 
+                    data: 'module_id=' + module_id, // Send value of the clicked button
+                    dataType: 'json', // Choosing a JSON datatype
+                })
+                .done(function(data) { // Variable data contains the data we get from serverside          
+                
+                    if(data.valid == 1){    
+                            
+                        $('#id_study_unit_{{ r.id }}').empty();
+                        $('#id_study_unit_{{ r.id }}').append('<option></option>');
+                        for (var x = 0; x <= data.info.length - 1; x++) {         
+                            var option = new Option(data.info[x].text, data.info[x].id, true, true);               
+                            $('#id_study_unit_{{ r.id }}').append(option);
+                        }                         
+                    }                       
+                });
+                return false;          
+            });
+
+            {% for x in r.timetable_sessions.all %}
+
+                $('#id_module_{{ r.id }}_{{ x.id }}').on('change', function(){
+                    var module_id = $('#id_module_{{ r.id }}_{{ x.id }}').val();
+                    
+                    $.ajax({ // ajax call starts
+                        url: "{% url 'college:ajax_fetch_study_units' %}", 
+                        data: 'module_id=' + module_id, // Send value of the clicked button
+                        dataType: 'json', // Choosing a JSON datatype
+                    })
+                    .done(function(data) { // Variable data contains the data we get from serverside          
+                    
+                        if(data.valid == 1){    
+                                
+                            $('#id_study_unit_{{ r.id }}_{{ x.id }}').empty();
+                            $('#id_study_unit_{{ r.id }}_{{ x.id }}').append('<option></option>');
+                            for (var x = 0; x <= data.info.length - 1; x++) {         
+                                var option = new Option(data.info[x].text, data.info[x].id, true, true);               
+                                $('#id_study_unit_{{ r.id }}_{{ x.id }}').append(option);
+                            }                         
+                        }                       
+                    });
+                    return false;          
+                });
+
+
+            {% endfor %}
+
+
+        {% endfor %}
+    });
+
+</script>
+
+{% endblock %}

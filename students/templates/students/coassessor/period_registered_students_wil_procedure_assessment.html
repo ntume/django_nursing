@@ -1,0 +1,35 @@
+{% extends 'base_tpl.html' %}
+
+{% block breadcrumb-content %}
+    <nav aria-label="breadcrumb" class="-intro-x mr-auto hidden sm:flex">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'college:co_assessor_dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'college:co_assessor_learning_programme_cohorts' learning_programme.id %}">{{ learning_programme.programme_code }} Cohorts</a></li>
+            
+            <li class="breadcrumb-item active" aria-current="page">{{ learning_programme_cohort.title }} Students</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block main-content %}
+
+
+    <div class="intro-y flex flex-col sm:flex-row items-center mt-8">
+        <h2 class="text-lg font-medium mr-auto">
+            {{ attempt_user.attempt.cohort_procedure.task }}
+        </h2>
+
+        <div class="w-full sm:w-auto flex mt-4 sm:mt-0">
+            <a href="{% url 'students:process_procedure_formative_assessment_final_mark' student_registration.id procedure_entry.id  %}"  class="btn btn-primary shadow-md mr-2">Process Final Mark</a>
+        </div>
+        
+    </div>
+
+    <div class="intro-y p-5 mt-5">
+        
+        <div class="overflow-x-auto" id='procedure_div'>
+            {% include 'students/lecturer/partials/period_registered_students_wil_procedure_assessment.html' %}
+        </div>
+    </div>
+
+{% endblock %}

@@ -1,0 +1,178 @@
+{% extends 'base_vertical.html' %}
+{% load bootstrap3 %}
+{% block main-content %}
+
+<div class="row">
+  <div class="col-md-12 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          <nav aria-label="breadcrumb">
+              <ol class="breadcrumb bg-inverse-info">
+
+                  <li class="breadcrumb-item"><a href="{% url 'psycad:dashboard' %}">Dashboard</a></li>
+                  <li class="breadcrumb-item"><a href="{% url 'psycad:report_adverts' %}">Job Posts / Adverts</a></li>
+                  <li class="breadcrumb-item active" aria-current="page"><a>{{ advert.position }}: #Students</a></li>
+
+              </ol>
+            </nav>
+
+            {% include 'messages.html' %}
+
+        </div>
+      </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-lg-12 grid-margin stretch-card">
+              <div class="card">
+                <div class="card-body">
+                  <h4 class="card-title">List of students applied </h4>
+
+                  <div class="table-responsive">
+                    <table class="table table-striped table-bordered" id="table_id_events">
+                      <thead>
+                        <tr>
+                          <th>#</th>
+                          <th>Department</th>
+                          <th>Student Details</th>
+                          <th>Level</th>
+                          <th>Contacts</th>
+                          <th>Gender</th>
+                          <th>Race</th>
+                          <th>Nationality</th>
+                          <th>Employed</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for selectee in students %}
+                        <tr>
+                          <td>{{ forloop.counter }}</td>
+                          <td>
+                            {{ selectee.student.department.department }}<br>{{ selectee.student.department.faculty.faculty }}
+                          </td>
+                          <td>
+                            <b>{{selectee.student.student_number}}</b><br><br>
+                            {{selectee.student.name}} {{selectee.student.surname}}
+                          </td>
+                          <td>{{selectee.student.level.level}}</td>
+                          <td>
+                            <b>Email:</b> {{selectee.student.email}}<br><br>
+                            <b>Cellphone:</b> {{selectee.student.contact_number}}
+                          </td>
+                          <td>
+
+                              {% if selectee.student.gender == 1 %}
+                                Male
+                              {% else %}
+                                Female
+                              {% endif %}
+
+                          </td>
+                          <td>
+                            {% if selectee.student.race == 1 %}Black{% elif selectee.student.race == 2 %}COLOURED{% elif selectee.student.race == 3 %}ASIAN{% elif selectee.student.race == 4 %}WHITE{% endif %}
+                          </td>
+
+                          <td> {{ selectee.student.nationality.countryName }} </td>
+                          <td>
+                            {% if selectee.student.employed == 1 %}
+                                Yes
+                            {% else %}
+                                No
+                            {% endif %}
+                          </td>
+                        </tr>
+                        {% empty %}
+                            <tr><td colspan="8">Sorry no applicants yet</td></tr>
+                        {% endfor %}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+</div>
+
+<div class="row">
+  <div class="col-lg-12 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          <h4 class="card-title">Filter App</h4>
+            <form action="{% url 'psycad:report_view_applicants' advert.id %}" method="POST">
+
+                {% csrf_token %}
+                <div class="form-group">
+                  <div class="input-group">
+
+                    <select name="faculty" class="form-control">
+                      <option value="0" selected>Faculty (All)</option>
+                      {% for f in faculties %}
+                        <option value="{{f.id}}">{{f.faculty}}</option>
+                      {% endfor %}
+                    </select>
+
+                    <select name="level" class="form-control">
+                      <option value="0" selected>Level (All)</option>
+                      {% for f in levels %}
+                        <option value="{{f.id}}">{{f.level}}</option>
+                      {% endfor %}
+                    </select>
+
+                  </div>
+                  <br>
+                  <button type="submit" class="btn btn-primary btn-icon-text btn-rounded pull-right"> <i class="ti-filter btn-icon-prepend"></i>Filter</button>
+                </div>
+              </form>
+        </div>
+      </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block js-content %}
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/jszip-2.5.0/dt-1.10.18/b-1.5.6/b-colvis-1.5.6/b-html5-1.5.6/b-print-1.5.6/cr-1.5.0/r-2.2.2/sl-1.3.0/datatables.min.css"/>
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/v/dt/jszip-2.5.0/dt-1.10.18/b-1.5.6/b-colvis-1.5.6/b-html5-1.5.6/b-print-1.5.6/cr-1.5.0/r-2.2.2/sl-1.3.0/datatables.min.js"></script>
+
+<script>
+
+
+  $(document).ready( function () {
+    $('#table_id_events').DataTable({
+
+      dom: 'B<"clear">lfrtip',
+      buttons: {
+        name: 'primary',
+        buttons: [
+            {
+                extend: 'copyHtml5',
+                exportOptions: {
+                    columns: [ 0, ':visible' ]
+                }
+            },
+            {
+                extend: 'excelHtml5',
+                exportOptions: {
+                    columns: ':visible'
+                }
+            },
+            {
+                extend: 'pdfHtml5',
+                exportOptions: {
+                    columns: ':visible'
+                }
+            },
+            'colvis'
+        ]
+      }}
+    );
+  });
+
+</script>
+
+
+
+{% endblock %}

@@ -1,0 +1,167 @@
+{% extends 'base_vertical.html' %}
+{% load bootstrap3 %}
+{% block main-content %}
+
+<div class="row">
+  <div class="col-md-12 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          <nav aria-label="breadcrumb">
+              <ol class="breadcrumb bg-inverse-info">
+
+                  <li class="breadcrumb-item"><a href="{% url 'psycad:dashboard' %}">Dashboard</a></li>
+                  <li class="breadcrumb-item"><a href="{% url 'psycad:report_events' %}">Recruitment Programmes</a></li>
+                  <li class="breadcrumb-item active" aria-current="page"><a>{{ event.title }}: #Companies</a></li>
+
+              </ol>
+            </nav>
+
+            {% include 'messages.html' %}
+
+        </div>
+      </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-lg-12 grid-margin stretch-card">
+              <div class="card">
+                <div class="card-body">
+                  <h4 class="card-title">List of Company RSVP</h4>
+
+                  <div class="table-responsive">
+                    <table class="table table-striped table-bordered" id="table_id_events">
+                      <thead>
+                        <tr>
+                          <th>#</th>
+                          <th>Company</th>
+                          <th>Contacts</th>
+                          <th>Approved</th>
+                          <th>Paid</th>
+                          <th>Date</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for c in rsvps %}
+                            <tr>
+                              <td class="py-1">
+                                {{ forloop.counter }}
+                              </td>
+                              <td>
+                                {{ c.company.company_name }}
+                              </td>
+                              <td>
+                                {% for contact in c.contacts.all %}
+                                  <b>Name:</b> {{ contact.title }} {{ contact.name }} {{ contact.surname }}<br><br>
+                                  <b>Email:</b> {{contact.email}}<br><br>
+                                  <b>Cellphone:</b> {{contact.telephone}}
+                                {% endfor %}
+                              </td>
+                              <td>
+                                {% if c.approved == 'Yes' %}
+                                  Yes
+                                {% else %}
+                                  No
+                                {% endif %}
+                              </td>
+                              <td>
+                                {% if c.paid == 'Yes' %}
+                                  Yes
+                                {% else %}
+                                  No
+                                {% endif %}
+                              </td>
+                              <td> {{ c.created_at }} </td>
+
+                            </tr>
+                        {% empty %}
+                            <tr><td colspan="10">Sorry no companies have registered</td></tr>
+                        {% endfor %}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+</div>
+
+<div class="row">
+  <div class="col-lg-12 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          <h4 class="card-title">Filter App</h4>
+            <form action="{% url 'psycad:report_view_company_rsvps' event.id  %}" method="POST">
+
+                {% csrf_token %}
+                <div class="form-group">
+                  <div class="input-group">
+
+                    <select name="approved" class="form-control">
+                      <option value="0" selected>Approved (All)</option>
+                        <option value="1">Yes</option>
+                        <option value="2">No</option>
+                    </select>
+                    <select name="paid" class="form-control">
+                      <option value="0" selected>Paid (All)</option>
+                        <option value="1">Yes</option>
+                        <option value="2">No</option>
+                    </select>
+
+                  </div>
+                  <br>
+                  <button type="submit" class="btn btn-primary btn-icon-text btn-rounded pull-right"> <i class="ti-filter btn-icon-prepend"></i>Filter</button>
+                </div>
+              </form>
+        </div>
+      </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block js-content %}
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/jszip-2.5.0/dt-1.10.18/b-1.5.6/b-colvis-1.5.6/b-html5-1.5.6/b-print-1.5.6/cr-1.5.0/r-2.2.2/sl-1.3.0/datatables.min.css"/>
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/v/dt/jszip-2.5.0/dt-1.10.18/b-1.5.6/b-colvis-1.5.6/b-html5-1.5.6/b-print-1.5.6/cr-1.5.0/r-2.2.2/sl-1.3.0/datatables.min.js"></script>
+
+<script>
+
+
+  $(document).ready( function () {
+    $('#table_id_events').DataTable({
+
+      dom: 'B<"clear">lfrtip',
+      buttons: {
+        name: 'primary',
+        buttons: [
+            {
+                extend: 'copyHtml5',
+                exportOptions: {
+                    columns: [ 0, ':visible' ]
+                }
+            },
+            {
+                extend: 'excelHtml5',
+                exportOptions: {
+                    columns: ':visible'
+                }
+            },
+            {
+                extend: 'pdfHtml5',
+                exportOptions: {
+                    columns: ':visible'
+                }
+            },
+            'colvis'
+        ]
+      }}
+    );
+  });
+
+</script>
+
+
+
+{% endblock %}

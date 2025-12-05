@@ -1,0 +1,21 @@
+Hello
+ 
+A new job advert has been posted.
+ 
+Please log on to the AHC SIMS portal to view the advert:
+ 
+Web Address: sims.ahcnc.co.za
+Company: {{ company}}
+Position: {{ post}}
+ 
+Make sure to keep your profile and email preferences up to date so we can serve you better.
+ 
+Sincerely
+ 
+AHC SIMS  Web Admin
+
+he new Protection of Personal Information Act (POPIA) has come into effect on 1 July 2021.
+
+If you are happy to continue receiving recruitment related news, information and more from the AHC SIMS platform and the UJ PsyCaD Career Services Office, then you can stay opted in by not taking any action. 
+
+Alternatively, you can opt out by signing into the system, click on your profile and then edit your email preferences.

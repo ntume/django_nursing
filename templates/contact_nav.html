@@ -1,0 +1,83 @@
+<nav class="bottom-navbar">
+  <div class="container">
+    <ul class="nav page-navigation">
+      <li class="nav-item {{dash_active}}">
+        <a class="nav-link" href="{% url 'contact:dashboard' %}">
+          <i class="ti-home menu-icon"></i>
+          <span class="menu-title">Dashboard</span>
+        </a>
+      </li>
+      <li class="nav-item {{profile_active}}">
+        <a class="nav-link" href="{% url 'contact:view_profile' %}">
+          <i class="ti-user menu-icon"></i>
+          <span class="menu-title">Profile</span>
+        </a>
+      </li>
+      <!--<li class="nav-item {{profile_active}}">
+        <a class="nav-link" href="{% url 'contact:view_profile' %}">
+          <i class="ti-hand-point-right menu-icon"></i>
+          <span class="menu-title">Other Company Contacts</span>
+        </a>
+      </li>
+      <li class="nav-item {{CV_menu}}">
+        <a href="#" class="nav-link">
+          <i class="ti-pencil-alt menu-icon"></i>
+          <span class="menu-title">Student CVs</span>
+          <i class="menu-arrow"></i></a>
+        <div class="submenu">
+          <ul class="submenu-item">
+            {% for depts in MENU_COMPANY_DEPARTMENTS %}
+              <li class="nav-item"><a class="nav-link" href="{% url 'contact:view_students' depts.department %}">{{depts.department}}</a></li>
+            {% empty %}
+              <li class="nav-item"><a class="nav-link" href="{% url 'contact:view_profile' %}">No departments added yet, please click to add some</a></li>
+            {% endfor %}
+          </ul>
+        </div>
+      </li>-->
+      <li class="nav-item {{events_menu}}">
+        <a href="{% url 'contact:event_list' %}" class="nav-link"><i class="ti-calendar menu-icon"></i><span class="menu-title">Recruitment Programmes</span></a>
+      </li>
+      <li class="nav-item {{adverts_menu}}">
+        <a href="#" class="nav-link">
+          <i class="ti-support menu-icon"></i>
+          <span class="menu-title">Adverts</span>
+          <i class="menu-arrow"></i></a>
+        <div class="submenu">
+          <ul class="submenu-item">
+            <li class="nav-item"><a class="nav-link" href="{% url 'contact:advert_list' %}">List of Adverts</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'contact:advert_create' %}">Add Advert</a></li>
+          </ul>
+        </div>
+      </li>
+      <li class="nav-item {{profile_active}}">
+        <a class="nav-link" href="{% url 'contact:company_interviews' %}">
+          <i class="ti-bell menu-icon"></i>
+          <span class="menu-title">Interviews</span>
+        </a>
+      </li>
+      <li class="nav-item {{profile_active}}">
+        <a class="nav-link" href="{% url 'contact:surveys' %}">
+          <i class="ti-receipt menu-icon"></i>
+          <span class="menu-title">Surveys</span>
+        </a>
+      </li>
+      <li class="nav-item {{ space_active }}">
+        <a class="nav-link" href="{% url 'contact:contact_view_spaces' %}">
+          <i class="ti-cloud menu-icon"></i>
+          <span class="menu-title">Virtual Spaces</span>
+        </a>
+      </li>
+      <!--<li class="nav-item {{wil_menu}}">
+        <a href="#" class="nav-link">
+          <i class="ti-ruler-pencil menu-icon"></i>
+          <span class="menu-title">Interns</span>
+          <i class="menu-arrow"></i></a>
+        <div class="submenu">
+          <ul class="submenu-item">
+            <li class="nav-item"><a class="nav-link" href="{% url 'mentor:list_all_interns' %}">List of all Company Interns</a></li>
+          </ul>
+        </div>
+      </li>-->
+    </ul>
+  </div>
+</nav>

@@ -1,0 +1,189 @@
+{% extends 'base_tpl.html' %}
+
+{% block breadcrumb-content %}
+<nav aria-label="breadcrumb" class="-intro-x mr-auto hidden sm:flex">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'administration:dashboard_lecturer' %}">Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'college:lecturer_learning_programme_cohorts' learning_programme.id %}">{{ learning_programme.programme_code }} Cohorts</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'college:lecturer_learning_programme_cohort_registration_periods' learning_programme_cohort.id %}">{{ learning_programme_cohort.title }} Registrations</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Formative Co-Assessor</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block main-content %}
+
+{% include 'messages.html' %}
+
+<form method = "POST" action="{% url 'college:assign_procedure_formative_assessment_co_assessor' learning_programme_cohort_registration_period.id %}" name="frmnotify" class="mt-5">
+    <div class="intro-y flex flex-col sm:flex-row items-center mt-8">
+        <h2 class="text-lg font-medium mr-auto">
+            {{ learning_programme_cohort_registration_period.title }} Formative Co-Assessor Staff Assignment
+        </h2>
+    </div>
+    <div class="intro-y flex flex-col sm:flex-row items-center mt-8">
+        <div class="w-full sm:w-auto flex mt-4 sm:mt-0">
+            
+                {% csrf_token %}
+                <input  type = "hidden" name = "userscustomLoop" value = "{{ items|length }}">
+        
+                <div class="intro-y col-span-12 overflow-auto lg:overflow-visible  p-5 box">
+                    <div class="form-inline col-span-12">
+                        <label for="id_admin" class="form-label w-24">Select Type</label>
+                        <select name="staff_type" id="id_staff_type" class="form-control" required>
+                            <option></option>
+                            <option value="internal">Internal Staff Member</option>
+                            <option value="external">External Staff Member</option>
+                        </select>
+                    </div>
+                    <div id='id_internal' style="display: none;" class="col-span-12">
+                        <label for="id_admin" class="form-label w-32 mt-5">Select Lecturer</label>
+                        <select name="co_assessor" id="id_co_assessor" class="form-control">
+                            <option></option>
+                            {% for admin in lecturers  %}
+                                <option value="{{ admin.id }}">{{ admin.first_name }} {{ admin.last_name }}</option>
+                            {% endfor %}
+                        </select>                            
+                    </div>
+                    <div id='id_external' style="display: none;" class="col-span-12 mt-5">
+                        <label for="id_admin" class="form-label w-48">Select External Co-Assessor</label>
+                        <select name="co_assessor_external" id="id_co_assessor_external" class="form-control" required>
+                            <option></option>
+                            {% for admin in external_staff  %}
+                                <option value="{{ admin.id }}">{{ admin.first_name }} {{ admin.last_name }}</option>
+                            {% endfor %}
+                            <option value='0'>Add New</option>
+                        </select>
+                    </div>
+                    <div id='external_add' style="display: none;" class="mt-5 grid grid-cols-4 gap-2">
+                        <div>
+                            <label for="id_admin" class="form-label w-32 mt-5">First Name</label>
+                            <input type='text' class='form-control' name='first_name' maxlength='20' id='id_first_name'>
+                        </div>
+                        <div>
+                            <label for="id_admin" class="form-label w-48 mt-5">Last Name</label>
+                            <input type='text' class='form-control' name='last_name' maxlength='20' id='id_last_name'>
+                        </div>
+                        <div>
+                            <label for="id_admin" class="form-label w-48 mt-5">Email</label>
+                            <input type='email' class='form-control' name='email' id='id_email'>
+                        </div>
+                    </div>
+                                      
+                    <div class="form-inline col-span-12">
+                        <button type="submit" class="btn btn-primary w-48 text-white mt-10">Assign Staff</button>
+                    </div>
+                </div>  
+
+        </div>
+    </div>
+
+    <div class="intro-y p-5 mt-5">
+        
+        <div class="overflow-x-auto">
+            <table class="table table-report -mt-2">
+                <thead>
+                    <tr>
+                        <th class="whitespace-nowrap"><input type="checkbox" name="toggle" value="all" class="form-check-input" onclick = "checkall(this)"></th>                  
+                        <th class="whitespace-nowrap">Procedure</th>
+                        <th class="whitespace-nowrap">Lecturer</th>
+                        <th class="whitespace-nowrap">Assessor</th>
+                        <th class="whitespace-nowrap">Co-Assessor</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in items %}
+                    <tr class="intro-x">
+                        <td class="w-40">
+                            <input type="checkbox" name="procedures_selected[]" value="{{ r.id }}" class="form-check-input">
+                        </td>
+                        <td>
+                            {{ r.procedure.task }}
+                        </td>
+                        <td>
+                            {{ r.lecturer.first_name }} {{ r.lecturer.last_name }}
+                        </td>
+                        <td>
+                            {{ r.clinical_facilitator.first_name }} {{ r.clinical_facilitator.last_name }}
+                        </td>
+                        <td>
+                            {{ r.co_assessor.first_name }} {{ r.co_assessor.last_name }}
+                        </td>
+                      
+                    </tr>
+                    {% empty %}
+                    <tr class="intro-x"><td colspan='6'>Nothing added yet</td></tr>
+                    {% endfor %}
+                    
+                <tbody>
+            </table>
+        </div>
+    </div>
+</form>
+{% endblock %}
+
+
+{% block js-content %}
+
+<script type="text/javascript">
+    
+    function checkall(source){
+        var loop = document.frmnotify.userscustomLoop.value;
+        
+        checkboxes = document.getElementsByName('procedures_selected[]');
+        for(var i=0, n=checkboxes.length;i<n;i++) {
+            checkboxes[i].checked = source.checked;
+        }
+
+      }
+
+      $(document).ready(function(){
+
+        $('#id_staff_type').on('change',function(){
+            var staff_type = $( "#id_staff_type" ).val();
+            if(staff_type == "internal"){
+                document.getElementById("id_internal").style.display = "block";
+                document.getElementById("id_external").style.display = "none";
+                $("#id_co_assessor").attr("required", true);
+                $("#id_co_assessor_external").attr("required", false);
+                $("#id_first_name").attr("required", false);
+                $("#id_last_name").attr("required", false);
+                $("#id_email").attr("required", false);
+            } else if(staff_type == "external"){
+                document.getElementById("id_internal").style.display = "none";
+                document.getElementById("id_external").style.display = "block";
+                $("#id_co_assessor").attr("required", false);
+                $("#id_co_assessor_external").attr("required", true);
+                $("#id_first_name").attr("required", false);
+                $("#id_last_name").attr("required", false);
+                $("#id_email").attr("required", false);
+            } 
+        });
+
+        $('#id_co_assessor_external').on('change',function(){
+            var co_assessor_external = $( "#id_co_assessor_external" ).val();
+            if(co_assessor_external == "0"){
+                document.getElementById("id_internal").style.display = "none";
+                document.getElementById("id_external").style.display = "block";
+                document.getElementById("external_add").style.display = "block";
+                $("#id_co_assessor").attr("required", false);
+                $("#id_co_assessor_external").attr("required", true);
+                $("#id_first_name").attr("required", true);
+                $("#id_last_name").attr("required", true);
+                $("#id_email").attr("required", true);
+            } else {
+                document.getElementById("id_internal").style.display = "none";
+                document.getElementById("id_external").style.display = "block";
+                document.getElementById("external_add").style.display = "none";
+                $("#id_co_assessor").attr("required", false);
+                $("#id_co_assessor_external").attr("required", true);
+                $("#id_first_name").attr("required", false);
+                $("#id_last_name").attr("required", false);
+                $("#id_email").attr("required", false);
+            } 
+        });
+    });
+
+</script>
+
+{% endblock %}

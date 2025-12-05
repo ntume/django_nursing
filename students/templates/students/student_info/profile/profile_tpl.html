@@ -1,0 +1,84 @@
+{% extends 'base_vertical.html' %}
+
+{% block breadcrumb-content %}
+    <nav aria-label="breadcrumb" class="-intro-x h-full mr-auto">
+        <ol class="breadcrumb breadcrumb-light">
+            <li class="breadcrumb-item"><a href="{% url 'students:student_dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Profile</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block main-content %}
+
+{% include 'messages.html' %}
+
+<div class="intro-y flex items-center mt-8">
+    <h2 class="text-lg font-medium mr-auto">
+        Profile Layout
+    </h2>
+</div>
+<div class="grid grid-cols-12 gap-6 mt-5">
+    <!-- BEGIN: Profile Menu -->
+    <div class="col-span-12 lg:col-span-4 2xl:col-span-3 flex lg:block flex-col-reverse">
+        <div class="intro-y box mt-5 lg:mt-0">
+            <div class="relative flex items-center p-5">
+                <div class="w-12 h-12 image-fit">
+                    {% if student.profile_pic %}
+                        <img alt="{{ student.first_name }}" class="rounded-full" src="{{ student.profile_pic.url }}">
+                    {% endif %}
+                </div>
+                <div class="ml-4 mr-auto">
+                    <div class="font-medium text-base">{{ student.first_name }} {{ student.last_name }}</div>
+                    <div class="text-slate-500">{{ student.id_number }}</div>
+                </div>
+             
+            </div>
+            <div class="p-5 border-t border-slate-200/60 dark:border-darkmode-400">
+                <a class="flex items-center mt-5 {% if learner_details_page %} text-primary font-medium{% endif %}" href="{% url 'students:student_profile' 1 %}"> <i data-lucide="activity" class="w-4 h-4 mr-2"></i> Personal Information </a>
+                <a class="flex items-center mt-5 {% if education_page %} text-primary font-medium{% endif %}" href="{% url 'students:student_profile' 3 %}"> <i data-lucide="box" class="w-4 h-4 mr-2"></i> Education </a>
+                <a class="flex items-center mt-5 {% if address_page %} text-primary font-medium{% endif %}" href="{% url 'students:student_profile' 2 %}"> <i data-lucide="map" class="w-4 h-4 mr-2"></i> Address </a>
+                <a class="flex items-center mt-5 {% if next_of_kin_page %} text-primary font-medium{% endif %}" href="{% url 'students:student_profile' 4 %}"> <i data-lucide="users" class="w-4 h-4 mr-2"></i> Next of Kin </a>
+            </div>
+            <div class="p-5 border-t border-slate-200/60 dark:border-darkmode-400">
+                <a class="flex items-center mt-5 {% if password_page %} text-primary font-medium{% endif %}" href="{% url 'students:student_profile' 6 %}"> <i data-lucide="lock" class="w-4 h-4 mr-2"></i> Change Password </a>
+                <a class="flex items-center mt-5 {% if profile_picture_page %} text-primary font-medium{% endif %}" href="{% url 'students:student_profile' 5 %}"> <i data-lucide="image" class="w-4 h-4 mr-2"></i> Profile Picture </a>
+                
+            </div>
+            
+        </div>
+        <div class="intro-y box p-5 bg-primary text-white mt-5">
+            <div class="flex items-center">
+                <div class="font-medium text-lg">Important Update</div>
+                <div class="text-xs bg-white dark:bg-primary dark:text-white text-slate-700 px-1 rounded-md ml-auto">New</div>
+            </div>
+            <div class="mt-4">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.</div>
+            <div class="font-medium flex mt-5">
+                <button type="button" class="btn py-1 px-2 border-white text-white dark:text-slate-300 dark:bg-darkmode-400 dark:border-darkmode-400">Take Action</button>
+                <button type="button" class="btn py-1 px-2 border-transparent text-white dark:border-transparent ml-auto">Dismiss</button>
+            </div>
+        </div>
+    </div>
+    <!-- END: Profile Menu -->
+    <div class="col-span-12 lg:col-span-8 2xl:col-span-9">
+        <div class="grid grid-cols-12 gap-6">
+            
+            {% if learner_details_page %}
+                {% include 'students/student_info/profile/learner_details.html' %}
+            {% elif education_page %}
+                {% include 'students/student_info/profile/education.html' %}
+            {% elif address_page %}
+                {% include 'students/student_info/profile/address.html' %}
+            {% elif next_of_kin_page %}
+                {% include 'students/student_info/profile/next_of_kin.html' %}
+            {% elif profile_picture_page %}
+                {% include 'students/student_info/profile/profile_picture.html' %}     
+            {% elif password_page %}
+                {% include 'students/student_info/profile/change_password.html' %}            
+            {% endif %}
+           
+        </div>
+    </div>
+</div>
+
+{% endblock %}

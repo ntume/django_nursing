@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en"  class="dark">
+    <!-- BEGIN: Head -->
+    <head>
+        <meta charset="utf-8">
+        <link href="{% static 'images/faviconSETA32.ico' %}" rel="shortcut icon">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="AHC Student Information Management System Verification System">
+        <meta name="keywords" content="Student, Proof of Registration Verification System">
+        <meta name="author" content="AHCNC">
+        <title>AHC Student Information Management System Verification System</title>
+        <!-- BEGIN: CSS Assets-->
+        <link rel="stylesheet" href="{% static 'css/app.css' %}" />
+        <!-- END: CSS Assets-->
+    </head>
+    <!-- END: Head -->
+    <body class="py-5 md:py-0">
+        <div class="container">
+            <!-- BEGIN: Error Page -->
+            <div class="">
+                
+                {% if found %}
+                    <div class="text-white mt-10 lg:mt-0">
+                        <div class="-intro-x lg:mr-20">
+                            <img class ="mt-2" src="{% static 'images/AHC-LOGO.png' %}"/>                            
+                        </div>
+                        <div class="mt-20 intro-x text-5xl font-medium text-black">AHCNC Proof of Registration Verification System</div>
+                        <div class="mt-5 intro-x text-xl lg:text-2xl font-medium mt-5">
+                            <b>This is to verify that {{ learner_name }} with student number: {{ student_number }} is successfully registered:
+                        </div>
+                        
+                        <div class="mt-5 intro-y col-span-12 overflow-auto lg:overflow-visible text-xl">
+                                The Student is registered for the following Modules
+                                <br><br>
+                                <table class="table table-report -mt-2">
+                                    <thead>
+                                        <tr>
+                                            <th class="whitespace-nowrap">Module Code</th>
+                                            <th class="whitespace-nowrap">Module</th>
+                                            <th class="whitespace-nowrap">NQF Level</th>
+                                            <th class="whitespace-nowrap">Credits</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for r in modules %}
+                                                <tr class="intro-x">
+                                                    <td class="w-40">
+                                                        {{ r.module.module.module_code }}
+                                                    </td>
+                                                    <td>
+                                                        {{ r.module.module.module_name }}
+                                                    </td>
+                                                    <td>
+                                                        {{ r.module.module.nqf_level.nqf_level }}
+                                                    </td>
+                                                    <td>
+                                                        {{ r.module.credits }}
+                                                    </td>                                         
+                                                </tr>
+                                        {% empty %}
+                                            <tr class="intro-x"><td colspan="4">No Modules</td></tr>
+                                        {% endfor %}
+                                        
+                                    <tbody>
+                                </table>
+                         
+                        </div>
+
+                        
+                        
+                    </div>
+                {% else %}
+                <div class="text-white mt-10 lg:mt-0">
+                    <div class="-intro-x lg:mr-20">
+                        <img class ="" src="{% static 'images/mict_logo.jpg' %}" height="200px"/>
+                    </div>
+                    <div class="intro-x text-3xl font-medium text-black mt-10">MICTSETA Learner Certificate Verification System</div>
+                    <div class="intro-x text-xl lg:text-2xl font-medium mt-5 text-warning">
+                        {{ msg }}
+                    </div>
+                    
+                </div>
+                {% endif %}
+            </div>
+            <!-- END: Error Page -->
+        </div>
+        
+        <!-- BEGIN: JS Assets-->
+        <script src="{% static 'js/app.js' %}"></script>
+        <!-- END: JS Assets-->
+    </body>
+</html>

@@ -1,0 +1,17 @@
+Dear {{ name }} \n\n
+
+Your Appointment status has been updated:\n\n
+
+Appointment Details:\n\n
+
+Description: {{ description }}\n
+Category: {{ category }}\n
+Date: {{ date }} at {{ time }}\n\n
+
+
+Update:\n
+{{ update }}\n\n
+
+Sincerely\n
+
+AHC SIMS  Web Admin

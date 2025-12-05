@@ -1,0 +1,433 @@
+<!-- BEGIN: Page -->
+<div class="intro-y box col-span-12 2xl:col-span-6">
+    <div class="flex items-center px-5 py-5 sm:py-3 border-b border-slate-200/60 dark:border-darkmode-400">
+        <h2 class="font-medium text-base mr-auto">
+            {{ programme_block.block_name }}
+        </h2>
+    </div>
+    <div class="p-5">
+
+        <div class="intro-y col-span-12 flex flex-wrap sm:flex-nowrap items-center mt-2">
+        
+            <div class="hidden md:block mx-auto text-slate-500"></div>
+            <div class="w-48 sm:w-auto mt-3 sm:mt-0 sm:ml-auto md:ml-0">
+                <div class="w-56 relative text-slate-500">
+                  <a href="javascript:;" class="btn btn-primary shadow-md mr-2" data-tw-toggle="modal" data-tw-target="#next_of_kin_modal">Add Logsheet Entry</a>
+                    <div id="next_of_kin_modal" class="modal" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-xl">
+                            <div class="modal-content">
+                                <form action="{% url 'students:add_logsheet' registration.id programme_block.id selected_month %}" method="POST" enctype="multipart/form-data">
+                                    {% csrf_token %}
+                                    <!-- BEGIN: Modal Header -->
+                                    <div class="modal-header">
+                                        <h2 class="font-medium text-base mr-auto">Add Logsheet</h2>                                             
+                                    </div> <!-- END: Modal Header -->
+                                    <!-- BEGIN: Modal Body -->
+                                    <div class="modal-body grid grid-cols-12 gap-4 gap-y-3">   
+                                        <div class="col-span-12 sm:col-span-12">
+                                            <label for="id_telephone" class="form-label w-48">Shift*</label>
+                                            <select name='shift' class='form-select' required>
+                                                <option></option>
+                                                {% for shift in shifts %}
+                                                    <option value="{{ shift.id }}">{{ shift.shift }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>   
+                                        <div class="col-span-12 sm:col-span-12">
+                                            <label for="start" class="form-label w-48">Start Date*</label>
+                                            <input name='date' id="id_date" type="date" class="form-control" placeholder="Date" max='' required>
+                                        </div>    
+                                        <div class="col-span-12 sm:col-span-12">
+                                            <label for="start" class="form-label w-48">Start Time*</label>
+                                        </div>                              
+                                        <div class="col-span-12 sm:col-span-12 form-inline">
+                                            <label for="start" class="form-label w-48">Hour*</label>
+                                            <select name='start_hour' id="start_hour"  class='form-select' required>
+                                                <option></option>
+                                                {% for time_choice in time_choices %}
+                                                    <option value="{{ time_choice }}">{{ time_choice }}</option>                                                   
+                                                {% endfor %}
+                                            </select>
+                                            <label for="start" class="form-label w-48">Minutes*</label>
+                                            <select name='start_minutes' id="start_minutes"  class='form-select' required>
+                                                <option></option>
+                                                {% for time_minute in time_minutes %}
+                                                    <option value="{{ time_minute }}">{{ time_minute }}</option>                                                   
+                                                {% endfor %}
+                                            </select>
+                                        </div>  
+                                        <div class="col-span-12 sm:col-span-12">
+                                            <label for="start" class="form-label w-48">End Date* <p class='text-danger' id='id_date_error_message'></p></label>
+                                            <input name='end_date' id="id_end_date" type="date" class="form-control" placeholder="Date" required max=''>
+                                        </div>  
+                                        <div class="col-span-12 sm:col-span-12">
+                                            <label for="end" class="form-label w-48">End Time*</label>                                            
+                                        </div>
+                                        <div class="col-span-12 sm:col-span-12 form-inline">
+                                            <label for="end" class="form-label w-48">Hour*</label>
+                                            <select name='end_hour' id="end_hour"  class='form-select' required>
+                                                <option></option>
+                                                {% for time_choice in time_choices %}
+                                                    <option value="{{ time_choice }}">{{ time_choice }}</option>                                                   
+                                                {% endfor %}
+                                            </select>
+                                            <label for="end" class="form-label w-48">Minutes*</label>
+                                            <select name='end_minutes' id="end_minutes"  class='form-select' required>
+                                                <option></option>
+                                                {% for time_minute in time_minutes %}
+                                                    <option value="{{ time_minute }}">{{ time_minute }}</option>                                                   
+                                                {% endfor %}
+                                            </select>
+                                        </div> 
+                                        <div class="col-span-12 sm:col-span-12">
+                                            <label for="student_impression" class="form-label w-80">On a Scale of 1 to 5, how was the session?</label>
+                                            <select required class='form-select' name='student_impression'>
+                                                <option></option>
+                                                <option value="1">1 - Best</option>
+                                                <option value="2">2</option>
+                                                <option value="3">3</option>
+                                                <option value="4">4</option>
+                                                <option value="5">5 - Not Good</option>
+                                            </select>
+                                        </div>   
+                                        <div class="col-span-12 sm:col-span-12">
+                                            <label for="student_comment" class="form-label w-80">Any Comments on how the shift was?*</label>
+                                            <textarea name='student_comment' id="student_comment" type="text" class="form-control" required></textarea>
+                                        </div>  
+
+                                        <div class="col-span-12 sm:col-span-12">
+                                            <p class='text-danger' id='id_facility_message'></p>
+                                        </div>
+
+                                        <div class="col-span-12 sm:col-span-12">
+                                            <label for="id_telephone" class="form-label w-48">What ward was your shift?*</label>
+                                            <select name='facility_ward' id='id_ward' class='form-select' required>
+                                                <option></option>
+                                                
+                                            </select>
+                                        </div>
+                                
+                                        <div class="col-span-12 sm:col-span-12">
+                                            <label for="id_telephone" class="form-label w-80">What discipline was your shift?*</label>
+                                            <select name='discipline' id='id_discipline' class='form-select' required>
+                                                <option></option>
+                                                
+                                            </select>
+                                        </div> 
+
+                                        
+                                                                                                                             
+                                    </div> <!-- END: Modal Body -->
+                                    <!-- BEGIN: Modal Footer -->
+                                    <div class="modal-footer"> 
+                                        <p class='text-danger' id='id_error_message'></p>
+                                        <button type="button" data-tw-dismiss="modal" class="btn btn-outline-secondary w-20 mr-1">Cancel</button> 
+                                        <button type="submit" id="id_add_logsheet" class="btn btn-primary w-80">Add Shift Log Entry</button> 
+                                    </div> <!-- END: Modal Footer -->
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div> <!-- END: Modal Content --> 
+                
+            </div>
+        </div>
+        <!-- BEGIN: Data List -->
+        <div class="intro-y col-span-12 overflow-x-auto scrollbar-hidden mt-10">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th><div class="flex items-center justify-center">Discipline</div></th>
+                        <th><div class="flex items-center justify-center">Ward</div></th> 
+                        <th><div class="flex items-center justify-center">Time</div></th>
+                        <th><div class="flex items-center justify-center">Hours</div></th>    
+                        <th><div class="flex items-center justify-center">Verified</div></th>                  
+                        <th><div class="flex items-center justify-center">ACTIONS</div></th>
+                  
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for entry in entries %}
+                        <tr class="intro-x">
+                            <td>
+                                {{ entry.discipline.discipline }}
+                            </td>
+                            <td>
+                                {{ entry.facility_ward.ward.ward }}
+                            </td>
+                            <td>
+                                <div class="flex items-center justify-center">{{ entry.date }} {{ entry.start }}</div> to 
+                                <div class="flex items-center justify-center">  {{ entry.end_date }} {{ entry.end }}</div>
+                            </td>
+                            <td>{{ entry.hours }}</td> 
+                            <td><div class="flex items-center justify-center">{{ entry.mentor_acknowledgment }}</div></td>
+                            <td class="table-report__action">
+                                <div class="flex justify-center items-center">
+
+                                    <div class="dropdown ml-auto sm:ml-0">
+                                        <button class="dropdown-toggle btn px-2 box" aria-expanded="false" data-tw-toggle="dropdown">
+                                            <span class="w-5 h-5 flex items-center justify-center"> <i class="w-4 h-4" data-lucide="plus"></i> </span>
+                                        </button>
+                                        <div class="dropdown-menu w-48">
+                                            <ul class="dropdown-content">
+                                                <li>
+                                                    <a class="dropdown-item" href="javascript:;" data-tw-toggle="modal" data-tw-target="#edit-modal_{{entry.id}}"> <i data-lucide="edit" class="w-4 h-4 mr-1"></i>Edit </a>
+                                                </li> 
+                                                <li>
+                                                    <a class="dropdown-item" href="javascript:;" data-tw-toggle="modal" data-tw-target="#delete-confirmation-modal_{{entry.id}}"> <i data-lucide="trash-2" class="w-4 h-4 mr-1"></i> Delete </a>
+                                                </li>                                        
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    
+                                </div>
+                              
+                                        <div id="delete-confirmation-modal_{{ entry.id }}" class="modal" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-body p-0">
+                                                    <form action="{% url 'students:delete_logsheet' registration.id programme_block.id selected_month entry.id %}" method="POST">
+                                                        {% csrf_token %}
+                                                        <div class="p-5 text-center">
+                                                            <i data-lucide="x-circle" class="w-16 h-16 text-danger mx-auto mt-3"></i> 
+                                                            <div class="text-3xl mt-5">Are you sure?</div>
+                                                            <div class="text-slate-500 mt-2">
+                                                                Do you really want to delete this record? 
+                                                                <br>
+                                                                This process cannot be undone.
+                                                            </div>
+                                                        </div>
+                                                        <div class="px-5 pb-8 text-center">
+                                                            <button type="button" data-tw-dismiss="modal" class="btn btn-outline-secondary w-24 mr-1">Cancel</button>
+                                                            <button type="submit" class="btn btn-danger w-24">Delete</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div id="edit-modal_{{entry.id}}" class="modal" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog modal-xl">
+                                            <div class="modal-content">
+                                                <form action="{% url 'students:edit_logsheet' registration.id programme_block.id selected_month entry.id %}" method="POST" enctype="multipart/form-data">
+                                                    {% csrf_token %}
+                                                    <!-- BEGIN: Modal Header -->
+                                                    <div class="modal-header">
+                                                        <h2 class="font-medium text-base mr-auto">Edit</h2>                                             
+                                                    </div> <!-- END: Modal Header -->
+                                                    <!-- BEGIN: Modal Body -->
+                                                    <div class="modal-body grid grid-cols-12 gap-4 gap-y-3">  
+                                                        <div class="col-span-12 sm:col-span-12">
+                                                            <label for="id_telephone" class="form-label w-48">Shift*</label>
+                                                            <select name='shift' class='tom-select' required>
+                                                                <option></option>
+                                                                {% for shift in shifts %}
+                                                                    {% if entry.shift == shift %}
+                                                                        <option value="{{ shift.id }}" selected>{{ shift.shift }}</option>
+                                                                    {% else %}
+                                                                        <option value="{{ shift.id }}">{{ shift.shift }}</option>
+                                                                    {% endif %}                                                                    
+                                                                {% endfor %}
+                                                            </select>
+                                                        </div>  
+                                                        <div class="col-span-12 sm:col-span-12">
+                                                            <label for="start" class="form-label w-48">Start Date*</label>
+                                                            <input id="id_date_{{ entry.id }}" name='date' id="date" type="date" class="form-control" value="{{ entry.date|date:'Y-m-d' }}" required  max='{{ today|date:"Y-m-d" }}'>
+                                                        </div>                                   
+                                                        <div class="col-span-12 sm:col-span-12">
+                                                            <label for="start" class="form-label w-48">Start Time*</label>
+                                                        </div>                              
+                                                        <div class="col-span-12 sm:col-span-12 form-inline">
+                                                            <label for="start" class="form-label w-48">Hour*</label>
+                                                            <select name='start_hour' id="start_hour"  class='form-select' required>
+                                                                <option></option>
+                                                                {% for time_choice in time_choices %}
+                                                                    {% if timechoice == entry.start|date:'H' %}
+                                                                        <option value="{{ time_choice }}" selected>{{ time_choice }}</option>  
+                                                                    {% else %}
+                                                                        <option value="{{ time_choice }}">{{ time_choice }}</option>  
+                                                                    {% endif %}
+                                                                {% endfor %}
+                                                            </select>
+                                                            <label for="start" class="form-label w-48">Minutes*</label>
+                                                            <select name='start_minutes' id="start_minutes"  class='form-select' required>
+                                                                <option></option>
+                                                                {% for time_minute in time_minutes %}
+                                                                    {% if time_minute == entry.start|date:'i' %}
+                                                                        <option value="{{ time_minute }}" selected>{{ time_minute }}</option> 
+                                                                    {% else %}
+                                                                        <option value="{{ time_minute }}">{{ time_minute }}</option> 
+                                                                    {% endif %}                                                                                                                      
+                                                                {% endfor %}
+                                                            </select>
+                                                        </div> 
+                                                        <div class="col-span-12 sm:col-span-12">
+                                                            <label for="start" class="form-label w-96">End Date*  <p class='text-danger' id='id_date_error_message_{{ entry.id }}'></p></label>
+                                                            <input name='end_date' id="id_end_date_{{ entry.id }}" type="date" class="form-control" value="{{ entry.end_date|date:'Y-m-d' }}" required  max='{{ today|date:"Y-m-d" }}'>
+                                                        </div>
+                                                        <div class="col-span-12 sm:col-span-12">
+                                                            <label for="end" class="form-label w-48">End Time*</label>                                            
+                                                        </div>
+                                                        <div class="col-span-12 sm:col-span-12 form-inline">
+                                                            <label for="end" class="form-label w-48">Hour*</label>
+                                                            <select name='end_hour' id="end_hour"  class='form-select' required>
+                                                                <option></option>
+                                                                {% for time_choice in time_choices %}
+                                                                    {% if timechoice == entry.end|date:'H' %}
+                                                                        <option value="{{ time_choice }}" selected>{{ time_choice }}</option>  
+                                                                    {% else %}
+                                                                        <option value="{{ time_choice }}">{{ time_choice }}</option>  
+                                                                    {% endif %}
+                                                                                                                         
+                                                                {% endfor %}
+                                                            </select>
+                                                            <label for="end" class="form-label w-48">Minutes*</label>
+                                                            <select name='end_minutes' id="end_minutes"  class='form-select' required>
+                                                                <option></option>
+                                                                {% for time_minute in time_minutes %}
+                                                                    {% if time_minute == entry.end|date:'i' %}
+                                                                        <option value="{{ time_minute }}" selected>{{ time_minute }}</option> 
+                                                                    {% else %}
+                                                                        <option value="{{ time_minute }}">{{ time_minute }}</option> 
+                                                                    {% endif %}                                                
+                                                                {% endfor %}
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-span-12 sm:col-span-12">
+                                                            <label for="student_impression" class="form-label w-80">On a Scale of 1 to 5, how was the session?</label>
+                                                            <select required class='form-select' name='student_impression'>
+                                                                <option></option>
+                                                                {% if entry.student_impression == 1 %}
+                                                                    <option value="1" selected>1 - Best</option>
+                                                                    <option value="2">2</option>
+                                                                    <option value="3">3</option>
+                                                                    <option value="4">4</option>
+                                                                    <option value="5">5 - Not Good</option>
+                                                                {% elif entry.student_impression == 2 %}
+                                                                    <option value="1">1 - Best</option>
+                                                                    <option value="2" selected>2</option>
+                                                                    <option value="3">3</option>
+                                                                    <option value="4">4</option>
+                                                                    <option value="5">5 - Not Good</option>
+                                                                {% elif entry.student_impression == 3 %}
+                                                                    <option value="1">1 - Best</option>
+                                                                    <option value="2">2</option>
+                                                                    <option value="3" selected>3</option>
+                                                                    <option value="4">4</option>
+                                                                    <option value="5">5 - Not Good</option>
+                                                                {% elif entry.student_impression == 4 %}
+                                                                    <option value="1">1 - Best</option>
+                                                                    <option value="2">2</option>
+                                                                    <option value="3">3</option>
+                                                                    <option value="4" selected>4</option>
+                                                                    <option value="5">5 - Not Good</option>
+                                                                {% elif entry.student_impression == 5 %}
+                                                                    <option value="1">1 - Best</option>
+                                                                    <option value="2">2</option>
+                                                                    <option value="3">3</option>
+                                                                    <option value="4">4</option>
+                                                                    <option value="5" selected>5 - Not Good</option>
+                                                                {% else %}
+                                                                    <option value="1">1 - Best</option>
+                                                                    <option value="2">2</option>
+                                                                    <option value="3">3</option>
+                                                                    <option value="4">4</option>
+                                                                    <option value="5">5 - Not Good</option>                                                                
+                                                                {% endif %}
+                                                                
+                                                            </select>
+
+                                                        </div>   
+                                                        <div class="col-span-12 sm:col-span-12">
+                                                            <label for="student_comment" class="form-label w-80">Any Comments on how the Procedure was?*</label>
+                                                            <textarea name='student_comment' id="student_comment" type="text" class="form-control" required>{{ entry.student_comment }}</textarea>
+                                                        </div>  
+
+                                                        <div class="col-span-12 sm:col-span-12">
+                                                            <p class='text-danger' id='id_facility_message_{{ entry.id }}'></p>
+                                                        </div>
+
+                                                        <div class="col-span-12 sm:col-span-12">
+                                                            <label for="id_telephone" class="form-label w-48">What ward was your shift?*</label>
+                                                            <select name='facility_ward' id='id_ward_{{ entry.id }}' class='form-select' required>
+                                                                <option></option>
+                                                                {% for w in entry.fetch_healthcare_facility_wards %}
+                                                                    {% if w.id == entry.facility_ward_id %}
+                                                                        <option value="{{ w.id }}" selected>{{ w.ward.ward }}</option>
+                                                                    {% else %}
+                                                                        <option value="{{ w.id }}">{{ w.ward.ward }}</option>
+                                                                    {% endif %}                                                                                                                                    
+                                                                {% endfor %}                                                                
+                                                            </select>
+                                                        </div> 
+
+                                                
+                                                        <div class="col-span-12 sm:col-span-12">
+                                                            <label for="id_telephone" class="form-label w-48">What discipline was your shift?*</label>
+                                                            <select name='discipline' id='id_discipline_{{ entry.id }}' class='form-select' required>
+                                                                <option></option>
+                                                                {% for discipline in disciplines %}
+                                                                    {% if entry.discipline == discipline %}
+                                                                        <option value="{{ discipline.id }}" selected>{{ discipline.discipline }}</option>
+                                                                    {% else %}
+                                                                        <option value="{{ discipline.id }}">{{ discipline.discipline }}</option>
+                                                                    {% endif %}
+                                                                    
+                                                                {% endfor %}
+                                                            </select>
+                                                        </div> 
+                                                                   
+                                                    </div> <!-- END: Modal Body -->
+                                                    <!-- BEGIN: Modal Footer -->
+                                                    <div class="modal-footer"> 
+                                                        <p class='text-danger' id='id_error_message_{{ entry.id }}'></p>
+                                                        <button type="button" data-tw-dismiss="modal" class="btn btn-outline-secondary w-20 mr-1">Cancel</button> 
+                                                        <button id="edit_{{ entry.id }}" type="submit" class="btn btn-primary w-80">Edit</button> 
+                                                    </div> <!-- END: Modal Footer -->
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                               
+                            </td>
+                     
+                        </tr>
+                    
+                    {% empty %}
+                        <tr class="intro-x">
+                            <td colspan="8">
+                                Nothing Added
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="row">
+            <div class="col-lg-12 grid-margin stretch-card">
+                <div class="card">
+                  <div class="card-body">
+
+                    <nav>
+                    
+                      <ul class="pagination flex-wrap pagination-rounded">
+                        
+                        {% for i in months %}
+                          {% if selected_month == i.id %}
+                            <li class="active page-link"><span>{{ i.month }} <span class="sr-only">(current)</span></span></li>
+                          {% else %}
+                            <li class="page-item"><a class="page-link" href="{% url 'students:non_simulated_wil_logsheets' registration.id programme_block.id i.id %}">[ {{ i.month }} ]</a></li>
+                          {% endif %}
+                        {% endfor %}
+                        
+                      </ul>
+                    </nav>
+
+                </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

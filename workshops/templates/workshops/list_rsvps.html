@@ -1,0 +1,112 @@
+{% extends 'base_vertical.html' %}
+
+{% block main-content %}
+<div class="row">
+  <div class="col-md-12 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          <nav aria-label="breadcrumb">
+            <ol class="breadcrumb bg-inverse-info">
+              {% if user.is_authenticated and user.roles_id == 11 %}
+                <li class="breadcrumb-item"><a href="{% url 'psycad:dashboard' %}">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'psycad:workshop_create' %}">Add Workshop</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'psycad:workshop_list' %}">Workshops</a></li>
+                <li class="breadcrumb-item active" aria-current="page"><a>RSVPs</a></li>
+              {% elif user.is_authenticated and user.roles_id == 10 %}
+                <li class="breadcrumb-item"><a href="{% url 'psycad:dashboard' %}">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'psycad:workshop_create' %}">Add Workshop</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'psycad:workshop_list' %}">Workshops</a></li>
+                <li class="breadcrumb-item active" aria-current="page"><a>RSVPs</a></li>
+              {% endif %}
+            </ol>
+            </nav>
+
+            {% include 'messages.html' %}
+
+        </div>
+      </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-lg-12 grid-margin stretch-card">
+              <div class="card">
+                
+                
+                    <a href="{% url 'psycad:print_workshop_rsvps_excel' workshop.id %}" type="button" class="btn btn-secondary btn-icon-text btn-rounded pull-right"> <i class="ti-printer btn-icon-prepend"></i>Export Excel</a>
+                    <div class="table-responsive">
+                      <table class="table table-bordered">
+                        <thead>
+                          <tr>
+                            <th>Student Details</th>
+                            <th>Contacts</th>
+                            <th>Gender</th>
+                            <th>Race</th>
+                            <th>Nationality</th>
+                            <th>Employed</th>
+                            <th>Level</th>
+                            <th>Qualification</th>
+                            <th>View Student</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {% for selectee in rsvps %}
+                              <tr>                             
+                                <td>
+                                  <b>{{selectee.student.student_number}}</b><br><br>
+                                  {{selectee.student.name}} {{selectee.student.surname}}
+                                </td>
+                                <td>
+                                  <b>Email:</b> {{selectee.student.email}}<br><br>
+                                  <b>Cellphone:</b> {{selectee.student.contact_number}}
+                                </td>
+                                <td>
+
+                                    {% if selectee.student.gender == 1 %}
+                                      Male
+                                    {% else %}
+                                      Female
+                                    {% endif %}
+
+                                </td>
+                                <td>
+                                  {% if selectee.student.race == 1 %}Black{% elif selectee.student.race == 2 %}COLOURED{% elif selectee.student.race == 3 %}ASIAN{% elif selectee.student.race == 4 %}WHITE{% endif %}
+                                </td>
+
+                                <td> {{ selectee.student.nationality.countryName }} </td>
+                                <td>
+                                  {% if selectee.student.employed == 1 %}
+                                      <button type="button" class="btn btn-outline-success btn-rounded btn-icon">
+                                        <i class="ti-check"></i>
+                                      </button>
+                                  {% else %}
+                                      <button type="button" class="btn btn-outline-danger btn-rounded btn-icon">
+                                        <i class="ti-close"></i>
+                                      </button>
+                                  {% endif %}
+                                </td>
+                                <td>{{ selectee.student.level.level }}</td>
+                                <td>{{ selectee.student.qualification }}<br>{{ selectee.student.department.department }}</td>
+                                <td>
+                                  <a href="{% url 'mentor:print_cv' selectee.student.id %}" class="btn btn-outline-primary btn-rounded btn-icon" target="_blank" style="target-new: tab;">
+                                    <br><i class="fa fa-file-pdf-o"></i>
+                                  </a> | <a class="btn btn-outline-success  btn-rounded btn-icon" href="{% url 'cv:view_resume' selectee.student.id selectee.student.name %}" target="_blank" style="target-new: tab;">
+                                    <br><i class="ti-world"></i>
+                                  </a>
+                                </td>                              
+                              </tr>
+                          {% empty %}
+                              <tr><td colspan="10">Sorry no students have rsvp</td></tr>
+                          {% endfor %}
+                        </tbody>
+                      </table>
+                    </div>
+                
+              </div>
+            </div>
+          </div>
+
+{% endblock %}
+
+{% block js-content %}
+
+{% endblock %}

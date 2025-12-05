@@ -1,0 +1,91 @@
+{% extends 'base_tpl.html' %}
+
+{% block breadcrumb-content %}
+    <nav aria-label="breadcrumb" class="-intro-x mr-auto hidden sm:flex">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'administration:dashboard_lecturer' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'college:lecturer_learning_programme_cohorts' learning_programme.id %}">{{ learning_programme.programme_code }} Cohorts</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'college:lecturer_learning_programme_cohort_registration_periods' learning_programme_cohort.id %}">{{ learning_programme_cohort.title }} Registrations</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'college:lecturer_module_list' learning_programme_cohort_period.id %}">{{ learning_programme_cohort_period.title }} - Modules</a></li>
+            
+            <li class="breadcrumb-item active" aria-current="page">Students</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block main-content %}
+
+{% include 'messages.html' %}
+
+    <div class="intro-y p-5 mt-5">
+        
+        <div class="overflow-x-auto">
+            <table class="table table-report -mt-2">
+                <thead>
+                    <tr>
+                        <th class="whitespace-nowrap">#</th>                  
+                        <th class="whitespace-nowrap">Student</th> 
+                        {% for assessment in assessments %}
+                            <th class="whitespace-nowrap">{{ assessment.title }}</th>
+                        {% endfor %}
+                        <th class="whitespace-nowrap">Total</th>
+                        <th class="whitespace-nowrap">Average</th>
+                        <th class="whitespace-nowrap">%</th>
+                        <th class="whitespace-nowrap">Year Mark</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for l in students %}
+                    <tr class="intro-x">
+                        <td class="w-40">
+                            {{ forloop.counter }}
+                        </td>
+                        <td>
+                            {{ l.student.registration__student_learning_programme__student__student_number }}<br>
+                            {{ l.student.registration__student_learning_programme__student__first_name }} {{ l.registration__student_learning_programme__student__last_name }}<br>
+                            {{ l.student.registration__student_learning_programme__student__email }}
+                        </td>
+                        {% for assessment in l.assessments %}
+                            <td>
+                                {{ assessment.marks }}
+                            </td>
+                        {% endfor %}
+                         <td>
+                            Assignment: {{ l.assignment }}<br><br>
+                            Test:       {{ l.test }}
+                         </td>
+                         <td>
+                            Assignment: {{ l.assignment_avg }}<br><br>
+                            Test:       {{ l.test_avg }}
+                         </td>
+                         <td>
+                            Assignment: {{ l.assignment_percentage }}<br><br>
+                            Test:       {{ l.test_percentage }}
+                         </td>
+                         <td>
+                            {{ l.student.year_mark }}
+                         </td>
+                    </tr>
+                    {% empty %}
+                    <tr class="intro-x">
+                        <td colspan='10'>
+                            No students added yet
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    
+                <tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}
+
+
+{% block js-content %}
+
+<script type="text/javascript">
+   
+
+</script>
+
+{% endblock %}

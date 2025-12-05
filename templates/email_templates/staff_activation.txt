@@ -1,0 +1,15 @@
+Dear {{ name }} \n\n
+
+Welcome to the AHC SIMS Web Application.\n\n
+
+Your account has been activated successfully.\n\n
+
+Please use the following credentials to log on:\n\n
+
+Web Address: sims.ahcnc.co.za\n
+Username/Email Address: {{ email }}\n
+Passcode: {{ password }}\n\n
+
+Sincerely\n\n
+
+AHC SIMS Web Admin

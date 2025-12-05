@@ -1,0 +1,112 @@
+{% extends 'base_admin_view.html' %}
+
+{% block css-content %}
+
+<style type="text/css">
+
+table.timecard {
+	margin: auto;
+	width: 100%;
+	border-collapse: collapse;
+	border: 1px solid #fff; /*for older IE*/
+	border-style: solid;
+}
+
+table.timecard caption {
+	background-color: #f79646;
+	color: #fff;
+  font-size: 0.875rem;
+	font-weight: normal;
+	letter-spacing: .4em;
+}
+
+table.timecard thead th {
+	padding: 8px;
+	background-color: #ffffff;
+	font-size: 0.875rem;
+  font-weight: bold;
+}
+
+table.timecard thead th#thDay {
+	width: 40%;
+}
+
+table.timecard thead th#thRegular, table.timecard thead th#thOvertime, table.timecard thead th#thTotal {
+	width: 20%;
+}
+
+table.timecard th, table.timecard td {
+	padding: 10px;
+	border-width: 1px;
+	border-style: solid;
+}
+
+table.timecard td {
+	text-align: left;
+  font-size: 0.875rem;
+}
+
+table.timecard tbody th {
+	text-align: left;
+	font-weight: normal;
+}
+
+table.timecard tfoot {
+	font-weight: bold;
+	font-size: 0.875rem;
+	background-color: #687886;
+	color: #fff;
+}
+
+table.timecard tr.even {
+	background-color: #008080;
+}
+</style>
+
+
+{% endblock %}
+
+{% block main-content %}
+{% include 'messages.html' %}
+<div class="row">
+  <div class="col-lg-12 grid-margin">
+              <div class="card">
+                <div class="card-body">
+                  <h4 class="card-title">List of Recruitment Programs</h4>
+
+  <div class="table-responsive">
+    <table class="timecard table-bordered" id="">
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Description</th>
+          <th>Event Type</th>
+          <th>Details</th>
+          <th>Location</th>
+          <th>Registered</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for event in events %}
+          <tr>
+              <td>{{ event.title }}</td>
+              <td>{{ event.description }}</td>
+              <td>{{ event.type }}</td>
+              <td>{{ event.event_date }}<br>{{ event.event_time }}</td>
+              <td>{{ event.location }}</td>
+              <td>
+									<a href="{% url 'contact:event_registration_form_company' event.id %}" class="btn btn-warning btn-rounded btn-icon"> <br><i class="fa fa-thumbs-o-down"></i></a>
+							</td>
+          </tr>
+        {% empty %}
+        <tr><td colspan="6">No Recruitment Programs added</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+{% endblock %}

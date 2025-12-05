@@ -1,0 +1,90 @@
+{% extends 'base_vertical.html' %}
+
+{% block breadcrumb-content %}
+    <nav aria-label="breadcrumb" class="-intro-x h-full mr-auto">
+        <ol class="breadcrumb breadcrumb-light">
+            <li class="breadcrumb-item"><a href="{% url 'students:student_dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'students:student_learning_programmes' %}">Learning Programmes</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ learning_programme.programme_code }} Registrations</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block main-content %}
+
+{% include 'messages.html' %}
+
+<div class="intro-y flex items-center mt-8">
+    <h2 class="text-lg font-medium mr-auto">
+        {{ learning_programme.programme_code }} Registrations
+    </h2>
+</div>
+<div class="intro-y p-5 mt-5">
+        
+    <div class="overflow-x-auto">
+        <table class="table table-report -mt-2">
+            <thead>
+                <tr>
+                    <th class="whitespace-nowrap">#</th>     
+                    <th class="whitespace-nowrap">Academic Period</th>               
+                    <th class="whitespace-nowrap">Registration Period</th>
+                    <th class="whitespace-nowrap">Preferred Healthcare Facility</th>
+                    <th class="whitespace-nowrap">Time Table</th>
+                    <th class="whitespace-nowrap">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in items %}
+                    <tr class="intro-x">
+                        <td class="w-40">
+                            {{ forloop.counter }}
+                        </td>
+                        <td>
+                            {{ r.registration_period.period.period }}
+                        </td>
+                        <td>
+                            {{ r.registration_period.title }} 
+                        </td>
+                        <td>
+                            {{ r.preferred_healthcare_facility.name }}
+                        </td>
+                        <td></td>                               
+                        <td class="table-report__action">
+                            <div class="flex justify-center items-center">
+
+                                <div class="dropdown ml-auto sm:ml-0">
+                                    <button class="dropdown-toggle btn px-2 box" aria-expanded="false" data-tw-toggle="dropdown">
+                                        <span class="w-5 h-5 flex items-center justify-center"> <i class="w-4 h-4" data-lucide="plus"></i> </span>
+                                    </button>
+                                    <div class="dropdown-menu w-48">
+                                        <ul class="dropdown-content">
+                                            <li>
+                                                <a class="dropdown-item" href="{% url 'students:view_learner_programme_registration' student_learning_programme.id r.registration_period.id %}"> <i data-lucide="check-square" class="w-4 h-4 mr-1"></i> View Registration </a>
+                                            </li> 
+                                            <li>
+                                                <a class="dropdown-item" href="{% url 'students:student_view_logsheet' r.id %}"> <i data-lucide="files" class="w-4 h-4 mr-1"></i> WIL Logsheets </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item" href="{% url 'students:student_learning_programme_registrations_modules' r.id %}"> <i data-lucide="star" class="w-4 h-4 mr-1"></i> Registered Modules </a>
+                                            </li>   
+                                            <li>
+                                                <a class="dropdown-item" href="{% url 'students:view_learner_educational_plan' student_learning_programme.id r.id %}"> <i data-lucide="files" class="w-4 h-4 mr-1"></i> Education Plan </a>
+                                            </li>                                     
+                                        </ul>
+                                    </div>
+                                </div>
+                                
+                            </div>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr class="intro-x"><td colspan='8'>Nothing added yet</td></tr>
+                {% endfor %}
+                
+            <tbody>
+        </table>
+    </div>
+
+</div>
+
+{% endblock %}

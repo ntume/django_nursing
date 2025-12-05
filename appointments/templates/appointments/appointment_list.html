@@ -1,0 +1,367 @@
+{% extends 'base_vertical.html' %}
+{% load bootstrap3 %}
+
+{% block css-content %}
+
+<style type="text/css">
+
+table.timecard {
+	margin: auto;
+	width: 100%;
+	border-collapse: collapse;
+	border: 1px solid #fff; /*for older IE*/
+	border-style: solid;
+}
+
+table.timecard caption {
+	background-color: #f79646;
+	color: #fff;
+  font-size: 0.875rem;
+	font-weight: normal;
+	letter-spacing: .4em;
+}
+
+table.timecard thead th {
+	padding: 8px;
+	background-color: #ffffff;
+	font-size: 0.875rem;
+  font-weight: bold;
+}
+
+table.timecard thead th#thDay {
+	width: 40%;
+}
+
+table.timecard thead th#thRegular, table.timecard thead th#thOvertime, table.timecard thead th#thTotal {
+	width: 20%;
+}
+
+table.timecard th, table.timecard td {
+	padding: 10px;
+	border-width: 1px;
+	border-style: solid;
+}
+
+table.timecard td {
+	text-align: left;
+  font-size: 0.875rem;
+}
+
+table.timecard tbody th {
+	text-align: left;
+	font-weight: normal;
+}
+
+table.timecard tfoot {
+	font-weight: bold;
+	font-size: 0.875rem;
+	background-color: #687886;
+	color: #fff;
+}
+
+table.timecard tr.even {
+	background-color: #008080;
+}
+</style>
+
+
+{% endblock %}
+
+{% block main-content %}
+<div class="row">
+  <div class="col-md-12 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          <nav aria-label="breadcrumb">
+              <ol class="breadcrumb bg-inverse-info">
+                  <li class="breadcrumb-item"><a href="{% url 'psycad:dashboard' %}">Dashboard</a></li>
+                  <li class="breadcrumb-item active" aria-current="page"><a>Appointments </a></li>
+              </ol>
+            </nav>
+
+            {% include 'messages.html' %}
+
+        </div>
+      </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+					{% if student_liason %}
+					<div class="row">
+						<div class="col-md-9"></div>
+						<div class="col-md-3">
+							<a href="{% url 'psycad:siteconfig_appointments' %}" type="button" class="btn {% if site_appointments.value == "False" %}btn-danger{% else %}btn-primary{% endif %} btn-icon-text btn-rounded pull-right">Students Appointments: {% if site_appointments.value == "False" %}Disabled{% else %}Enabled{% endif %}</a>
+						</div>
+					</div>
+					{% endif %}
+<div class="row">
+  <div class="col-md-12 mx-auto">
+    <ul class="nav nav-pills nav-pills-custom" id="pills-tab-custom" role="tablist">
+      <li class="nav-item">
+        <a class="nav-link active" id="pills-home-tab-custom" data-toggle="pill" href="#pills-requests" role="tab" aria-controls="pills-home" aria-selected="true">
+          Pending Requests
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" id="pills-profile-tab-custom" data-toggle="pill" href="#pills-myappts" role="tab" aria-controls="pills-profile" aria-selected="false">
+          My Appointments
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" id="pills-contact-tab-custom" data-toggle="pill" href="#pills-calendar" role="tab" aria-controls="pills-profile" aria-selected="false">
+          Calendar View
+        </a>
+      </li>
+    </ul>
+    <div class="tab-content tab-content-custom-pill" id="pills-tabContent-custom">
+      <div class="tab-pane fade show active" id="pills-requests" role="tabpanel" aria-labelledby="pills-home-tab-custom">
+
+        <div class="table-responsive">
+          <table class="timecard table-striped table-bordered">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Student's Details</th>
+                <th>Description</th>
+                <th>Details</th>
+                <th>Category</th>
+                <th>Status</th>
+                <th>Feedback</th>
+                <th>Assigned</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for a in requests %}
+                <tr>
+                  <td>{{ forloop.counter }}</td>
+                  <td>
+										{{ a.student.name }} {{ a.student.surname }} <br>
+										{{ a.student.id_number }}<br>
+										{{ a.student.student_number }}<br>
+										{{ a.student.alternate_email }}<br>
+										{{ a.student.contact_number }}<br>
+                    {{ a.student.department.department }}<br>
+                    {{ a.student.department.faculty.faculty }}<br>
+										<b>{{ a.student.campus.campus }}</b>
+                  </td>
+                  <td>{{ a.description }}</td>
+                  <td>
+                    {{ a.appointment_date }}<br>
+                    {{ a.appointment_time_start }}<br><br>
+										<b>Contact Method:</b> {{ a.contact.contact }}
+
+                  </td>
+                  <td>{{ a.category.category }}</td>
+                  <td>{{ a.status }}</td>
+                  <td>{{ a.appointment_acceptance_feedback }}</td>
+                  <td>
+										{% if student_liason %}
+											<div class="badge badge-default badge-pill"><a href="#" data-toggle="modal" data-target="#{{ a.id }}_assigned">{% if a.assigned %}{{ a.assigned.first_name }}{% else %}Assign Consultant{% endif %}</a></div>
+
+											<div class="modal fade" id="{{ a.id }}_assigned" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true">
+	                      <div class="modal-dialog" role="document">
+	                        <div class="modal-content">
+	                          <div class="modal-header">
+	                            <h5 class="modal-title" id="ModalLabel">Assign Consultant</h5>
+	                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+	                              <span aria-hidden="true">&times;</span>
+	                            </button>
+	                          </div>
+	                          <form action="{% url 'psycad:appointment_assign' a.id %}" method="POST">
+	                            {% csrf_token %}
+	                          <div class="modal-body">
+
+	                              <div class="form-group">
+	                                <label for="id_status">Consultant (required)</label>
+	                                <select name="consultant" id="id_consultant" class="form-control">
+																		{% for c in consultants %}
+																			{% if c.email != "mark@wilms.co.za" and c.email != "gre@test.com" %}
+			                                  {% if c.user == a.assigned %}
+																					<option value="{{ c.id }}" selected>{{ c.first_name }} {{ c.last_name }}</option>
+																				{% else %}
+																					<option value="{{ c.id }}">{{ c.first_name }} {{ c.last_name }}</option>
+			                                  {% endif %}
+																			{% endif %}
+																		{% endfor %}
+	                                </select>
+	                              </div>
+
+	                          </div>
+	                          <div class="modal-footer">
+	                            <button type="submit" class="btn btn-success">Assign Consultant</button>
+	                            <button type="button" class="btn btn-light" data-dismiss="modal">Close</button>
+	                          </div>
+	                          </form>
+	                        </div>
+	                      </div>
+	                    </div>
+
+										{% else %}
+											<div class="badge badge-primary badge-pill">{{ a.assigned.first_name }}</div>
+										{% endif %}
+
+									<!--
+										{% if a.assigned %}
+											<div class="badge badge-primary badge-pill">{{ a.assigned.first_name }}</div>
+										{% else %}
+											<a href="{% url 'psycad:appointment_accept' a.id %}" class="btn btn-warning btn-rounded btn-icon" data-toggle="tooltip" data-placement="right" title="Click to accept this appointment. This appointment will be added to your list"> <br><i class="fa fa-thumbs-o-down"></i></a>
+										{% endif %}
+									-->
+                  </td>
+                </tr>
+                {% empty %}
+                  <tr><td colspan="8">Sorry you do not have any assigned appointments</td></tr>
+                {% endfor %}
+
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+      <div class="tab-pane fade" id="pills-myappts" role="tabpanel" aria-labelledby="pills-profile-tab-custom">
+
+        <div class="table-responsive">
+          <table class="timecard table-striped table-bordered">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Student</th>
+                <th>Description</th>
+                <th>Details</th>
+                <th>Category</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for a in my_appointments %}
+                <tr>
+                  <td>{{ forloop.counter }}</td>
+                  <td>
+                    {{ a.student.name }} {{ student.surname }}
+                    <br>
+										{{ a.student.id_number }}<br>
+                    {{ a.student.email }} / {{ a.student.alternate_email }}
+                    <br>
+                    {{ a.student.department.department }}
+                    <br>
+                    {{ a.student.department.faculty.faculty }}
+										<br>
+										<b>{{ a.student.campus.campus }}</b>
+                  </td>
+                  <td>{{ a.description }}</td>
+                  <td>
+                    {{ a.appointment_date }}<br>
+                    {{ a.appointment_time_start }}
+                  </td>
+                  <td>{{ a.category.category }}</td>
+                  <td>{{ a.status }}</td>
+                </tr>
+
+              {% empty %}
+                <tr><td colspan="8">Sorry you do not have any assigned appointments</td></tr>
+              {% endfor %}
+
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+      <div class="tab-pane fade" id="pills-calendar" role="tabpanel" aria-labelledby="pills-contact-tab-custom">
+
+        <div class="row">
+          <div class="col-md-3">
+            <div class="fc-external-events">
+              {% for a in my_appointments %}
+                  <div class='fc-event'>
+										<p>{{ a.category.category }}</p>
+                    <p class="small-text">{{ a.description }}</p>
+                    <p class="text-muted mb-0">{{ a.appointment_date }} at {{ a.appointment_time_start }}</p>
+                  </div>
+              {% empty %}
+                  <div class='fc-event'>
+                    <p class="small-text">No Appointments Accepted</p>
+                  </div>
+              {% endfor %}
+              <hr>
+              {% for a in requests %}
+
+              <div class='fc-event'>
+                <p class="small-text">{{ a.category.category }}</p>
+                <p class="small-text">{{ a.description }}</p>
+                <p class="text-muted mb-0">{{ a.appointment_date }} at {{ a.appointment_time_start }}</p>
+              </div>
+
+              {% endfor %}
+            </div>
+          </div>
+          <div class="col-md-9">
+            <div class="card">
+              <div class="card-body">
+                <h4 class="card-title">Fullcalendar</h4>
+                <div id="calendar" class="full-calendar"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+</div></div>
+
+{% endblock %}
+
+
+{% block js-content  %}
+
+<script src='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/bootstrap/main.min.js'></script>
+
+  <script type="text/javascript">
+    (function($) {
+      'use strict';
+      $(function() {
+        if ($('#calendar').length) {
+          $('#calendar').fullCalendar({
+            header: {
+              left: 'prev,next today',
+              center: 'title',
+              right: 'month,basicWeek,basicDay'
+            },
+            defaultDate: '{{ today }}',
+            navLinks: true, // can click day/week names to navigate views
+            editable: true,
+            eventLimit: true, // allow "more" link when too many events
+            events: [
+              {% for a in my_appointments %}
+                {
+                  title: '{{ a.category.category }}\n{{ a.status }}',
+                  start: '{{ a.appointment_date|date:"Y-m-d" }}T{{ a.appointment_time_start|date:"h:i:s" }}',
+                  color: '#40316E'
+                },
+              {% endfor %}
+
+              {% for a in requests %}
+              {
+                title: '{{ a.category.category }}\n{{ a.status }}',
+                start: '{{ a.appointment_date|date:"Y-m-d" }}T{{ a.appointment_time_start|date:"h:i:s" }}',
+                color: 'orange'
+              },
+              {% endfor %}
+            ]
+          })
+        }
+      });
+    })(jQuery);
+
+
+
+  </script>
+
+{% endblock %}

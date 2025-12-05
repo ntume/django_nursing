@@ -1,0 +1,101 @@
+{% extends 'base_tpl.html' %}
+
+{% block breadcrumb-content %}
+    <nav aria-label="breadcrumb" class="-intro-x mr-auto hidden sm:flex">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'administration:dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'college:learning_programme_cohorts' learning_programme.id %}">{{ learning_programme.programme_code }} Cohorts</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'college:learning_programme_cohort_registration_periods' learning_programme_cohort.id %}">{{ learning_programme_cohort.title }} Registrations</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'college:learning_programme_cohort_registration_modules' learning_programme_cohort_period.id %}">{{ learning_programme_cohort_period.title }} Modules</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'college:learning_programme_cohort_registration_module_students' learning_programme_cohort_period.id module.id %}">{{  module.module.module_code }} Students</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Moderation Report</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block main-content %}
+
+<div class="intro-y flex flex-col sm:flex-row items-center mt-8">
+    <h2 class="text-lg font-medium mr-auto">
+        {{ module.module.module_code }} {{ module.module.module_name }} Moderation report
+    </h2>
+    
+</div>
+
+    <div class="intro-y p-5 mt-5">
+        
+        <div class="overflow-x-auto">
+            <table class="table table-report -mt-2">
+                <thead>
+                    <tr>
+                        <th>#</th> 
+                        <th>CRITERIA</th>
+                        <th>OUTCOME</th>   
+                        <th>REMARKS</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for entry in assessment %}                        
+                        
+                        {% if entry.question_type == 'Heading' %}
+                            <tr class="intro-x">                                        
+                                <td>
+                                    {{ entry.number }}
+                                </td>
+                                <td colspan='3'><b>{{ entry.criteria }}</b></td>                                         
+                            </tr>
+                        {% elif entry.question_type == 'Note' %}
+                            <tr class="intro-x">
+                                    
+                                <td>{{ entry.number }}</td>
+                                <td colspan='3'>{{ entry.criteria }}</td>                                         
+                            </tr>
+                        {% elif entry.question_type == 'Question' %}
+                            <tr class="intro-x">                                    
+                                <td>{{ entry.number }}</td>
+                                <td>{{ entry.criteria }}</td>
+                                <td>{{ entry.answer_answer }}</td>            
+                                <td>{{ entry.answer_comment }}</td>
+                            </tr>
+                        {% endif %}
+                    
+                    {% empty %}
+                        <tr class="intro-x">
+                            <td colspan="4">
+                                Moderation not Done
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td><div id='messages_attachments_comments'></div></td>
+                        <td>Moderator's Comments</td>
+                        <td colspan='2'>{{ report.comment }}</td>
+                    </tr>
+                    <tr>
+                        <td><div id='messages_attachments_feedback'></div></td>
+                        <td>Moderator's Feedback</td>
+                        <td colspan='2'>{{ report.moderators_feedback }}</td>
+                    </tr>
+                    <tr>
+                        <td><div id='messages_attachments_recommendations'></div></td>
+                        <td>Moderator's Recommendations</td>
+                        <td colspan='2'>{{ report.recommendations }}</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+{% endblock %}
+
+
+{% block js-content %}
+
+<script type="text/javascript">
+    
+   
+
+</script>
+
+{% endblock %}

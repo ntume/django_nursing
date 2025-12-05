@@ -1,0 +1,264 @@
+{% extends 'accounts/accounts_base.html' %}
+{% load bootstrap3 %}
+{% load static %}
+
+{% block main-content %}
+<div class="container-fluid page-body-wrapper">
+    <div class="main-panel">
+      <div class="content-wrapper">
+        <div class="row grid-margin">
+          <div class="col-12">
+
+            {% include 'messages.html' %}
+
+            <div class="card">
+              <div class="card-body">
+              <div class="brand-logo" style="margin: 0 auto;width: 100%; text-align: center">
+                <img src="{% static 'images/logo.png' %}" alt="logo"><br><br>
+                <h4>New here?</h4>
+                <h6 class="font-weight-light">Signing up is easy. It only takes a few steps. Input your student number in the textbox below and search for your details</h6>
+              </div><br>
+
+
+                <form method="post" class="pt-3" action="{% url 'accounts:student_signup' %}">
+                  {% csrf_token %}
+
+                  <div class="row" style="margin: 0 auto;width: 100%; text-align: center">
+                    <div class="col-md-9">
+                      <div class="form-group row">
+                        <label class="col-sm-3 col-form-label">Student Number</label>
+                        <div class="col-sm-9">
+                          {% bootstrap_field form.student_number show_label=False %}
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <button type="button" class="btn btn-success btn-icon-text" id="checkstud" name="checkstud">
+                        <i class="ti-search btn-icon-prepend"></i>
+                        Search
+                      </button>
+                    </div>
+                  </div>
+
+                  <div id="div_studentinfo" style="display: none;">
+
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="form-group row">
+                        <label class="col-sm-3 col-form-label">Campus</label>
+                        <div class="col-sm-9">
+                          {% bootstrap_field form.campus show_label=False %}
+                        </div>
+                      </div>
+                  </div>
+                    <div class="col-md-6">
+                      <div class="form-group row">
+                        <label class="col-sm-3 col-form-label">ID Number</label>
+                        <div class="col-sm-9">
+                          {% bootstrap_field form.id_number show_label=False %}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="form-group row">
+                        <label class="col-sm-3 col-form-label">Name</label>
+                        <div class="col-sm-9">
+                          {% bootstrap_field form.name show_label=False %}
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="form-group row">
+                        <label class="col-sm-3 col-form-label">Surname</label>
+                        <div class="col-sm-9">
+                          {% bootstrap_field form.surname show_label=False %}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="form-group row">
+                        <label class="col-sm-3 col-form-label">Gender</label>
+                        <div class="col-sm-9">
+                          {% bootstrap_field form.gender show_label=False %}
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="form-group row">
+                        <label class="col-sm-3 col-form-label">Race</label>
+                        <div class="col-sm-9">
+                          {% bootstrap_field form.race show_label=False %}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="form-group row">
+                        <label class="col-sm-3 col-form-label">Contact Number</label>
+                        <div class="col-sm-9">
+                          {% bootstrap_field form.contact_number show_label=False %}
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="form-group row">
+                        <label class="col-sm-3 col-form-label">Personal Email (Not UJ Email)</label>
+                        <div class="col-sm-9">
+                          {% bootstrap_field form.alternate_email show_label=False %}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="form-group row">
+                        <label class="col-sm-3 col-form-label">Employed</label>
+                        <div class="col-sm-9">
+                          {% bootstrap_field form.employed show_label=False %}
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="form-group row">
+                        <label class="col-sm-3 col-form-label">Nationality</label>
+                        <div class="col-sm-9">
+                          {% bootstrap_field form.nationality show_label=False %}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="form-group row">
+                        <label class="col-sm-3 col-form-label">Study Level</label>
+                        <div class="col-sm-9">
+                          {% bootstrap_field form.level show_label=False %}
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="form-group row">
+                        <label class="col-sm-3 col-form-label">Department</label>
+                        <div class="col-sm-9">
+                          <select name="department" class="form-control" title="" required id="id_department">
+                            {% for faculty in faculties %}
+                              <optgroup label="{{ faculty.faculty }}">
+                                {% for department in faculty.departments.all %}
+                                  <option value="{{ department.id }}">{{ department.department }}</option>
+                                {% endfor %}
+                              </optgroup>
+                            {% endfor %}
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div class="row">
+                    <div class="col-md-12">
+                      <h4>POPI Compliance / Privacy Notice</h4>
+                      <div class="form-group">
+                        <label class="form-check-label col-md-12">
+                          <input type="checkbox" class="form-check-input" name="consent" id="id_consent" required>
+                          I give UJCareerWiz consent to collect and process my information.
+                        </label>
+                      </div>
+                      <div class="form-group">
+                        <label class="form-check-label col-md-12">
+                          <input type="checkbox" class="form-check-input" name="use" id="id_use" required>
+                          UJCareerWiz will use my information for career guidance and for finding employment.
+                        </label>
+                      </div>
+                      <div class="form-group">
+                        <label class="form-check-label col-md-12">
+                          <input type="checkbox" class="form-check-input" name="share" id="id_share" required>
+                          UJCareerWiz will only share your personal information and CV with companies that have posted jobs that you have applied for.
+                        </label>
+                      </div>
+                      <div class="form-group">
+                        <label class="form-check-label col-md-12">
+                          <input type="checkbox" class="form-check-input" name="delete" id="id_delete" required>
+                          I can delete my account and information from UJCareerWiz at any point I want to.
+                        </label>
+                      </div>
+                    </div>                    
+                  </div>
+                  
+                  <div class="brand-logo" style="margin: 0 auto;width: 100%; text-align: center">
+                  <input type="submit" class="btn btn-primary" name="" value="Sign Up">
+                </div>
+              </div>
+                <br>
+                </form>
+                <div class="brand-logo" style="margin: 0 auto;width: 100%; text-align: center">
+                    <h4>Already have an account?</h4>
+                    <h4 class="font-weight-light"><a href="{% url 'accounts:login' %}">Login here</a></h4>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+  <!-- content-wrapper ends -->
+    </div>
+  <!-- page-body-wrapper ends -->
+  </div>
+{% endblock %}
+
+{% block js-content %}
+
+<script type="text/javascript">
+
+    $(document).ready(function(){
+      $('#checkstud').on('click', function(){ // This event fires when a button is clicked
+          var student_number = $( "#id_student_number" ).val();
+
+          $.ajax({ // ajax call starts
+            url: "{% url 'accounts:ajax_student_validate' %}", // JQuery loads serverside.php
+            data: 'student_number=' + student_number, // Send value of the clicked button
+            dataType: 'json', // Choosing a JSON datatype
+          })
+          .done(function(data) { // Variable data contains the data we get from serverside
+
+               if(data.valid == 1){
+
+                    document.getElementById("div_studentinfo").style.display = "block";
+
+                    $( "#id_surname" ).val( data.surname );
+                    $( "#id_department" ).val( data.department );
+                    $( "#id_contact_number" ).val( data.contact_number );
+                }
+               else if(data.valid == 0){
+                    $( "#student_number" ).val("");
+                    alert(data.message);
+
+                    document.getElementById("div_studentinfo").style.display = "none";
+               }
+               else if(data.valid == 2){
+                    alert(data.message);
+
+                    $( "#id_surname" ).val( "" );
+                    $( "#id_department" ).val( "" );
+                    $( "#id_contact_number" ).val( "" );
+
+                    document.getElementById("div_studentinfo").style.display = "block";
+               }
+          });
+         // or $(this).val()
+        return false; // keeps the page from not refreshing
+      });
+    });
+</script>
+
+
+{% endblock %}

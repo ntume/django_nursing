@@ -1,0 +1,112 @@
+{% extends 'base_tpl.html' %}
+
+{% block breadcrumb-content %}
+    <nav aria-label="breadcrumb" class="-intro-x mr-auto hidden sm:flex">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'administration:dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ learning_programme.programme_code }} Cohorts</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block main-content %}
+
+{% include 'messages.html' %}
+
+
+    <div class="intro-y flex flex-col sm:flex-row items-center mt-8">
+        <h2 class="text-lg font-medium mr-auto">
+            {{ learning_programme.programme_name }} Cohorts
+        </h2>
+        <div class="w-full sm:w-auto flex mt-4 sm:mt-0">
+            <button data-tw-toggle="modal" data-tw-target="#add-modal"  class="btn btn-primary shadow-md mr-2">Add Cohort</button>
+
+            <div id="add-modal" class="modal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <form action="{% url 'college:learning_programme_cohort_add' learning_programme.id %}" method="POST">
+                            {% csrf_token %}
+                            <!-- BEGIN: Modal Header -->
+                            <div class="modal-header">
+                                <h2 class="font-medium text-base mr-auto">Add Cohort</h2>                                             
+                            </div> <!-- END: Modal Header -->
+                            <!-- BEGIN: Modal Body -->
+                            <div class="modal-body grid grid-cols-12 gap-4 gap-y-3">
+                                <div class="col-span-12 sm:col-span-12"> 
+                                    <label for="modal-form-1" class="form-label">Title*</label> 
+                                    <input id="title" name='title' type="text" class="form-control" placeholder="Title" required maxlength='50'> 
+                                </div>
+                                <div class="col-span-12 sm:col-span-12"> 
+                                    <label for="modal-form-1" class="form-label">Start Date*</label> 
+                                    <input id="start_date" name='start_date' type="date" class="form-control" placeholder="Start Date" required > 
+                                </div>
+                                <div class="col-span-12 sm:col-span-12"> 
+                                    <label for="modal-form-1" class="form-label">End Date*</label> 
+                                    <input id="end_date" name='end_date' type="date" class="form-control" placeholder="End Date" required > 
+                                </div>
+                                                                                           
+                            </div> <!-- END: Modal Body -->
+                            <!-- BEGIN: Modal Footer -->
+                            <div class="modal-footer"> 
+                                <button type="button" data-tw-dismiss="modal" class="btn btn-outline-secondary w-20 mr-1">Cancel</button> 
+                                <button type="submit" class="btn btn-primary w-40">Add Cohort</button> 
+                            </div> <!-- END: Modal Footer -->
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="intro-y p-5 mt-5">
+        
+        <div class="overflow-x-auto">
+            <table class="table table-report -mt-2">
+                <thead>
+                    <tr>
+                        <th class="whitespace-nowrap">#</th>                    
+                        <th class="whitespace-nowrap">Title</th>
+                        <th class="whitespace-nowrap">Start Date</th>
+                        <th class="whitespace-nowrap">End Date</th>
+                        <th class="whitespace-nowrap">#Learners</th>
+                        <th class="whitespace-nowrap">Registration Periods</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in items %}
+                    <tr class="intro-x">
+                        <td class="w-40">
+                            {{ forloop.counter }}
+                        </td>
+                        <td>
+                            {{ r.title }}
+                        </td>
+                        <td>
+                            {{ r.start_date }}
+                        </td>
+                        <td>
+                            {{ r.end_date }}
+                        </td>
+                        <td>
+                            <i data-lucide="users" class="w-4 h-4 mr-1"></i> {{ r.students.count }} Students                               
+                        </td>
+                                            
+                      
+                        <td class="table-report__action">
+                            <div class="flex">
+                                <a class="flex items-center mr-3" href="{% url 'students:requested_leave_cohorts_registrations' r.id %}"> <i data-lucide="activity" class="w-4 h-4 mr-1"></i> Registration periods </a>
+                                
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr class="intro-x"><td colspan='6'>Nothing added yet</td></tr>
+                    {% endfor %}
+                    
+                <tbody>
+            </table>
+        </div>
+    </div>
+
+{% endblock %}

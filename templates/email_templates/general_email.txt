@@ -1,0 +1,7 @@
+Dear {{ name }}\n\n
+
+{{ email_body }}\n\n
+
+Sincerely\n\n
+
+AHC SIMS Web Admin

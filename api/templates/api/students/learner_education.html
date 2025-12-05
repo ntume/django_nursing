@@ -1,0 +1,106 @@
+<form action="{% url 'api:edit_learner_education_details' lp.id %}" method='POST'>
+    {% csrf_token %}  
+    <div class="font-medium text-base">Education Details</div>
+    <div class="grid grid-cols-12 gap-4 gap-y-5 mt-5"> 
+        <div class="intro-y col-span-12 sm:col-span-6">
+            <label for="id_first_name" class="form-label w-full">Highest NQF Level Attained</label>
+            <select name="highest_nqf_level" id="id_highest_nqf_level" class=-"form-select" {{ lp_edit }}>
+                <option></option>
+                {% for nqf in nqf_levels  %}
+                    {% if lp.student.highest_nqf_level_id == nqf.id %}
+                        <option value="{{ nqf.id }}" selected>NQF Level: {{ nqf.nqf_level }} {{ nqf.description }}</option>
+                    {% else %}
+                        <option value="{{ nqf.id }}">NQF Level: {{ nqf.nqf_level }} {{ nqf.description }}</option>
+                    {% endif %}
+                {% endfor %}    
+            </select>
+        </div> 
+
+        <div class="intro-y col-span-12 sm:col-span-6">
+            <label for="id_highest_qualification" class="form-label w-full">Title of your highest qualification?*</label>
+            <input name='highest_qualification' id="id_highest_qualification" type="text" class="form-control" placeholder="Highest Qualification" value='{{ lp.student.highest_qualification|default_if_none:"" }}' required {{ lp_edit }}>
+        </div>   
+
+        <div class="intro-y col-span-12 sm:col-span-6">
+            <label for="id_marticulated" class="form-label w-full">Have you matriculated from high school</label>
+            <select name="marticulated" id="id_marticulated" class="form-select" required {{ lp_edit }}>
+                <option></option>
+                {% if lp.student.marticulated == "Yes" %}
+                    <option value="Yes" selected>Yes</option>
+                    <option value="No">No</option>
+                {% elif lp.student.marticulated == "No" %}
+                    <option value="Yes">Yes</option>
+                    <option value="No" selected>No</option>
+                {% else %}
+                    <option value="Yes">Yes</option>
+                    <option value="No">No</option>
+                {% endif %}
+            </select>
+        </div> 
+
+        <div class="intro-y col-span-12 sm:col-span-6" id = "div_marticulated_sa" {% if lp.student.marticulated == "Yes" %} style="display:block" {% else %} style="display:none" {% endif %}>
+            <label for="id_marticulated_sa" class="form-label w-full">Did you matriculate in South Africa</label>
+            <select name="marticulated_sa" id="id_marticulated_sa" class="form-select" {{ lp_edit }}>
+                <option></option>
+                {% if lp.student.marticulated_sa == "Yes" %}
+                    <option value="Yes" selected>Yes</option>
+                    <option value="No">No</option>
+                {% elif lp.student.marticulated_sa == "No" %}
+                    <option value="Yes">Yes</option>
+                    <option value="No" selected>No</option>
+                {% else %}
+                    <option value="Yes">Yes</option>
+                    <option value="No">No</option>
+                {% endif %}
+            </select>
+        </div>
+
+        <div class="intro-y col-span-12 sm:col-span-6" id = "div_high_school_province" {% if lp.student.marticulated_sa == "Yes" %} style="display:block" {% else %} style="display:none" {% endif %}>
+            <label for="id_high_school_province" class="form-label w-full">Province High School Marticulated from</label>
+            <select name="province" id="id_province_highschool" class="form-select" {{ lp_edit }}>
+                <option></option>
+                {% for p in provinces %}
+                    {% if lp.student.high_school_code %}
+                        {% if p.id == lp.student.high_school_code.ProvinceCD_id %}
+                            <option value="{{ p.id }}" selected>{{ p.province }}</option>
+                        {% else %}
+                            <option value="{{ p.id }}">{{ p.province }}</option>
+                        {% endif %}
+                    {% else %}
+                        <option value="{{ p.id }}">{{ p.province }}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="intro-y col-span-12 sm:col-span-6" id = "div_high_school" {% if lp.student.marticulated_sa == "Yes" %} style="display:block" {% else %} style="display:none" {% endif %}>
+            <label for="id_high_school_province" class="form-label w-full">Select High School Marticulated from</label>
+            <select name="high_school_code" id="id_high_school_code" class="form-select" {{ lp_edit }}>
+                {% if lp.student.high_school_code %}
+                    {% for code in lp.student.fetch_schools_province %}
+                        {% if lp.student.high_school_code_id == code.id %}
+                            <option value="{{ code.id }}" selected>{{ code.Official_Institution_Name }}</option>
+                        {% else %}
+                            <option value="{{ code.id }}">{{ code.Official_Institution_Name }}</option>
+                        {% endif %}                    
+                    {% endfor %}
+                {% endif %}
+            </select>
+        </div>
+
+        <div class="intro-y col-span-12 sm:col-span-6" id = "div_high_school_name" {% if lp.student.marticulated_sa == "No" %} style="display:block" {% else %} style="display:none" {% endif %}>
+            <label for="id_high_school" class="form-label w-full">High school Marticulated from</label>
+            <input name='high_school' id="id_high_school" type="text" class="form-control" placeholder="High school Marticulated From" value='{{ lp.student.high_school|default_if_none:"" }}' {{ lp_edit }}>
+        </div>   
+
+        <div class="intro-y col-span-12 sm:col-span-6" id = "div_year_national_certificate" style="display:none">
+            <label for="id_year_national_certificate" class="form-label w-full">Year of National Senior Certificate</label>
+            <input min="2000" name='year_national_certificate' id="id_year_national_certificate" type="number" class="form-control" placeholder="Year National Senior Certificate" value='{{ lp.student.year_national_certificate|default_if_none:"" }}'  maxlength="4" {{ lp_edit }}>
+        </div> 
+        
+        <div class="intro-y col-span-12 flex items-center justify-center sm:justify-end mt-5">
+            <a href="{% url 'api:open_onboarding' lp.id lp.student.slug previous_page %}" class="btn btn-secondary w-24">Previous</a>
+            <button type='submit' class="btn btn-primary w-24 ml-2">Next</button>
+        </div>
+    </div>
+</form>

@@ -1,0 +1,142 @@
+<div class="overflow-x-auto">
+    <table class="table table-report -mt-2">
+        <thead>
+            <tr>
+                <th class="whitespace-nowrap">#</th>                    
+                <th class="whitespace-nowrap">Assessment Criteria</th>
+                <th class="whitespace-nowrap">Type of Question</th>
+                <th class="whitespace-nowrap">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for r in items %}
+            <tr class="intro-x">
+                <td class="w-40">
+                    {{ r.original_number }}
+                </td>
+                <td>
+                    {{ r.question }}
+                </td>
+                <td>
+                    {{ r.question_type }}
+                </td>
+                
+              
+                <td class="table-report__action w-56">
+                    <div class="flex justify-center items-center">
+                        <a class="flex items-center mr-3" href="javascript:;" data-tw-toggle="modal" data-tw-target="#edit-modal_{{ r.id }}"> <i data-lucide="check-square" class="w-4 h-4 mr-1"></i> Edit </a>
+                        <div id="edit-modal_{{ r.id }}" class="modal" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <form action="{% url 'configurable:clinical_procedure_assessment_edit' task.id r.id %}" method="POST">
+                                        {% csrf_token %}
+                                        <!-- BEGIN: Modal Header -->
+                                        <div class="modal-header">
+                                            <h2 class="font-medium text-base mr-auto">Clinical Procedure</h2>                                             
+                                        </div> <!-- END: Modal Header -->
+                                        <!-- BEGIN: Modal Body -->
+                                        <div class="modal-body grid grid-cols-12 gap-4 gap-y-3">
+                                            <div class="col-span-12 sm:col-span-12"> 
+                                                <label for="modal-form-1" class="form-label">Number*</label> 
+                                                <input id="number" name='number' type="text" class="form-control" value="{{ r.original_number }}" required maxlength='10'> 
+                                            </div>  
+                                            <div class="col-span-12 sm:col-span-12"> 
+                                                <label for="modal-form-1" class="form-label">Text*</label> 
+                                                <textarea id="question" name='question' type="text" class="form-control" placeholder="Question Text" required>{{ r.question }}</textarea> 
+                                            </div>    
+                                            <div class="col-span-12 sm:col-span-12"> 
+                                                <label for="modal-form-1" class="form-label">Text Type*</label> 
+                                                <select name='question_type' id='question_type' class='form-select' required>
+                                                    <option></option>
+                                                    {% if r.question_type == 'Heading'  %}
+                                                        <option value='Heading' selected>Heading</option>
+                                                        <option value='Note'>Note</option>
+                                                        <option value='Question'>Question</option>
+                                                    {% elif r.question_type == 'Note' %}
+                                                        <option value='Heading'>Heading</option>
+                                                        <option value='Note' selected>Note</option>
+                                                        <option value='Question'>Question</option>
+                                                    {% elif r.question_type == 'Question' %}
+                                                        <option value='Heading'>Heading</option>
+                                                        <option value='Note'>Note</option>
+                                                        <option value='Question' selected>Question</option>
+                                                    {% else %}
+                                                        <option value='Heading'>Heading</option>
+                                                        <option value='Note'>Note</option>
+                                                        <option value='Question'>Question</option>
+                                                    {% endif %}
+                                                    
+                                                </select>
+                                            </div>
+                                            
+                                            <div class="col-span-12 sm:col-span-12"> 
+                                                <label for="modal-form-1" class="form-label">Penalty*</label> 
+                                                <select name='penalty' id='penalty' class='form-select' required>
+                                                    <option></option>
+                                                    {% if r.penalty == '0' %}
+                                                        <option value='0' selected>0</option>
+                                                        <option value='10'>-10</option>
+                                                        <option value='50'>-50</option>
+                                                    {% elif r.penalty == '10'  %}
+                                                        <option value='0'>0</option>
+                                                        <option value='10' selected>-10</option>
+                                                        <option value='50'>-50</option>
+                                                    {% elif r.penalty == '50'  %}
+                                                        <option value='0'>0</option>
+                                                        <option value='10'>-10</option>
+                                                        <option value='50' selected>-50</option>
+                                                    {% else %}
+                                                        <option value='0'>0</option>
+                                                        <option value='10'>-10</option>
+                                                        <option value='50'>-50</option>
+                                                    {% endif %}
+                                                    
+                                                </select>
+                                            </div>
+                                              
+                                                                           
+                                        </div> <!-- END: Modal Body -->
+                                        <!-- BEGIN: Modal Footer -->
+                                        <div class="modal-footer"> 
+                                            <button type="button" data-tw-dismiss="modal" class="btn btn-outline-secondary w-20 mr-1">Cancel</button> 
+                                            <button type="submit" class="btn btn-primary w-40">Edit</button> 
+                                        </div> <!-- END: Modal Footer -->
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <a class="flex items-center text-danger" href="javascript:;" data-tw-toggle="modal" data-tw-target="#delete-confirmation-modal_{{ r.id }}"> <i data-lucide="trash-2" class="w-4 h-4 mr-1"></i> Delete </a>
+                        <div id="delete-confirmation-modal_{{ r.id }}" class="modal" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-body p-0">
+                                        <form action="{% url 'configurable:clinical_procedure_assessment_delete' task.id r.id %}" method="POST">
+                                            {% csrf_token %}
+                                            <div class="p-5 text-center">
+                                                <i data-lucide="x-circle" class="w-16 h-16 text-danger mx-auto mt-3"></i> 
+                                                <div class="text-3xl mt-5">Are you sure?</div>
+                                                <div class="text-slate-500 mt-2">
+                                                    Do you really want to delete this record? 
+                                                    <br>
+                                                    This process cannot be undone.
+                                                </div>
+                                            </div>
+                                            <div class="px-5 pb-8 text-center">
+                                                <button type="button" data-tw-dismiss="modal" class="btn btn-outline-secondary w-24 mr-1">Cancel</button>
+                                                <button type="submit" class="btn btn-danger w-24">Delete</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr class="intro-x"><td colspan='4'>Nothing added yet</td></tr>
+            {% endfor %}
+            
+        <tbody>
+    </table>
+</div>

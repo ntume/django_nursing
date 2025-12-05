@@ -1,0 +1,63 @@
+<div class="border border-slate-200/60 dark:border-darkmode-400 rounded-md p-5 mt-5">
+    {% if lp.learning_programme.intervention.intervention.grant == "University Placement" %}
+        <mark class="p-3 bg-yellow-200">Please add the university or HEI that the learners are doing their course with and will issue out their diploma/qualification upon completion of the WIL programme</mark><br><br>    
+    {% endif %}
+    {% if lp.learning_programme.intervention.intervention.grant == "TVET Placement Programmes" %}
+        <mark class="p-3 bg-yellow-200">Please add the TVET institution that the learner was attending for their N certificates</mark><br><br>    
+    {% endif %}
+    {% if lp.learning_programme.intervention.intervention.grant == "Bursaries" %}
+        <mark class="p-3 bg-yellow-200">Please add the institution that the learner is currently registered with</mark><br><br>    
+    {% endif %}
+    {% if lp.learning_programme.intervention.intervention.grant == "Internship Programmes" %}
+        <mark class="p-3 bg-yellow-200">Please add the institution that the learner graduated from needs to be captured on this section</mark><br><br>    
+    {% endif %}
+    {% if user.logged_in_role_id == 24 or user.logged_in_role_id == 46 %}<mark class="p-3 bg-success text-white"><a target="_blank" href="{% url 'lpd:lp_training_providers' lp.learning_programme.id %}">To add a training provider, please click here</a></mark><br><br>{% endif %}
+    <div class="font-medium flex items-center border-b border-slate-200/60 dark:border-darkmode-400 pb-5"> <i data-lucide="chevron-down" class="w-4 h-4 mr-2"></i> Training Provider </div>
+    
+    
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Training Provider</th>
+                <th>Accreditation Number</th>
+                <th>Registration Number</th>
+                <th>SDL Number</th>
+                <th>Selected</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for tp in lp.learning_programme.training_providers.all %}
+                <tr>                
+                    <td>{{ tp.training_provider.name }}</td>
+                    <td>{{ tp.training_provider.accreditation_number }}</td>
+                    <td>{{ tp.training_provider.registration_number }}</td>
+                    <td>{{ tp.training_provider.sdl_number }}</td>
+                    <td>
+
+                        {% if user.logged_in_role_id == 24 or user.logged_in_role_id == 46 %}
+
+                            {% if tp == lp.training_provider %}
+                                <a href="{% url 'lpd:save_learner_training_provider' lp.id tp.id %}" class="btn btn-success mr-1 mb-2 text-white"> <i data-lucide="check" class="w-5 h-5"></i> </a>
+                            {% else %}
+                                <a href="{% url 'lpd:save_learner_training_provider' lp.id tp.id %}" class="btn btn-danger mr-1 mb-2 text-white"> <i data-lucide="x" class="w-5 h-5"></i> </a>
+                            {% endif %}
+
+                        {% else %}
+
+                            {% if tp == lp.training_provider %}
+                                <a class="btn btn-success mr-1 mb-2 text-white"> <i data-lucide="check" class="w-5 h-5"></i> </a>
+                            {% else %}
+                                <a class="btn btn-danger mr-1 mb-2 text-white"> <i data-lucide="x" class="w-5 h-5"></i> </a>
+                            {% endif %}
+
+                        {% endif %}
+                        
+                    </td>                
+                </tr>
+            {% empty %}
+                <tr><td colspan="5"><mark class="p-1 bg-success text-white"><a target="_blank" href="{% url 'lpd:lp_training_providers' lp.learning_programme.id %}">No Training Providers Added, please click here</a></mark></td></tr>
+            {% endfor %}
+        </tbody>
+
+    </table>
+</div>

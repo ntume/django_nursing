@@ -1,0 +1,60 @@
+<div class="grid grid-cols-2 gap-4 mt-5 border-dashed border-2 border-indigo-600 px-8 py-8">
+    <table>
+        <tr>
+            <td class="font-medium">Learner Details</td>
+            <td>
+                {% if learner_completed %}
+                    <button class="btn btn-success mr-1 mb-2 text-white"> <i data-lucide="check-square" class="w-4 h-4 mr-2"></i> Complete</button> 
+                {% else %}
+                    <button class="btn btn-danger mr-1 mb-2 text-white"> <i data-lucide="x-square" class="w-4 h-4 mr-2"></i> Pending</button> 
+                {% endif %}                            
+            </td>
+            <td>{% if not learner_completed %}{{ learner_reason|safe }}{% endif %}</td>
+            <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+        </tr>
+                 
+    </table>                
+</div>
+
+<div class="intro-y col-span-12 flex items-center justify-center sm:justify-end mt-5">
+    <a href="{% url 'api:open_onboarding' lp.id lp.student.slug previous_page %}" class="btn btn-secondary w-24">Previous</a>
+    <button {% if not learner_completed %} disabled {% endif %} data-tw-toggle="modal" data-tw-target="#confirm-submission-modal" class="btn {% if learner_completed %}  btn-warning {% else %} btn-secondary {% endif %} btn-primary w-80 ml-2  text-white">Submit Onboarding Form</button>
+    <!-- BEGIN: Modal Content -->
+    <div id="confirm-submission-modal" class="modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-body p-4">
+                    <form action="{% url 'api:submit_onboarding_details' lp.id %}" method="POST" onsubmit="btnSubmit.disabled = true;btnSubmit.innerHTML ='Submitting Application...'; return true;">
+                        {% csrf_token %}
+                    <div class="p-5 text-center"> <i data-lucide="info" class="w-16 h-16 text-warning mx-auto mt-3"></i>
+                        <div class="text-3xl mt-5">Submit OnBoarding</div>
+                        <div class="text-slate-500 mt-2">Are you sure you want to submit? Please inout your password below.</div>
+                    </div>
+                    <div>
+                        
+                        <div class="col-span-12 sm:col-span-12 mt-5"> 
+                            <label for="physical_address_1" class="form-label">Password </label> 
+                            <input id="password" name='password' type="password" class="form-control" value="" required> 
+                        </div>  
+                        <div class="col-span-12 sm:col-span-12 mt-5"> 
+                            <label for="physical_address_1" class="form-label">Repeat Password </label> 
+                            <input id="password2" name='password2' type="password" class="form-control" value="" required> 
+                        </div> 
+                    </div>
+                    
+                    <div class="px-5 pb-8 text-center mt-5"> 
+                        
+                        
+                            <button type="button" data-tw-dismiss="modal" class="btn btn-outline-secondary w-24 mr-1">Cancel</button>
+                            <button type="submit" class="btn btn-warning w-80 text-white" name="btnSubmit">Submit OnBoarding Form</button>
+                        
+                    </div>
+                </form>
+                </div>
+            </div>
+        </div>
+    </div> <!-- END: Modal Content -->      
+    
+    
+   
+</div>

@@ -1,0 +1,387 @@
+{% extends 'base.html' %}
+{% load bootstrap3 %}
+{% load static %}
+
+{% block main-content %}
+      <div class="row">
+            <div class="col-12">
+              {% include 'messages.html' %}
+              <div class="card">
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col-lg-4">
+                      <div class="border-bottom text-center pb-4">
+
+                        <img src="{% if student.profile_pic %}{{student.profile_pic.url}}{% else %}https://via.placeholder.com/92x92{% endif %}" alt="profile" class="img-lg rounded-circle mb-3"/>
+                        <button class="btn btn-primary btn-block mb-2" data-toggle="modal" data-target="#updateprofilepic" >Update Profile Picture</button>
+                        <div class="modal fade" id="updateprofilepic" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true">
+                      <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="ModalLabel">Update Profile Picture</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                              <span aria-hidden="true">&times;</span>
+                            </button>
+                          </div>
+                          <form action="{% url 'student:update_profile_picture' student.id %}" method="POST" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <div class="modal-body">
+                              <p>Please select an image to upload as your profile pciture. As this is for your CV and potential employers will view your profile, please select an appropriate picture like a passport photo of size 92 X 92</p>
+                                <div class="form-group">
+                                  <label for="recipient-name" class="col-form-label">Profile Picture:</label>
+                                  {% bootstrap_field form.profile_pic show_label=False %}
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                              <button type="submit" class="btn btn-primary">Update Profile Picture</button>
+                              <button type="button" class="btn btn-light" data-dismiss="modal">Close</button>
+                            </div>
+                          </form>
+                        </div>
+                      </div>
+                    </div>
+                        <div class="mb-3">
+                          <h3>{{ student.name }} {{ student.surname }}</h3>
+                          <h5>{{ student.email }}</h5>
+                          <div class="align-items-center">
+                            <h5 class="mb-0 mr-2 text-muted">{{ student.nationality.countryName }}</h5>
+                          </div>
+                        </div>
+                        <form id="editable-form" class="editable-form">
+                          <a href="#" id="student_bio" data-type="textarea" data-pk="{{student.id}}" data-title="Enter a short bio" data-url="{% url 'student:updatebio' student.id %}" data-params="{csrfmiddlewaretoken:'{{csrf_token}}'}">{{ student.bio }}</a>
+                        </form>
+
+                      </div>
+                      <div class="border-bottom py-4">
+                        <p>Skills</p>
+                        <div>
+                          {% for skill in student.cv_skills.all %}
+                            <label class="badge badge-outline-dark">{{skill.skill}}</label>
+                          {% empty %}
+                            <label class="badge badge-outline-dark">Sorry no Skills added yet, head over to: <a href="{% url 'student:cv' student.id %}">Update CV</a></label>
+                          {% endfor %}
+
+                        </div>
+                      </div>
+
+                      <div class="border-bottom py-4">
+                        <p>Languages</p>
+                        <p>
+                          <form action="{% url 'student:add_language' student.id %}" method="POST">
+                            {% csrf_token %}
+                            <select name="language_id" class="form-control">
+                              <option>Add Language from List</option>
+                              {% for language in languages %}
+                                <option value="{{language.id}}">{{language.language}}</option>
+                              {% endfor %}
+                            </select>
+                            <input type="submit" value="Add Langauge" class="btn btn-warning btn-sm">
+                          </form>
+                        </p>
+                        <div>
+                          {% for language in student.languages.all %}
+                            <label class="badge badge-outline-dark">{{language.language}}</label>
+                          {% empty %}
+                            <label class="badge badge-outline-dark">Sorry no languages added yet</label>
+                          {% endfor %}
+
+                        </div>
+                      </div>
+
+                      <button class="btn btn-primary btn-block mb-2" data-toggle="modal" data-target="#updatepassword" >Update Password</button>
+                      <div class="modal fade" id="updatepassword" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title" id="ModalLabel">Update Password</h5>
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                          </button>
+                        </div>
+                        <form action="{% url 'student:update_password' %}" method="POST">
+                          {% csrf_token %}
+                          <div class="modal-body">
+                              <div class="form-group">
+                                <label for="recipient-name" class="col-form-label">New Password:</label>
+                                <input type="password" class="form-control" name="new_password">
+                              </div>
+                              <div class="form-group">
+                                <label for="message-text" class="col-form-label">Repeat Password:</label>
+                                <input type="password" class="form-control" name="repeat_password">
+                              </div>
+                          </div>
+                          <div class="modal-footer">
+                            <button type="submit" class="btn btn-success">Update Password</button>
+                            <button type="button" class="btn btn-light" data-dismiss="modal">Close</button>
+                          </div>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                    </div>
+                    <div class="col-lg-8">
+                      <!--<div class="d-flex justify-content-between">
+                        <div>
+                          <button class="btn btn-outline-primary">Message</button>
+                          <button class="btn btn-primary">Request</button>
+                        </div>
+                      </div>-->
+                      <div class="mt-4 py-2 border-top border-bottom">
+                        <ul class="nav profile-navbar">
+                          <li class="nav-item">
+                            <a class="nav-link active" href="{% url 'student:profile' %}">
+                              <i class="ti-user"></i>
+                              Profile
+                            </a>
+                          </li>
+                          <li class="nav-item">
+                            <a class="nav-link active" href="{% url 'student:update_email_preferences' %}">
+                              <i class="ti-email"></i>
+                              Email Preferences
+                            </a>
+                          </li>
+                          <!--<li class="nav-item">
+                            <a class="nav-link" href="#">
+                              <i class="ti-calendar"></i>
+                              Agenda
+                            </a>
+                          </li>
+                          <li class="nav-item">
+                            <a class="nav-link" href="#">
+                              <i class="ti-clip"></i>
+                              Resume
+                            </a>
+                          </li>-->
+                        </ul>
+                      </div>
+                      <div class="profile-feed">
+                        <div class="align-items-start profile-feed-item">
+                          <form action="{% url 'student:update_profile' student.id %}" method="POST" class="cmxform">
+                            {% csrf_token %}
+
+                              <div class="form-group">
+                                <label for="name">Name (required)</label>
+                                <input id="name" class="form-control" name="name" minlength="2" type="text" value="{{student.name}}" required>
+                              </div>
+                              <div class="form-group">
+                                <label for="surname">Surname (required)</label>
+                                <input id="surname" class="form-control" name="surname" minlength="2" type="text" value="{{student.surname}}" required>
+                              </div>
+                              <div class="form-group">
+                                <label for="id_number">ID / Passport Number (required)</label>
+                                <input id="id_number" class="form-control" name="id_number" minlength="2" type="text" value="{{student.id_number}}" required>
+                              </div>
+                              <div class="form-group">
+                                <label for="student_number">Student Number (required)</label>
+                                <input id="student_number" class="form-control" name="student_number" minlength="2" type="number" value="{{student.student_number}}" required>
+                              </div>
+                              <div class="form-group">
+                                <label for="gender">Gender (required)</label>
+                                <select class="form-control" name="gender" id="gender">
+                                  {% if student.gender == 1%}
+                                    <option value="1" selected>Male</option>
+                                    <option value="2">Female</option>
+                                  {% else %}
+                                    <option value="1">Male</option>
+                                    <option value="2" selected>Female</option>
+                                  {% endif %}
+                                </select>
+                              </div>
+                              <div class="form-group">
+                                <label for="race">Race (required)</label>
+                                <select class="form-control" name="race" id="race">
+                                  {% if student.race == 1 %}
+                                    <option value="1" selected>BLACK</option>
+                                    <option value="2">COLOURED</option>
+                                    <option value="3">ASIAN</option>
+                                    <option value="4">WHITE</option>
+                                  {% elif student.race == 2 %}
+                                    <option value="1">BLACK</option>
+                                    <option value="2" selected>COLOURED</option>
+                                    <option value="3">ASIAN</option>
+                                    <option value="4">WHITE</option>
+                                  {% elif student.race == 3 %}
+                                    <option value="1">BLACK</option>
+                                    <option value="2">COLOURED</option>
+                                    <option value="3" selected>ASIAN</option>
+                                    <option value="4">WHITE</option>
+                                  {% else %}
+                                  <option value="1">BLACK</option>
+                                  <option value="2">COLOURED</option>
+                                  <option value="3">ASIAN</option>
+                                  <option value="4" selected>WHITE</option>
+                                  {% endif %}
+                                </select>
+                              </div>
+                              <div class="form-group">
+                                <label for="disability">Disability (required)</label>
+                                <select class="form-control" name="disability" id="disability">
+                                  {% if student.disability == 1%}
+                                    <option value="1" selected>Yes</option>
+                                    <option value="2">No</option>
+                                  {% else %}
+                                    <option value="1">Yes</option>
+                                    <option value="2" selected>No</option>
+                                  {% endif %}
+                                </select>
+                              </div>
+                              <div class="form-group">
+                                <label for="disabilityspecify">Specify Disability</label>
+                                <input id="disabilityspecify" class="form-control" name="disabilityspecify" minlength="2" type="text" value="{{student.disabilityspecify}}">
+                              </div>
+                              <div class="form-group">
+                                <label for="contact_number">Contact Number (required)</label>
+                                <input id="contact_number" class="form-control" name="contact_number" minlength="2" type="text" value="{{student.contact_number}}" required>
+                              </div>
+                              <div class="form-group">
+                                <label for="alternate_email">Alternate Email (required)</label>
+                                <input id="id_alternate_email" class="form-control" name="alternate_email" type="email" value="{{student.alternate_email}}" required>
+                              </div>
+                              <div class="form-group">
+                                <label for="employed">Employed (required)</label>
+                                <select class="form-control" name="employed" id="employed">
+                                  {% if student.employed == 1%}
+                                    <option value="1" selected>Yes</option>
+                                    <option value="2">No</option>
+                                  {% else %}
+                                    <option value="1">Yes</option>
+                                    <option value="2" selected>No</option>
+                                  {% endif %}
+                                </select>
+                              </div>
+                              <div class="form-group">
+                                <label for="driverslicence">Drivers Licence (required)</label>
+                                <select class="form-control" name="driverslicence" id="driverslicence">
+                                  {% if student.driverslicence == 1%}
+                                    <option value="1" selected>Yes</option>
+                                    <option value="2">No</option>
+                                  {% else %}
+                                    <option value="1">Yes</option>
+                                    <option value="2" selected>No</option>
+                                  {% endif %}
+                                </select>
+                              </div>
+                              <div class="form-group">
+                                <label for="department_id">Department (required)</label>
+                                <select class="form-control" name="department_id" id="department_id">
+                                  {% for faculty in faculties %}
+                                    <optgroup label = "{{ faculty.faculty }}">
+                                    {% for department in faculty.departments.all %}
+                                      {% if student.department_id == department.id %}
+                                        <option value="{{department.id}}" selected>{{department.department}}</option>
+                                      {% else %}
+                                        <option value="{{department.id}}">{{department.department}}</option>
+                                      {% endif %}
+                                    {% endfor %}
+                                  {% endfor %}
+                                </select>
+                              </div>
+                              <div class="form-group">
+                                <label for="level_id">Academic Level (required)</label>
+                                <select class="form-control" name="level_id" id="level_id">
+                                  <option></option>
+                                  {% for level in levels %}
+                                    {% if student.level_id == level.id %}
+                                      <option value="{{level.id}}" selected>{{level.level}}</option>
+                                    {% else %}
+                                      <option value="{{level.id}}">{{level.level}}</option>
+                                    {% endif %}
+                                  {% endfor %}
+                                </select>
+                              </div>
+                              <div class="form-group">
+                                <label for="level_id">Degree Choice (required)</label>
+                                <select class="form-control" name="degree_choice" id="id_degree_choice" required>
+                                  <option></option>
+                                  {% for degree in degree_choices %}
+                                    {% if student.degree_choice_id == degree.id %}
+                                      <option value="{{degree.id}}" selected>{{degree.degree}}</option>
+                                    {% else %}
+                                      <option value="{{degree.id}}">{{degree.degree}}</option>
+                                    {% endif %}
+                                  {% endfor %}
+                                </select>
+                              </div>
+                              <div class="form-group">
+                                <label for="disabilityspecify">Qualification</label>
+                                <input id="id_qualification" class="form-control" name="qualification" minlength="2" type="text" value="{{student.qualification}}">
+                              </div>
+                              <div class="form-group">
+                                <label for="campus_id">Campus (required)</label>
+                                <select class="form-control" name="campus_id" id="campus_id">
+                                  <option></option>
+                                  {% for c in campuses %}
+                                    {% if student.campus_id == c.id %}
+                                      <option value="{{c.id}}" selected>{{c.campus}}</option>
+                                    {% else %}
+                                      <option value="{{c.id}}">{{c.campus}}</option>
+                                    {% endif %}
+                                  {% endfor %}
+                                </select>
+                              </div>
+                              <div class="form-group">
+                                <label for="language_id">First Language (required)</label>
+                                <select class="form-control" name="language_id" id="language_id">
+                                  <option></option>
+                                  {% for language in languages %}
+                                    {% if student.language_id == language.id %}
+                                      <option value="{{language.id}}" selected>{{language.language}}</option>
+                                    {% else %}
+                                      <option value="{{language.id}}">{{language.language}}</option>
+                                    {% endif %}
+                                  {% endfor %}
+                                </select>
+                              </div>
+                              <div class="form-group">
+                                <label for="nationality_id">Region (required)</label>
+                                <select class="form-control" name="region" id="region_id">
+                                  <option></option>
+                                  {% for region in regions %}
+                                    {% if student.region_id == region.id %}
+                                      <option value="{{region.id}}" selected>{{region.region}}</option>
+                                    {% else %}
+                                      <option value="{{region.id}}">{{region.region}}</option>
+                                    {% endif %}
+                                  {% endfor %}
+                                </select>
+                              </div>
+                              <div class="form-group">
+                                <label for="nationality_id">Nationality (required)</label>
+                                <select class="form-control" name="nationality_id" id="nationality_id">
+                                  <option></option>
+                                  {% for nationality in countries %}
+                                    {% if student.nationality_id == nationality.id %}
+                                      <option value="{{nationality.id}}" selected>{{nationality.countryName}}</option>
+                                    {% else %}
+                                      <option value="{{nationality.id}}">{{nationality.countryName}}</option>
+                                    {% endif %}
+                                  {% endfor %}
+                                </select>
+                              </div>
+                              <div class="form-group">
+                                <label for="bio">Tell us about yourself (required)</label>
+                                <textarea name="bio" id="bio" class="form-control" required>{{student.bio}}</textarea>
+                              </div>
+                              <div class="form-group">
+                                <label for="address">Address (required)</label>
+                                <textarea name="address" id="v" class="form-control" required>{{student.address}}</textarea>
+                              </div>
+                              <div class="form-group">
+                                <input class="btn btn-primary" type="submit" value="Update Profile">
+                              </div>
+
+                          </form>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+{% endblock %}
+
+{% block js-content %}
+    <script src="{% static 'js/x-editable.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,454 @@
+<ul>
+  <li>
+      <a href="javascript:;" class="side-menu side-menu{{ dash_menu }}">
+          <div class="side-menu__icon">
+              <i data-tw-merge="" data-lucide="home" class="stroke-1.5 w-5 h-5"></i>
+          </div>
+          <div class="side-menu__title">
+              Dashboard
+              <div class="side-menu__sub-icon transform rotate-180">
+                  <i data-tw-merge="" data-lucide="chevron-down" class="stroke-1.5 w-5 h-5"></i>
+              </div>
+          </div>
+      </a>
+  </li>
+
+  <li class="my-6 side-nav__divider"></li>
+  <li>
+      <a href="javascript:;" class="side-menu side-menu{{ cohort_menu }}">
+          <div class="side-menu__icon">
+              <i data-tw-merge="" data-lucide="edit" class="stroke-1.5 w-5 h-5"></i>
+          </div>
+          <div class="side-menu__title">
+              Learner Cohorts
+              <div class="side-menu__sub-icon ">
+                  <i data-tw-merge="" data-lucide="chevron-down" class="stroke-1.5 w-5 h-5"></i>
+              </div>
+          </div>
+      </a>
+      <ul class="">
+        {% for programme in MENU_PROGRAMMES %}
+            <li>
+                <a href="{% url 'college:learning_programme_cohorts' programme.id %}" class="side-menu">
+                    <div class="side-menu__icon">
+                        <i data-tw-merge="" data-lucide="activity" class="stroke-1.5 w-5 h-5"></i>
+                    </div>
+                    <div class="side-menu__title">
+                        {{ programme.programme_code }}
+                    </div>
+                </a>
+            </li>
+          {% endfor %}
+      
+      </ul>
+  </li>
+
+
+
+<li>
+    <a href="{% url 'appointments:appointments_my_list' %}" class="side-menu side-menu{{ appt_menu }}">
+        <div class="side-menu__icon">
+            <i data-tw-merge="" data-lucide="calendar" class="stroke-1.5 w-5 h-5"></i>
+        </div>
+        <div class="side-menu__title">
+            Appointment Requests
+            
+        </div>
+    </a>
+</li>
+
+<li>
+    <a href="javascript:;" class="side-menu side-menu{{ facility_bookings_menu }}">
+        <div class="side-menu__icon">
+            <i data-tw-merge="" data-lucide="building" class="stroke-1.5 w-5 h-5"></i>
+        </div>
+        <div class="side-menu__title">
+            Facility Bookings            
+            <div class="side-menu__sub-icon ">
+                  <i data-tw-merge="" data-lucide="chevron-down" class="stroke-1.5 w-5 h-5"></i>
+              </div>
+        </div>
+    </a>
+    <ul class="{{ facility_bookings_menu_open }}">
+
+        <li>
+            <a href="{% url 'facilities:facility_bookings' %}" class="side-menu side-menu{{ facility_admin_menu_open }}">
+                <div class="side-menu__icon"> <i data-tw-merge="" data-lucide="activity" class="stroke-1.5 w-5 h-5"></i> </div>
+                <div class="side-menu__title">Administrator Bookings</div>
+            </a>
+        </li>
+
+        <li>
+            <a href="{% url 'facilities:facility_booking_staff_list' %}" class="side-menu side-menu{{ facility_book_menu_open }}">
+                <div class="side-menu__icon"> <i data-tw-merge="" data-lucide="activity" class="stroke-1.5 w-5 h-5"></i> </div>
+                <div class="side-menu__title">Request Facility</div>
+            </a>
+        </li>
+         
+      </ul>
+</li>
+
+<li>
+    <a href="javascript:;" class="side-menu side-menu{{ resource_bookings_menu }}">
+        <div class="side-menu__icon">
+            <i data-tw-merge="" data-lucide="activity" class="stroke-1.5 w-5 h-5"></i>
+        </div>
+        <div class="side-menu__title">
+            Resource Bookings    
+            <div class="side-menu__sub-icon ">
+                  <i data-tw-merge="" data-lucide="chevron-down" class="stroke-1.5 w-5 h-5"></i>
+              </div>        
+        </div>
+    </a>
+    <ul class="{{ resource_bookings_menu_open }}">
+
+        <li>
+            <a href="{% url 'resources:resource_bookings' %}" class="side-menu side-menu{{ resource_admin_menu_open }}">
+                <div class="side-menu__icon"> <i data-tw-merge="" data-lucide="activity" class="stroke-1.5 w-5 h-5"></i> </div>
+                <div class="side-menu__title">Administrator Bookings</div>
+            </a>
+        </li>
+
+        <li>
+            <a href="{% url 'resources:resource_booking_staff_list' %}" class="side-menu side-menu{{ resource_book_menu_open }}">
+                <div class="side-menu__icon"> <i data-tw-merge="" data-lucide="activity" class="stroke-1.5 w-5 h-5"></i> </div>
+                <div class="side-menu__title">Request Resource</div>
+            </a>
+        </li>
+         
+      </ul>
+</li>
+
+  <li class="my-6 side-nav__divider text-white">WEB Admin Tasks</li>
+  <li>
+      <a href="{% url 'college:college_campuses' %}" class="side-menu side-menu{{ campus_menu }}">
+          <div class="side-menu__icon">
+              <i data-tw-merge="" data-lucide="building" class="stroke-1.5 w-5 h-5"></i>
+          </div>
+          <div class="side-menu__title">
+              Campus
+              
+          </div>
+      </a>
+  </li>
+  <li>
+    <a href="{% url 'college:health_care_facilities' %}" class="side-menu side-menu{{ health_care_facility_menu }}">
+        <div class="side-menu__icon">
+            <i data-tw-merge="" data-lucide="building" class="stroke-1.5 w-5 h-5"></i>
+        </div>
+        <div class="side-menu__title">
+            Healthcare Facilities
+            
+        </div>
+    </a>
+  </li>
+  <li>
+      <a href="{% url 'college:staff_list' %}" class="side-menu side-menu{{ staff_menu }}">
+          <div class="side-menu__icon">
+              <i data-tw-merge="" data-lucide="users" class="stroke-1.5 w-5 h-5"></i>
+          </div>
+          <div class="side-menu__title">
+              Staff Management
+          </div>
+      </a>
+  </li>
+  <li>
+      <a href="{% url 'college:learning_programmes' %}" class="side-menu side-menu{{ learning_programme_menu }}">
+          <div class="side-menu__icon">
+              <i data-tw-merge="" data-lucide="hard-drive" class="stroke-1.5 w-5 h-5"></i>
+          </div>
+          <div class="side-menu__title">
+              Learning Programmes
+          </div>
+      </a>
+  </li>
+  <li>
+    <a href="{% url 'college:moderators' %}" class="side-menu side-menu{{ moderator_menu }}">
+        <div class="side-menu__icon">
+            <i data-tw-merge="" data-lucide="users" class="stroke-1.5 w-5 h-5"></i>
+        </div>
+        <div class="side-menu__title">
+            Moderators Management
+        </div>
+    </a>
+</li>
+  <!--<li>
+    <a href="{% url 'college:registration_period_list' %}" class="side-menu side-menu{{ registration_period_menu_open }}">
+        <div class="side-menu__icon">
+            <i data-tw-merge="" data-lucide="calendar" class="stroke-1.5 w-5 h-5"></i>
+        </div>
+        <div class="side-menu__title">
+            Registration Periods
+        </div>
+    </a>
+  </li>-->
+  <li>
+    <a href="{% url 'announcements:announcement_list' %}" class="side-menu side-menu{{ announcement_menu_open }}">
+        <div class="side-menu__icon">
+            <i data-tw-merge="" data-lucide="megaphone" class="stroke-1.5 w-5 h-5"></i>
+        </div>
+        <div class="side-menu__title">
+            General Announcements
+        </div>
+    </a>
+  </li>
+
+  <li class="my-6 side-nav__divider"></li>
+  <li>
+      <a href="javascript:;" class="side-menu side-menu{{ facilities_menu }}">
+          <div class="side-menu__icon">
+              <i data-tw-merge="" data-lucide="inbox" class="stroke-1.5 w-5 h-5"></i>
+          </div>
+          <div class="side-menu__title">
+              Facility Management
+              <div class="side-menu__sub-icon ">
+                  <i data-tw-merge="" data-lucide="chevron-down" class="stroke-1.5 w-5 h-5"></i>
+              </div>
+          </div>
+      </a>
+      <ul class="{{ facilities_menu_open }}">
+
+
+
+        <li>
+            <a href="{% url 'facilities:activities' %}" class="side-menu side-menu{{ activity_menu_open }}">
+                <div class="side-menu__icon"> <i data-tw-merge="" data-lucide="activity" class="stroke-1.5 w-5 h-5"></i> </div>
+                <div class="side-menu__title">Activities</div>
+            </a>
+        </li>
+
+        <li>
+            <a href="{% url 'facilities:facilities' %}" class="side-menu side-menu{{ facility_menu_open }}">
+                <div class="side-menu__icon"> <i data-tw-merge="" data-lucide="activity" class="stroke-1.5 w-5 h-5"></i> </div>
+                <div class="side-menu__title">Facilities</div>
+            </a>
+        </li>
+         
+      </ul>
+  </li>
+  <li class="my-6 side-nav__divider"></li>
+  <li>
+      <a href="javascript:;" class="side-menu side-menu{{ resources_menu }}">
+          <div class="side-menu__icon">
+              <i data-tw-merge="" data-lucide="inbox" class="stroke-1.5 w-5 h-5"></i>
+          </div>
+          <div class="side-menu__title">
+              Resource Management
+              <div class="side-menu__sub-icon ">
+                  <i data-tw-merge="" data-lucide="chevron-down" class="stroke-1.5 w-5 h-5"></i>
+              </div>
+          </div>
+      </a>
+      <ul class="{{ resources_menu_open }}">
+
+        <li>
+            <a href="{% url 'resources:resources' %}" class="side-menu side-menu{{ resources_menu_open }}">
+                <div class="side-menu__icon"> <i data-tw-merge="" data-lucide="activity" class="stroke-1.5 w-5 h-5"></i> </div>
+                <div class="side-menu__title">Resources</div>
+            </a>
+        </li>
+         
+      </ul>
+  </li>
+
+  
+
+  <li class="my-6 side-nav__divider"></li>
+  <li>
+      <a href="javascript:;" class="side-menu side-menu{{ config_menu }}">
+          <div class="side-menu__icon">
+              <i data-tw-merge="" data-lucide="inbox" class="stroke-1.5 w-5 h-5"></i>
+          </div>
+          <div class="side-menu__title">
+              Configurables
+              <div class="side-menu__sub-icon ">
+                  <i data-tw-merge="" data-lucide="chevron-down" class="stroke-1.5 w-5 h-5"></i>
+              </div>
+          </div>
+      </a>
+      <ul class="{{ config_menu_open }}">
+
+        <li>
+            <a href="{% url 'configurable:languages' %}" class="side-menu side-menu{{ languag_menu_open }}">
+                <div class="side-menu__icon"> <i data-tw-merge="" data-lucide="activity" class="stroke-1.5 w-5 h-5"></i> </div>
+                <div class="side-menu__title"> Language </div>
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'configurable:gender' %}" class="side-menu side-menu{{ gender_menu_open }}">
+                <div class="side-menu__icon"> <i data-tw-merge="" data-lucide="activity" class="stroke-1.5 w-5 h-5"></i> </div>
+                <div class="side-menu__title"> Gender </div>
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'configurable:races' %}" class="side-menu side-menu{{ race_menu_open }}">
+                <div class="side-menu__icon"> <i data-tw-merge="" data-lucide="activity" class="stroke-1.5 w-5 h-5"></i> </div>
+                <div class="side-menu__title"> Race </div>
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'configurable:economic_status' %}" class="side-menu side-menu{{ economic_status_menu_open }}">
+                <div class="side-menu__icon"> <i data-tw-merge="" data-lucide="activity" class="stroke-1.5 w-5 h-5"></i> </div>
+                <div class="side-menu__title"> Economic Status </div>
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'configurable:disabilities' %}" class="side-menu side-menu{{ disability_menu_open }}">
+                <div class="side-menu__icon"> <i data-tw-merge="" data-lucide="activity" class="stroke-1.5 w-5 h-5"></i> </div>
+                <div class="side-menu__title"> Disability </div>
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'configurable:residential_status' %}" class="side-menu side-menu{{ residential_menu_open }}">
+                <div class="side-menu__icon"> <i data-tw-merge="" data-lucide="activity" class="stroke-1.5 w-5 h-5"></i> </div>
+                <div class="side-menu__title"> Residential Status </div>
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'configurable:question_types' %}" class="side-menu side-menu{{ question_type_menu_open }}">
+                <div class="side-menu__icon"> <i data-lucide="help-circle"></i> </div>
+                <div class="side-menu__title"> Question Types </div>
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'configurable:type_of_ids' %}" class="side-menu side-menu{{ type_of_id_menu_open }}">
+                <div class="side-menu__icon"> <i data-tw-merge="" data-lucide="activity" class="stroke-1.5 w-5 h-5"></i> </div>
+                <div class="side-menu__title">Type of IDs </div>
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'configurable:nationalities' %}" class="side-menu">
+                <div class="side-menu__icon"> <i data-tw-merge="" data-lucide="activity" class="stroke-1.5 w-5 h-5"></i> </div>
+                <div class="side-menu__title">Nationalities </div>
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'configurable:type_of_leave' %}" class="side-menu side-menu{{ type_of_leave_menu_open }}">
+                <div class="side-menu__icon"> <i data-tw-merge="" data-lucide="activity" class="stroke-1.5 w-5 h-5"></i> </div>
+                <div class="side-menu__title">Type of Leave </div>
+            </a>
+        </li>
+
+        <li>
+            <a href="{% url 'appointments:config_appointment_categories' %}" class="side-menu side-menu{{ appt_category_menu_open }}">
+                <div class="side-menu__icon"> <i data-tw-merge="" data-lucide="activity" class="stroke-1.5 w-5 h-5"></i> </div>
+                <div class="side-menu__title">Appointment Categories</div>
+            </a>
+        </li>
+
+        <li>
+            <a href="{% url 'appointments:config_appointment_contact_methods' %}" class="side-menu side-menu{{ appt_contact_menu_open }}">
+                <div class="side-menu__icon"> <i data-tw-merge="" data-lucide="activity" class="stroke-1.5 w-5 h-5"></i> </div>
+                <div class="side-menu__title">Appointment Contact Method </div>
+            </a>
+        </li>
+
+        <li>
+            <a href="{% url 'appointments:config_appointment_recommendations' %}" class="side-menu side-menu{{ appt_recommendation_menu_open }}">
+                <div class="side-menu__icon"> <i data-tw-merge="" data-lucide="activity" class="stroke-1.5 w-5 h-5"></i> </div>
+                <div class="side-menu__title">Appointment Recommendation </div>
+            </a>
+        </li>
+
+        <li>
+            <a href="{% url 'configurable:indemnity_list' %}" class="side-menu side-menu{{ indemnity_menu_open }}">
+                <div class="side-menu__icon"> <i data-tw-merge="" data-lucide="activity" class="stroke-1.5 w-5 h-5"></i> </div>
+                <div class="side-menu__title">Indemnity </div>
+            </a>
+        </li>
+
+        <li>
+            <a href="{% url 'configurable:sponsorship_list' %}" class="side-menu side-menu{{ sponsorship_menu_open }}">
+                <div class="side-menu__icon"> <i data-tw-merge="" data-lucide="activity" class="stroke-1.5 w-5 h-5"></i> </div>
+                <div class="side-menu__title">Sponsorship </div>
+            </a>
+        </li>
+
+        <li>
+            <a href="{% url 'configurable:block_list' %}" class="side-menu side-menu{{ block_menu_open }}">
+                <div class="side-menu__icon"> <i data-tw-merge="" data-lucide="activity" class="stroke-1.5 w-5 h-5"></i> </div>
+                <div class="side-menu__title">Programme Blocks </div>
+            </a>
+        </li>
+
+        <li>
+            <a href="{% url 'configurable:clinical_procedure_list' %}" class="side-menu side-menu{{ demonstration_menu_open }}">
+                <div class="side-menu__icon"> <i data-tw-merge="" data-lucide="activity" class="stroke-1.5 w-5 h-5"></i> </div>
+                <div class="side-menu__title">Clinical Procedures</div>
+            </a>
+        </li>
+
+        <li>
+            <a href="{% url 'configurable:discipline_list' %}" class="side-menu side-menu{{ discipline_menu_open }}">
+                <div class="side-menu__icon"> <i data-tw-merge="" data-lucide="activity" class="stroke-1.5 w-5 h-5"></i> </div>
+                <div class="side-menu__title">Disciplines</div>
+            </a>
+        </li>
+
+        <li>
+            <a href="{% url 'configurable:ward_list' %}" class="side-menu side-menu{{ ward_menu_open }}">
+                <div class="side-menu__icon"> <i data-tw-merge="" data-lucide="activity" class="stroke-1.5 w-5 h-5"></i> </div>
+                <div class="side-menu__title">Wards</div>
+            </a>
+        </li>
+
+        <li>
+            <a href="{% url 'configurable:shift_list' %}" class="side-menu side-menu{{ shift_menu_open }}">
+                <div class="side-menu__icon"> <i data-tw-merge="" data-lucide="activity" class="stroke-1.5 w-5 h-5"></i> </div>
+                <div class="side-menu__title">Shift Types</div>
+            </a>
+        </li>
+
+        <li>
+            <a href="{% url 'configurable:wil_scale_list' %}" class="side-menu side-menu{{ wil_scale_menu_open }}">
+                <div class="side-menu__icon"> <i data-tw-merge="" data-lucide="activity" class="stroke-1.5 w-5 h-5"></i> </div>
+                <div class="side-menu__title">WIL Scale Questions</div>
+            </a>
+        </li>
+
+        <li>
+            <a href="{% url 'configurable:registration_block_list' %}" class="side-menu side-menu{{ registration_block_menu_open }}">
+                <div class="side-menu__icon"> <i data-tw-merge="" data-lucide="activity" class="stroke-1.5 w-5 h-5"></i> </div>
+                <div class="side-menu__title">Registration Blocks</div>
+            </a>
+        </li>
+
+        <li>
+            <a href="{% url 'announcements:config_announcement_categories' %}" class="side-menu side-menu{{ announcement_category_menu_open }}">
+                <div class="side-menu__icon"> <i data-tw-merge="" data-lucide="activity" class="stroke-1.5 w-5 h-5"></i> </div>
+                <div class="side-menu__title">Announcement Categories</div>
+            </a>
+        </li>
+
+        <li>
+            <a href="{% url 'configurable:register_category_list' %}" class="side-menu side-menu{{ register_category_menu_open }}">
+                <div class="side-menu__icon"> <i data-tw-merge="" data-lucide="activity" class="stroke-1.5 w-5 h-5"></i> </div>
+                <div class="side-menu__title">Register Categories</div>
+            </a>
+        </li>
+
+        <li>
+            <a href="{% url 'configurable:doses' %}" class="side-menu side-menu{{ dose_menu_open }}">
+                <div class="side-menu__icon"> <i data-tw-merge="" data-lucide="activity" class="stroke-1.5 w-5 h-5"></i> </div>
+                <div class="side-menu__title">Vaccination Doses</div>
+            </a>
+        </li>
+
+        <li>
+            <a href="{% url 'facilities:activities' %}" class="side-menu side-menu{{ activity_menu_open }}">
+                <div class="side-menu__icon"> <i data-tw-merge="" data-lucide="activity" class="stroke-1.5 w-5 h-5"></i> </div>
+                <div class="side-menu__title">Activities</div>
+            </a>
+        </li>
+
+        <li>
+            <a href="{% url 'facilities:facilities' %}" class="side-menu side-menu{{ facility_menu_open }}">
+                <div class="side-menu__icon"> <i data-tw-merge="" data-lucide="activity" class="stroke-1.5 w-5 h-5"></i> </div>
+                <div class="side-menu__title">Facilities</div>
+            </a>
+        </li>
+         
+      </ul>
+  </li>
+
+</ul>

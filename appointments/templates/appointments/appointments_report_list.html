@@ -1,0 +1,230 @@
+{% extends 'base_tpl.html' %}
+
+{% block breadcrumb-content %}
+    <nav aria-label="breadcrumb" class="-intro-x mr-auto hidden sm:flex">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'administration:dashboard_librarian' %}">Dashboard</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Appointment Report</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block main-content %}
+
+{% include 'messages.html' %}
+
+
+    <div class="intro-y flex flex-col sm:flex-row items-center mt-8">
+        <h2 class="text-lg font-medium mr-auto">
+            Appointment Reports
+        </h2>
+        
+    </div>
+
+    <div class="intro-y col-span-12 lg:col-span-12 mt-5">
+        <!-- BEGIN: Form Layout -->
+        <div class="intro-y box p-5">
+            <form action="{% url 'appointments:appointments_report_list_filter' %}" method="POST">
+                {% csrf_token %}
+                <div class="grid grid-cols-10 gap-2">
+                    <div>
+                    <select data-placeholder="Select Category" class="form-select" id="crud-form-2" name="category">
+                        <option value="0">Select Category</option>
+                        {% for p in categories %}
+                            <option value="{{ p.id }}">{{ p.category }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <select data-placeholder="Select Status" class="form-select" id="crud-form-2" name="status">
+                        <option value="0">Select Status</option>
+                        <option value="Assigned">Assigned</option>
+                        <option value="Approved">Approved</option>
+                        <option value="Declined">Declined</option>
+                        <option value="NewTime">New Time Requested</option>
+                        <option value="Completed">Completed</option>
+                    </select>
+                </div>
+                <div>
+                    <select data-placeholder="Select Recommendation" class="tom-select w-full" id="crud-form-2" name="outcome">
+                        <option value="0">Select Recommendation</option>
+                        {% for p in recommendations %}
+                            <option value="{{ p.id }}">{{ p.recommendation }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <select data-placeholder="Select Staff" class="tom-select w-full" id="crud-form-2" name="assigned">
+                        <option value="0">Select Staff</option>
+                        {% for p in staff %}
+                            <option value="{{ p.user.id }}">{{ p.last_name }} {{ p.first_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div><input id="student_number" name="student_number" type="text" class="form-control" placeholder="Student Number"></div>
+                <div class="">
+                    <button type="submit" class="btn btn-success w-24 text-white"><i data-lucide="filter" class="w-4 h-4 mr-2"></i>Filter</button>
+                </div>
+                <div class="">
+                    <a href="{% url 'appointments:print_appointment_list_excel' filter %}" class="btn btn-warning w-36 text-white"><i data-lucide="printer" class="w-4 h-4 mr-2"></i>Export Excel</a>
+                </div>
+                <div class="">
+                    <a href="{% url 'appointments:create_appointment_report_pdf' filter %}" class="btn btn-primary w-36 text-white"><i data-lucide="printer" class="w-4 h-4 mr-2"></i>Export PDF</a>
+                </div>
+                      
+                
+            </form>
+                    
+                
+            
+        </div>
+        <!-- END: Form Layout -->
+    </div>
+
+    <div class="intro-y p-5 mt-5">
+        
+        <div class="overflow-x-auto">
+            <table class="table table-report -mt-2">
+                    <thead>
+                      <tr>
+                        <th>#</th>
+                        <th>Student</th>
+                        <th>Description</th>
+                        <th>Details</th>
+                        <th>Category</th>
+                        <th>Status</th>
+                        <th>Notes</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for a in report_appointments %}
+                        <tr>
+                          <td>{{ forloop.counter }}</td>
+                          <td>
+                            {{ a.student.name }} {{ a.student.surname }}
+                            <br>
+                            {{ a.student.student_number }}
+                            <br>
+                            {{ a.student.email }}
+                            <br>
+                            {{ a.student.cellphone }}
+                          </td>
+                          <td>{{ a.description }}</td>
+                          <td>
+                            {{ a.appointment_date }}<br>
+                            {{ a.appointment_time_start }} to {{ a.appointment_time_end }}<br><br>
+                            <b>Contact Method:</b> {{ a.contact.contact }}
+                          </td>
+                          <td>{{ a.category.category }}</td>
+                          <td>
+                            <div class="badge badge-{% if a.status == 'Completed' %}success{% else %}danger{% endif %} badge-pill">{{ a.status }}</div>
+        
+                            <br><br>
+        
+                            {% if a.status == 'Completed' %}
+        
+                            <p>The following were recommended to the student <br>in order of importance: </p>
+        
+                              {% for outcome in a.outcome.all %}
+        
+                                {{ outcome.recommendation.recommendation }}<br>
+        
+                              {% endfor %}
+        
+        
+                            {% endif %}                                    
+                          </td> 
+                          <td>
+                            <a class="btn btn-success btn-rounded btn-icon" data-tw-toggle="modal" data-tw-target="#notes_{{ forloop.counter }}"><i data-lucide="file" class="w-4 h-4 mr-1"></i></a>
+        
+                            <div class="modal fade" id="notes_{{ forloop.counter }}" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true">
+                              <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                  <div class="modal-header">
+                                    <h5 class="modal-title" id="ModalLabel">Notes</h5>
+                                    <button type="button" class="close" data-tw-dismiss="modal" aria-label="Close">
+                                      <span aria-hidden="true">&times;</span>
+                                    </button>
+                                  </div>
+                                  
+                                  <div class="modal-body">
+        
+                                        <table>
+                                          {% for note in a.notes.all %}
+                                            <tr><td>{{ note.notes }}<br><a href="{% url 'appointments:appointment_delete_notes' note.id %}">--Delete Note--</a></td></tr>
+                                          {% endfor %}
+                                        </table>
+                                             
+                                  </div>
+                                  <div class="modal-footer">
+                                    <button type="button" class="btn btn-light" data-tw-dismiss="modal">Close</button>
+                                  </div>
+                                 
+                                </div>
+                              </div>
+                            </div>
+        
+                          </td>                         
+                        </tr>
+        
+                      {% empty %}
+                        <tr><td colspan="7">Sorry no appointments</td></tr>
+                      {% endfor %}
+        
+                    </tbody>
+                  </table>
+        </div>
+
+        <!-- BEGIN: Pagination -->
+    <div class="intro-y col-span-12 overflow-x-auto scrollbar-hidden items-center">
+        <nav class="w-full sm:w-auto sm:mr-auto">
+            {% if is_paginated %}
+                <ul class="pagination">
+                    <li class="page-item"><a class="page-link" href="#"> <i class="w-4 h-4" data-lucide="chevrons-left"></i> </a></li>
+                    {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}"> <i class="w-4 h-4" data-lucide="chevron-left"></i> </a>
+                        </li>
+                    {% endif %}
+                    {% for i in paginator.page_range %}
+                        {% if page_obj.number == i %}
+                        <li class="active page-item"> <a class="page-link" href="#">{{ i }}</a> </li>
+                        {% else %}
+                        <li class="active page-item"> <a href="?page={{ i }}" class="page-link">{{ i }}</a> </li>
+                        {% endif %}
+                    {% endfor %}
+                    {% if page_obj.has_next %}               
+                        <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}"> <i class="w-4 h-4" data-lucide="chevron-right"></i> </a></li>
+                    {% endif %}
+                </ul>
+            {% endif %}           
+        </nav>  
+        
+        <nav class="w-full sm:w-auto sm:mr-auto">
+            {% if items.has_other_pages %}
+                <ul class="pagination">
+                    {% if items.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ items.previous_page_number }}&filter={{filter}}"> <i class="w-4 h-4" data-lucide="chevron-left"></i> </a>
+                        </li>
+                  
+                    {% endif %}
+                    {% for i in items.paginator.page_range %}
+                        {% if items.number == i %}
+                        <li class="active page-item"> <a class="page-link" href="#">{{ i }}</a> </li>
+                        {% else %}
+                        <li class="page-item"> <a href="?page={{ i }}&filter={{filter}}" class="page-link">{{ i }}</a> </li>
+                        {% endif %}
+                    {% endfor %}
+                    {% if items.has_next %}               
+                        <li class="page-item"><a class="page-link" href="?page={{ items.next_page_number }}&filter={{filter}}"> <i class="w-4 h-4" data-lucide="chevron-right"></i> </a></li>
+                   
+                    {% endif %}
+                </ul>
+            {% endif %}           
+        </nav>
+    </div>
+    <!-- END: Pagination -->
+    </div>
+
+{% endblock %}

@@ -1,0 +1,118 @@
+{% extends 'base_tpl.html' %}
+
+{% block breadcrumb-content %}
+    <nav aria-label="breadcrumb" class="-intro-x mr-auto hidden sm:flex">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'administration:dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'college:learning_programme_cohorts' learning_programme.id %}">{{ learning_programme.programme_code }} Cohorts</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'college:learning_programme_cohort_registration_periods' learning_programme_cohort.id %}">{{ learning_programme_cohort.title }} Registrations</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Module Moderators</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block main-content %}
+
+{% include 'messages.html' %}
+
+<form method = "POST" action="{% url 'college:assign_module_moderator' learning_programme_cohort_registration_period.id %}" name="frmnotify" class="mt-5">
+    <div class="intro-y flex flex-col sm:flex-row items-center mt-8">
+        <h2 class="text-lg font-medium mr-auto">
+            {{ learning_programme_cohort_registration_period.title }} Module Moderator Assignment
+        </h2>
+    </div>
+    <div class="intro-y flex flex-col sm:flex-row items-center mt-8">
+        <div class="w-full sm:w-auto flex mt-4 sm:mt-0">
+            
+                {% csrf_token %}
+                <input  type = "hidden" name = "userscustomLoop" value = "{{ items|length }}">
+        
+                <div class="intro-y col-span-12 overflow-auto lg:overflow-visible">
+                    <div class="form-inline col-span-12">
+                        <label for="id_admin" class="form-label w-48">Select Moderator</label>
+                        <select name="moderator" id="moderator" class="form-control" required>
+                            <option></option>
+                            {% for admin in moderators  %}
+                                <option value="{{ admin.id }}">{{ admin.first_name }} {{ admin.last_name }}</option>
+                            {% endfor %}
+                        </select>
+                        
+                        <label for="id_admin" class="form-label w-4"></label>
+                        
+                        <button type="submit" class="btn btn-primary w-48 text-white">Assign Moderator</button>
+                    </div>  
+                </div>  
+
+        </div>
+    </div>
+
+    <div class="intro-y p-5 mt-5">
+        
+        <div class="overflow-x-auto">
+            <table class="table table-report -mt-2">
+                <thead>
+                    <tr>
+                        <th class="whitespace-nowrap"><input type="checkbox" name="toggle" value="all" class="form-check-input" onclick = "checkall(this)"></th>                  
+                        <th class="whitespace-nowrap">Module</th>
+                        <th class="whitespace-nowrap">Summative<br> Weight</th>
+                        <th class="whitespace-nowrap">Formative<br> Weights</th>
+                        <th class="whitespace-nowrap">Assessments</th>
+                        <th class="whitespace-nowrap">Moderator</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in items %}
+                    <tr class="intro-x">
+                        <td class="w-40">
+                            <input type="checkbox" name="modules_selected[]" value="{{ r.id }}" class="form-check-input">
+                        </td>
+                        <td>
+                            {{ r.module.module_code }} {{ r.module.module_name }}
+                        </td>
+                        <td>
+                            <b>Year Mark:</b> {{ r.entrance_year_mark }}%<br>
+                            <b>Exam weight:</b> {{ r.summative_weight }}%
+                        </td>                                              
+                        <td>
+                            <b>Assignments:</b> {{ r.assignment_weight }}%<br>
+                            <b>Tests:</b> {{ r.test_weight }}%
+                        </td>
+                        <td>
+                            {% for p in r.formative.all %}
+                            <b>{{ p.title }} {{ p.weight }}%</b><br>                            
+                            {% endfor %}
+                        </td>
+                        <td>
+                            {{ r.moderator.first_name }} {{ r.moderator.last_name }}
+                        </td>
+                      
+                    </tr>
+                    {% empty %}
+                    <tr class="intro-x"><td colspan='6'>No modules added</td></tr>
+                    {% endfor %}
+                    
+                <tbody>
+            </table>
+        </div>
+    </div>
+</form>
+{% endblock %}
+
+
+{% block js-content %}
+
+<script type="text/javascript">
+    
+    function checkall(source){
+        var loop = document.frmnotify.userscustomLoop.value;
+        
+        checkboxes = document.getElementsByName('modules_selected[]');
+        for(var i=0, n=checkboxes.length;i<n;i++) {
+            checkboxes[i].checked = source.checked;
+        }
+
+      }
+
+</script>
+
+{% endblock %}

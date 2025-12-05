@@ -1,0 +1,440 @@
+{% extends 'base_vertical.html' %}
+{% load bootstrap3 %}
+{% block css-content %}
+
+<style type="text/css">
+
+table.timecard {
+	margin: auto;
+	width: 100%;
+	border-collapse: collapse;
+	border: 1px solid #fff; /*for older IE*/
+	border-style: solid;
+}
+
+table.timecard caption {
+	background-color: #f79646;
+	color: #fff;
+  font-size: 0.875rem;
+	font-weight: normal;
+	letter-spacing: .4em;
+}
+
+table.timecard thead th {
+	padding: 8px;
+	background-color: #ffffff;
+	font-size: 0.875rem;
+  font-weight: bold;
+}
+
+table.timecard thead th#thDay {
+	width: 40%;
+}
+
+table.timecard thead th#thRegular, table.timecard thead th#thOvertime, table.timecard thead th#thTotal {
+	width: 20%;
+}
+
+table.timecard th, table.timecard td {
+	padding: 10px;
+	border-width: 1px;
+	border-style: solid;
+}
+
+table.timecard td {
+	text-align: left;
+  font-size: 0.875rem;
+}
+
+table.timecard tbody th {
+	text-align: left;
+	font-weight: normal;
+}
+
+table.timecard tfoot {
+	font-weight: bold;
+	font-size: 0.875rem;
+	background-color: #687886;
+	color: #fff;
+}
+
+table.timecard tr.even {
+	background-color: #008080;
+}
+</style>
+
+
+{% endblock %}
+
+{% block main-content %}
+<div class="row">
+  <div class="col-md-12 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          <nav aria-label="breadcrumb">
+              <ol class="breadcrumb bg-inverse-info">
+                {%  if user.is_authenticated and user.roles_id == 2  %}
+                  <li class="breadcrumb-item"><a href="{% url 'wil:dashboard' %}">Dashboard</a></li>
+                  <li class="breadcrumb-item active" aria-current="page"><a href="{% url 'wil:advert_list' %}">All Adverts</a></li>
+                  <li class="breadcrumb-item active" aria-current="page"><a href="{% url 'wil:advert_list_active' %}">Active Adverts</a></li>
+                {% elif user.is_authenticated and user.roles_id == 10 or user.is_authenticated and user.roles_id == 11 %}
+                  <li class="breadcrumb-item"><a href="{% url 'psycad:dashboard' %}">Dashboard</a></li>
+                  <li class="breadcrumb-item active" aria-current="page"><a href="{% url 'psycad:advert_list' %}">All Adverts</a></li>
+                  <li class="breadcrumb-item active" aria-current="page"><a href="{% url 'psycad:advert_list_active' %}">Active Adverts</a></li>
+                {% endif %}
+              </ol>
+            </nav>
+
+            {% include 'messages.html' %}
+
+        </div>
+      </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-lg-12 grid-margin stretch-card">
+              <div class="card">
+                <div class="card-body">
+                  <h4 class="card-title">List of Adverts</h4>
+                  <p class="card-description">
+                    <div class="row">
+                      <div class="col-md-10">
+                          <p>To publish or unpublish, look at the thumb up or down in the 'Published Column'</p>
+                      </div>
+                      <div class="col-md-2 pull-right">
+                        <ul class="navbar-nav mr-lg-2">
+                          <li class="nav-item nav-search d-none d-lg-block">
+                            <div class="input-group">
+                                <div class="form-group">
+                                  <div class="input-group">
+                                    <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Select View</button>
+                                      <div class="dropdown-menu">
+                                        <a class="dropdown-item" href="{% url 'psycad:view_adverts_as' %}" target="_blank" style="target-new: tab;">Student View</a>
+                                      </div>
+                                  </div>
+                                </div>
+
+                            </div>
+                          </li>
+                        </ul>
+                      </div>
+
+                  </p>
+                  <div class="table-responsive">
+                    <table class="timecard">
+                      <thead>
+                        <tr>
+                          <th>Type & Position</th>
+                          <th>Company Name</th>
+                          <th>Departments</th>
+                          <th>Published</th>
+                          <th>File</th>
+                          <th>Cut off Date</th>
+                          <th>Applicants</th>
+                          <th>Interviews</th>
+                          <th>Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for advert in adverts %}
+                            <tr>
+                              <td class="py-1">
+                                <b>{{advert.type.type}}</b>
+                                <br><br>
+                                <u>{{advert.position}}</u>
+                                <br><br>
+                                {{advert.contract}} - {{advert.paid}} Position
+                              </td>
+                              <td>
+                                <a data-toggle="modal" data-target="#view{{ advert.id }}" >{{ advert.company_name }}</a>
+
+                                <div class="modal fade" id="view{{ advert.id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel-3" aria-hidden="true">
+        													<div class="modal-dialog  modal-lg" role="document">
+        														<div class="modal-content">
+        															<div class="modal-header">
+        																<h5 class="modal-title" id="exampleModalLabel-3">Job Details</h5>
+        																<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        																	<span aria-hidden="true">&times;</span>
+        																</button>
+        															</div>
+
+        															<div class="modal-body">
+        																<p><b>Company:</b><br>{{ advert.company.company_name }}</p>
+        																<p><b>Position:</b><br>{{ advert.position }}</p>
+        																<p><b>Description:</b><br>{{ advert.description }}</p>
+        																<p><b>Type:</b><br>{{ advert.type.type }}</p>
+        																<p><b>Cut off Date:</b><br>{{ advert.cut_off_date }}</p>
+        																<p><b>Address:</b><br>{{ advert.address }}</p>
+        																<p><b>Contract:</b><br>{{ advert.contract }}</p>
+        																<p><b>Requirements:</b><br>{{ advert.requirements }}</p>
+        																<p><b>Date Added:</b><br>{{ advert.created_at }}</p>
+        																<p><b>Departments:</b><br>
+        																	{% for d in advert.departments.all %}
+        																		{{ d.department }} <br>
+        																	{% endfor %}
+        																</p>
+        															</div>
+        															<div class="modal-footer">
+        																<button type="button" class="btn btn-light" data-dismiss="modal">Close</button>
+        															</div>
+
+        														</div>
+        													</div>
+        												</div>
+                              </td>
+                              <td>
+
+
+
+                                {% for dept in advert.departments.all %}
+                                  <a href="{% url 'psycad:advert_remove_department' advert.id dept.id %}" data-toggle="tooltip" data-placement="bottom" title="Click to remove"><div class="badge badge-primary badge-pill">{{dept.department}}</div></a><br><br>
+                                {% empty %}
+                                  No Departments added
+                                {% endfor %}
+                                <br>
+                                <button class="btn btn-inverse-primary btn-rounded btn-icon" data-toggle="modal" data-target="#department{{ advert.id }}"><i class="fa fa-plus-circle"></i></button>
+
+                                <div class="modal fade" id="department{{ advert.id }}" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true">
+                                  <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                      <div class="modal-header">
+                                        <h5 class="modal-title" id="ModalLabel">Add Department to Advert: {{ advert.position }}</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                          <span aria-hidden="true">&times;</span>
+                                        </button>
+                                      </div>
+                                      <form action="{% url 'psycad:advert_add_department' advert.id %}" method="POST">
+                                        {% csrf_token %}
+                                      <div class="modal-body">
+                                        <div class="form-group">
+                                          <label for="date_visit">Department</label>
+                                          <select name="department" id="id_department" class="form-control">
+                                              {% for faculty in faculties %}
+                                                <optgroup label="{{ faculty.faculty }}">
+                                                  {% for department in faculty.departments.all %}
+                                                    <option value="{{ department.id }}">{{ department.department }}</option>
+                                                  {% endfor %}
+                                              {% endfor %}
+                                          </select>
+                                        </div>
+                                      </div>
+                                      <div class="modal-footer">
+                                        <button type="submit" class="btn btn-success">Add Department</button>
+                                        <button type="button" class="btn btn-light" data-dismiss="modal">Close</button>
+                                      </div>
+                                      </form>
+                                    </div>
+                                  </div>
+                                </div>
+                              </td>
+                              <td>
+
+                                  {% if advert.publish == 'Yes' %}
+                                    <a href="{% url 'psycad:advert_publish' advert.id %}" class="btn btn-success btn-rounded btn-icon"> <br><i class="fa fa-thumbs-o-up"></i></a>
+                                    <br><br>
+                                  Send Email to students
+                                  <a href="{% url 'psycad:advert_send_email' advert.id %}" class="btn btn-primary btn-rounded btn-icon"> <br><i class="fa fa-envelope"></i></a>
+                                  
+                                  {% else %}
+                                    <a href="{% url 'psycad:advert_publish' advert.id %}" class="btn btn-warning btn-rounded btn-icon"> <br><i class="fa fa-thumbs-o-down"></i></a>
+                                    <br><br>
+                                  Send Email to students
+                                  <a type="button" data-toggle="popover" title="Email can not be sent" data-content="Sorry cannot send email because the advert is unpublished" class="btn btn-secondary btn-rounded btn-icon" data-custom-class="popover-danger"> <br><i class="fa fa-envelope"></i></a>
+                                  
+                                  {% endif %}
+                                  
+                              </td>
+                              <td>
+                                {% if advert.file != '' %}
+                                  <a href="{{ advert.file.url }}">Download File</a>
+                                {% endif %}
+                                <br>
+                                <button type="button" class="btn btn-inverse-primary btn-rounded btn-icon" data-toggle="modal" data-target="#file{{ advert.id }}"><i class="fa fa-cloud-upload"></i></button>
+
+                                <div class="modal fade" id="file{{ advert.id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel-3" aria-hidden="true">
+                                  <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                      <div class="modal-header">
+                                        <h5 class="modal-title" id="exampleModalLabel-3">Upload Advert File: {{advert.title}}</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                          <span aria-hidden="true">&times;</span>
+                                        </button>
+                                      </div>
+                                      <form action="{% url 'psycad:advert_file' advert.id %}" method="POST" enctype="multipart/form-data">
+                                        {% csrf_token %}
+                                      <div class="modal-body">
+                                        <p>Please select file to upload</p>
+                                        <div class="row">
+                                          <div class="col-md-12">
+                                            <div class="form-group row">
+
+                                              <div class="col-sm-10">
+                                                {% bootstrap_field form.file show_label=False%}
+                                              </div>
+                                            </div>
+                                          </div>
+
+                                        </div>
+                                      </div>
+                                      <div class="modal-footer">
+                                        <button type="submit" class="btn btn-success">Upload</button>
+                                        <button type="button" class="btn btn-light" data-dismiss="modal">No</button>
+                                      </div>
+                                      </form>
+                                    </div>
+                                  </div>
+                                </div>
+                              </td>
+                              <td>{{advert.cut_off_date}}</td>
+                              <td>
+                                <a class="btn btn-inverse-warning btn-fw btn-icon-text col-md-12" href="{% url 'psycad:view_applicants' advert.id %}"> <i class="ti-user btn-icon-prepend"></i>{{ advert.students_favourite.count }}</a>
+                              </td>
+                              <td>
+                                {% for interview in adverts.interviews.all %}
+                                    <a href="" data-toggle="tooltip" data-placement="bottom" title="Click to remove"><div class="badge badge-primary badge-pill">{{interview.date_interview}}</div></a><br><br>
+                                {% endfor %}
+                                <button type="button" class="btn btn-inverse-primary btn-fw btn-icon-text col-md-12" data-toggle="modal" data-target="#interview{{ advert.id }}"><i class="ti-plus btn-icon-prepend"></i>  </button>
+
+                                <div class="modal fade" id="interview{{ advert.id }}" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true">
+                                  <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                      <div class="modal-header">
+                                        <h5 class="modal-title" id="ModalLabel">Add Interview</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                          <span aria-hidden="true">&times;</span>
+                                        </button>
+                                      </div>
+                                      {%  if user.is_authenticated and user.roles_id == 2  %}
+                                        <form action="{% url 'wil:advert_add_interview' advert.id %}" method="POST">
+                                      {% elif user.is_authenticated and user.roles_id == 10 %}
+                                        <form action="{% url 'psycad:advert_add_interview' advert.id %}" method="POST">
+                                      {% endif %}
+                                        {% csrf_token %}
+                                          <div class="modal-body">
+                                            <div class="form-group">
+                                              <label for="date_interview">Date of Interview</label>
+                                              <input id="id_date_interview" class="form-control" name="date_interview" type="date" required>
+                                            </div>
+
+                                            <div class="form-group">
+                                              <label for="id_time_interview">Time of Interview</label>
+                                              <input id="id_time_interview" class="form-control" name="time_interview" type="time" required>
+                                            </div>
+
+                                            <div class="form-group">
+                                              <label for="location">Location</label>
+                                              <textarea name="location" id="id_location" class="form-control"></textarea>
+                                            </div>
+
+                                            <div class="form-group">
+                                              <label for="comment">Comment</label>
+                                              <textarea name="notes" id="id_notes" class="form-control"></textarea>
+                                            </div>
+
+                                            <div class="form-group">
+                                              <label for="id_time_interview">Number of Students</label>
+                                              <input id="id_number_of_students" class="form-control" name="number_of_students" type="number" required>
+                                            </div>
+
+                                          </div>
+                                          <div class="modal-footer">
+                                            <button type="submit" class="btn btn-success">Add Interview Session</button>
+                                            <button type="button" class="btn btn-light" data-dismiss="modal">Close</button>
+                                          </div>
+                                        </form>
+                                    </div>
+                                  </div>
+                                </div>
+
+
+                              </td>
+                              <td>
+																		<a href="{% url 'psycad:print_advert_pdf' advert.id %}" class="btn btn-primary btn-rounded btn-icon"> <br><i class="ti-printer"></i></a>
+
+                                    <a href="{% url 'psycad:advert_edit' advert.id %}" class="btn btn-info btn-rounded btn-icon"> <br><i class="fa fa-edit"></i></a>
+
+                                    <button type="button" class="btn btn-danger btn-rounded btn-icon" data-toggle="modal" data-target="#delete{{ advert.id }}" > <i class="fa fa-trash-o"></i> </button>
+
+                                    <div class="modal fade" id="delete{{ advert.id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel-3" aria-hidden="true">
+                                      <div class="modal-dialog" role="document">
+                                        <div class="modal-content">
+                                          <div class="modal-header">
+                                            <h5 class="modal-title" id="exampleModalLabel-3">Delete Advert</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                              <span aria-hidden="true">&times;</span>
+                                            </button>
+                                          </div>
+                                          <form action="{% url 'psycad:advert_delete' advert.id %}" method="POST">
+                                            {% csrf_token %}
+                                          <div class="modal-body">
+                                            <p>Are you sure you want to delete this advert?</p>
+                                          </div>
+                                          <div class="modal-footer">
+                                            <button type="submit" class="btn btn-success">Yes</button>
+                                            <button type="button" class="btn btn-light" data-dismiss="modal">No</button>
+                                          </div>
+                                          </form>
+                                        </div>
+                                      </div>
+                                    </div>
+
+
+                              </td>
+                            </tr>
+                        {% empty %}
+                            <tr><td colspan="8">Sorry no adverts added</td></tr>
+                        {% endfor %}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+</div>
+{% endblock %}
+
+{% block js-content %}
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/jszip-2.5.0/dt-1.10.18/b-1.5.6/b-colvis-1.5.6/b-html5-1.5.6/b-print-1.5.6/cr-1.5.0/r-2.2.2/sl-1.3.0/datatables.min.css"/>
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/v/dt/jszip-2.5.0/dt-1.10.18/b-1.5.6/b-colvis-1.5.6/b-html5-1.5.6/b-print-1.5.6/cr-1.5.0/r-2.2.2/sl-1.3.0/datatables.min.js"></script>
+
+<script>
+  $(document).ready( function () {
+    $('#table_advert').DataTable({
+
+      dom: 'B<"clear">lfrtip',
+      buttons: {
+        name: 'primary',
+        buttons: [
+            {
+                extend: 'copyHtml5',
+                exportOptions: {
+                    columns: [ 0, ':visible' ]
+                }
+            },
+            {
+                extend: 'excelHtml5',
+                exportOptions: {
+                    columns: ':visible'
+                }
+            },
+            {
+                extend: 'pdfHtml5',
+                exportOptions: {
+                    columns: ':visible'
+                }
+            },
+            'colvis'
+        ]
+      }}
+    );
+  });
+
+</script>
+
+
+
+{% endblock %}

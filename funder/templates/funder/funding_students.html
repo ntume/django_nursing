@@ -1,0 +1,133 @@
+{% extends 'base_vertical.html' %}
+
+{% block main-content %}
+<div class="row">
+  <div class="col-md-12 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          <nav aria-label="breadcrumb">
+              <ol class="breadcrumb bg-inverse-info">
+                  <li class="breadcrumb-item"><a href="{% url 'wil:dashboard' %}">Dashboard</a></li>
+                  <li class="breadcrumb-item"><a href="{% url 'wil:funding' funding.funder.id %}">{{funding.funder.funder}}</a></li>
+                  <li class="breadcrumb-item active" aria-current="page"><a>Students from funding: {{funding.funder.funder}} - {{funding.start}} to {{funding.end}}</a></li>
+              </ol>
+            </nav>
+
+            {% include 'messages.html' %}
+
+        </div>
+      </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-lg-12 grid-margin">
+              <div class="card">
+                <div class="card-body">
+                  <h4 class="card-title">Students from funding: {{funding.funder.funder}} - {{funding.start}} to {{funding.end}}</h4>
+
+                  <div class="table-responsive">
+                    <table class="table table-bordered">
+                      <thead>
+                        <tr>
+                          <th>Student Number</th>
+                          <th>ID Number</th>
+                          <th>Full name</th>
+                          <th>Contacts</th>
+                          <th>Registration</th>
+                          <th>Completion</th>
+                          <th>Company</th>
+                          <th>Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for stud in funding.students.all %}
+                            <tr>
+                              <td>{{stud.student.student.student_number}}</td>
+                              <td>{{stud.student.student.id_number}}</td>
+                              <td>{{stud.student.student.name}} {{stud.student.student.surname}}</td>
+                              <td>{{stud.student.student.cellphone}}<br>{{stud.student.student.email}}</td>
+                              <td>{{stud.student.registration_date}}</td>
+                              <td>{{stud.student.completion_date}}</td>
+                              <td>{{stud.student.company.company_name}}<br>{{stud.student.mentor.fullname}}<br><i>{{stud.student.mentor.email}}<br>{{stud.student.mentor.cellphone}} / {{stud.student.mentor.telephone}}</i></td>
+                              <td>
+
+                                <button type="button" class="btn btn-danger btn-rounded btn-icon" data-toggle="modal" data-target="#delete{{ stud.id }}" > <i class="fa fa-trash-o"></i> </button>
+
+                                <div class="modal fade" id="delete{{ stud.id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel-3" aria-hidden="true">
+                                  <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                      <div class="modal-header">
+                                        <h5 class="modal-title" id="exampleModalLabel-3">Remove Student from Funding</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                          <span aria-hidden="true">&times;</span>
+                                        </button>
+                                      </div>
+                                      <form action="{% url 'wil:funding_students_delete' funding.funder.id funding.id stud.id %}" method="POST">
+                                        {% csrf_token %}
+                                      <div class="modal-body">
+                                        <p>Are you sure you want to remove this student {{stud.student.student.name}} {{stud.student.student.surname}}?</p>
+                                      </div>
+                                      <div class="modal-footer">
+                                        <button type="submit" class="btn btn-success">Yes</button>
+                                        <button type="button" class="btn btn-light" data-dismiss="modal">No</button>
+                                      </div>
+                                      </form>
+                                    </div>
+                                  </div>
+                                </div>
+
+                              </td>
+                            </tr>
+                        {% empty %}
+                            <tr><td colspan="8">Sorry no students added</td></tr>
+                        {% endfor %}
+                      </tbody>
+                    </table>
+
+</div>
+{% endblock %}
+
+{% block js-content %}
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/jszip-2.5.0/dt-1.10.18/b-1.5.6/b-colvis-1.5.6/b-html5-1.5.6/b-print-1.5.6/cr-1.5.0/r-2.2.2/sl-1.3.0/datatables.min.css"/>
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/v/dt/jszip-2.5.0/dt-1.10.18/b-1.5.6/b-colvis-1.5.6/b-html5-1.5.6/b-print-1.5.6/cr-1.5.0/r-2.2.2/sl-1.3.0/datatables.min.js"></script>
+
+<script>
+  $(document).ready( function () {
+    $('#table_id').DataTable({
+
+      dom: 'B<"clear">lfrtip',
+      buttons: {
+        name: 'primary',
+        buttons: [
+            {
+                extend: 'copyHtml5',
+                exportOptions: {
+                    columns: [ 0, ':visible' ]
+                }
+            },
+            {
+                extend: 'excelHtml5',
+                exportOptions: {
+                    columns: ':visible'
+                }
+            },
+            {
+                extend: 'pdfHtml5',
+                exportOptions: {
+                    columns: ':visible'
+                }
+            },
+            'colvis'
+        ]
+      }}
+    );
+  });
+
+</script>
+
+
+
+{% endblock %}

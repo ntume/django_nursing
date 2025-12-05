@@ -1,0 +1,69 @@
+<nav class="bottom-navbar">
+  <div class="container">
+    <ul class="nav page-navigation">
+      <li class="nav-item {{dash_active}}">
+        <a class="nav-link" href="{% url 'mentor:dashboard' %}">
+          <i class="ti-home menu-icon"></i>
+          <span class="menu-title">Dashboard</span>
+        </a>
+      </li>
+      <li class="nav-item {{profile_active}}">
+        <a class="nav-link" href="{% url 'mentor:view_profile' %}">
+          <i class="ti-user menu-icon"></i>
+          <span class="menu-title">Profile</span>
+        </a>
+      </li>
+      <!--<li class="nav-item {{CV_menu}}">
+        <a href="#" class="nav-link">
+          <i class="ti-pencil-alt menu-icon"></i>
+          <span class="menu-title">Student CVs</span>
+          <i class="menu-arrow"></i></a>
+        <div class="submenu">
+          <ul class="submenu-item">
+            {% for depts in MENU_COMPANY_DEPARTMENTS %}
+              <li class="nav-item"><a class="nav-link" href="{% url 'mentor:view_students' depts.department.department %}">{{depts.department.department}}</a></li>
+            {% empty %}
+              <li class="nav-item"><a class="nav-link" href="{% url 'mentor:view_profile' %}">No departments added yet, please click to add some</a></li>
+            {% endfor %}
+          </ul>
+        </div>
+      </li>-->
+      <li class="nav-item {{events_menu}}">
+        <a href="#" class="nav-link">
+          <i class="ti-calendar menu-icon"></i>
+          <span class="menu-title">Recruitment Programs</span>
+          <i class="menu-arrow"></i></a>
+        <div class="submenu">
+          <ul class="submenu-item">
+            <li class="nav-item"><a class="nav-link" href="#">Recruitment Programs</a></li>
+            <li class="nav-item"><a class="nav-link" href="#">Recruitment Programs you have registered for</a></li>
+          </ul>
+        </div>
+      </li>
+      <li class="nav-item {{adverts_menu}}">
+        <a href="#" class="nav-link">
+          <i class="ti-support menu-icon"></i>
+          <span class="menu-title">Adverts</span>
+          <i class="menu-arrow"></i></a>
+        <div class="submenu">
+          <ul class="submenu-item">
+            <li class="nav-item"><a class="nav-link" href="{% url 'mentor:advert_list' %}">List of Adverts</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'mentor:advert_create' %}">Add Advert</a></li>
+          </ul>
+        </div>
+      </li>
+      <li class="nav-item {{wil_menu}}">
+        <a href="#" class="nav-link">
+          <i class="ti-ruler-pencil menu-icon"></i>
+          <span class="menu-title">WIL</span>
+          <i class="menu-arrow"></i></a>
+        <div class="submenu">
+          <ul class="submenu-item">
+            <li class="nav-item"><a class="nav-link" href="{% url 'mentor:list_my_interns' %}">List of my Interns</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'mentor:list_all_interns' %}">List of all Company Interns</a></li>
+          </ul>
+        </div>
+      </li>
+    </ul>
+  </div>
+</nav>

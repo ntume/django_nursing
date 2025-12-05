@@ -1,0 +1,272 @@
+<div class="border border-slate-200/60 dark:border-darkmode-400 rounded-md p-5 mt-5">
+    <div class="font-medium flex items-center border-b border-slate-200/60 dark:border-darkmode-400 pb-5"> <i data-lucide="chevron-down" class="w-4 h-4 mr-2"></i> Attachments </div>
+    <div class="intro-y box p-5 bg-danger text-white mt-5">
+        <div class="flex items-center">
+            <div class="font-medium text-lg">Important Notice</div>
+            <div class="text-xs bg-white dark:bg-primary dark:text-white text-slate-700 px-1 rounded-md ml-auto">Take Note!</div>
+        </div>
+        <div class="mt-4">
+            The maximum file size for the document attachments is 10mb<br><br>
+            The certified stamp needs to be not more than 3 months old<br><br>
+            <b>All documents need to be in PDF format.</b><br><br>
+            <b>Please upload the required documents individually.</b>
+        </div>
+        
+    </div>
+    <br>
+    
+    <div class="grid grid-cols-1 gap-4 mt-5 border-dashed border-2 border-indigo-600 px-8 py-8">
+        {% include 'messages.html' %}
+        <form 
+            enctype="multipart/form-data"
+            hx-post="{% url 'students:learner_attachment_bulk_upload' lp.id learner_registration.id %}"
+            hx-trigger="submit"
+            hx-target="#messages_attachments"
+            action="#"
+            hx-on::before-request="attachButton.disabled = true;attachButton.innerHTML ='Saving....'; return true;"
+            hx-on::after-request="attachButton.disabled = false;attachButton.innerHTML ='Saved!'; return true;">
+        
+            {% csrf_token %} 
+
+            <div class="">
+                {% if user.logged_in_role_id == 2 or user.logged_in_role_id == 1 or user.logged_in_role_id == 6 or user.logged_in_role_id == 10 %}
+                    <button id='attachButton' type="submit"  class="btn btn-success w-60 ml-2  text-white" >Upload/Save Attachments</button>                          
+                {% endif %}
+            </div>
+
+            <table class="table table-striped table-bordered mt-5">
+                <thead>
+                    <tr>
+                        <th>Document Type</th>
+                        <th>Status</th>
+                        <th>Upload</th>
+                        <th>View</th>
+                    </tr>
+                   
+                    <tr>
+                    <td class="font-medium">CERTIFIED COPY OF ID/PASSPORT</td>
+                    <td>
+                        {% if learner_registration.attachments.id_copy %}
+                            <button class="btn btn-success mr-1 mb-2 text-white"> <i data-lucide="check-square" class="w-5 h-5"></i> </button> 
+                        {% else %}
+                            <button class="btn btn-danger mr-1 mb-2 text-white"> <i data-lucide="x-square" class="w-5 h-5"></i> </button> 
+                        {% endif %} 
+                    </td>
+                   
+                        <td>
+                            <input name='id_copy' id="id_id_copy" type="file" class="form-control">
+                        </td>
+                
+                    <td>
+                        <a target='_blank' {% if learner_registration.attachments.id_copy %} href="{{ learner_registration.attachments.id_copy.url }}"  class="btn btn-primary w-24 mr-2 mb-2" {% else %} disabled class="btn btn-secondary w-24 mr-2 mb-2" {% endif %}> <i data-lucide="landmark" class="w-4 h-4 mr-2"></i> View </a>
+                    </td>            
+                    
+                </tr>
+                <tr>
+                    <td class="font-medium">SANC LEARNER REGISTRATION FORM</td>
+                    <td>
+                        {% if learner_registration.attachments.sanc_learner_registration %}
+                            <button class="btn btn-success mr-1 mb-2 text-white"> <i data-lucide="check-square" class="w-5 h-5"></i> </button> 
+                        {% else %}
+                            <button class="btn btn-danger mr-1 mb-2 text-white"> <i data-lucide="x-square" class="w-5 h-5"></i> </button> 
+                        {% endif %} 
+                    </td>
+                    
+                        <td>
+                            <input name='sanc_learner_registration' id="id_sanc_learner_registration" type="file" class="form-control">
+                        </td>
+                   
+                    <td>
+                        <a target='_blank' {% if learner_registration.attachments.sanc_learner_registration %} href="{{ learner_registration.attachments.sanc_learner_registration.url }}"  class="btn btn-primary w-24 mr-2 mb-2" {% else %} disabled class="btn btn-secondary w-24 mr-2 mb-2" {% endif %}> <i data-lucide="landmark" class="w-4 h-4 mr-2"></i> View </a>
+                    </td>
+                    
+                </tr>
+          
+                <tr>
+                    <td class="font-medium">CERTIFIED COPY OF MATRIC/AFFIDAVIT FOR MATRIC IF THERE IS AN ERROR ON THE MATRIC</td>
+                    <td>
+                        {% if learner_registration.attachments.matric_certificate %}
+                            <button class="btn btn-success mr-1 mb-2 text-white"> <i data-lucide="check-square" class="w-5 h-5"></i> </button> 
+                        {% else %}
+                            <button class="btn btn-danger mr-1 mb-2 text-white"> <i data-lucide="x-square" class="w-5 h-5"></i> </button> 
+                        {% endif %} 
+                    </td>
+                    
+                        <td>
+                            <input name='matric_certificate' id="id_matric_certificate" type="file" class="form-control">
+                        </td>
+                 
+                    <td>
+                        <a  target='_blank' {% if learner_registration.attachments.matric_certificate %} href="{{ learner_registration.attachments.matric_certificate.url }}" class="btn btn-primary w-24 mr-2 mb-2" {% else %} disabled class="btn btn-secondary w-24 mr-2 mb-2" {% endif %}> <i data-lucide="landmark" class="w-4 h-4 mr-2"></i> View </a>
+                    </td>
+                    
+                </tr>  
+        
+             
+                {% if lp.student.marital_status  == "Married" or lp.student.marital_status  == "Divorced"  %} 
+                    <tr>
+                        <td class="font-medium">CERTIFIED COPY OF MARRIAGE CERT/DECREE OF DIVORCE</td>
+                        <td>
+                            {% if learner_registration.attachments.marriage_certificate %}
+                                <button class="btn btn-success mr-1 mb-2 text-white"> <i data-lucide="check-square" class="w-5 h-5"></i> </button> 
+                            {% else %}
+                                <button class="btn btn-danger mr-1 mb-2 text-white"> <i data-lucide="x-square" class="w-5 h-5"></i> </button> 
+                            {% endif %} 
+                        </td>
+                        
+                            <td>
+                                <input name='marriage_certificate' id="id_marriage_certificate" type="file" class="form-control">
+                            </td>
+                     
+                        <td>
+                            <a  target='_blank' {% if learner_registration.attachments.marriage_certificate %} href="{{ learner_registration.attachments.marriage_certificate.url }}"  class="btn btn-primary w-24 mr-2 mb-2" {% else %} disabled class="btn btn-secondary w-24 mr-2 mb-2" {% endif %}> <i data-lucide="landmark" class="w-4 h-4 mr-2"></i> View </a>
+                        </td>
+                        
+                    </tr> 
+                {% endif %}
+              
+                <tr>
+                    <td class="font-medium">CERTIFIED COPIES OF OTHER QUALIFICATIONS (MEDICAL: NURSING, FIRST AID, CPR, OTHER: COMPUTERS, ETC.)</td>
+                    <td>
+                        {% if learner_registration.attachments.other_qualification %}
+                            <button class="btn btn-success mr-1 mb-2 text-white"> <i data-lucide="check-square" class="w-5 h-5"></i> </button> 
+                        {% else %}
+                            <button class="btn btn-danger mr-1 mb-2 text-white"> <i data-lucide="x-square" class="w-5 h-5"></i> </button> 
+                        {% endif %} 
+                    </td>
+                        <td>
+                            <input name='other_qualification' id="id_other_qualification" type="file" class="form-control"> 
+                        </td>
+               
+                    <td>
+                        <a  target='_blank' {% if learner_registration.attachments.other_qualification %} href="{{ learner_registration.attachments.other_qualification.url }}"  class="btn btn-primary w-24 mr-2 mb-2" {% else %} disabled class="btn btn-secondary w-24 mr-2 mb-2" {% endif %}> <i data-lucide="landmark" class="w-4 h-4 mr-2"></i> View </a>
+                    </td>
+                    
+                </tr>
+            
+                <tr>
+                    <td class="font-medium">PROOF OF INDEMNITY (UNION MEMBERSHIP CARD OR A MEMBERSHIP LETTER/DOCUMENT)</td>
+                    <td>
+                        {% if learner_registration.attachments.indemnity %}
+                            <button class="btn btn-success mr-1 mb-2 text-white"> <i data-lucide="check-square" class="w-5 h-5"></i> </button> 
+                        {% else %}
+                            <button class="btn btn-danger mr-1 mb-2 text-white"> <i data-lucide="x-square" class="w-5 h-5"></i> </button> 
+                        {% endif %} 
+                    </td>
+                    
+                        <td>
+                            <input name='indemnity' id="id_indemnity" type="file" class="form-control"> 
+                        </td>
+                  
+                    <td>
+                        <a  target='_blank' {% if learner_registration.attachments.indemnity %} href="{{ learner_registration.attachments.indemnity.url }}"  class="btn btn-primary w-24 mr-2 mb-2" {% else %} disabled class="btn btn-secondary w-24 mr-2 mb-2" {% endif %}> <i data-lucide="landmark" class="w-4 h-4 mr-2"></i> View </a>
+                    </td>
+                    
+                </tr>
+                {% if learning_programme.duration > 1 %} 
+                    <tr>
+                        <td class="font-medium">CERTIFIED COPY OF SANC CERTIFICATE  OF REGISTRATION AS PRACTITIONER </td>
+                        <td>
+                            {% if learner_registration.attachments.sanc_certificate %}
+                                <button class="btn btn-success mr-1 mb-2 text-white"> <i data-lucide="check-square" class="w-5 h-5"></i> </button> 
+                            {% else %}
+                                <button class="btn btn-danger mr-1 mb-2 text-white"> <i data-lucide="x-square" class="w-5 h-5"></i> </button> 
+                            {% endif %} 
+                        </td>
+                        
+                            <td>
+                                <input name='sanc_certificate' id="id_sanc_certificate" type="file" class="form-control">
+                            </td>
+                     
+                        <td>
+                            <a  target='_blank' {% if learner_registration.attachments.sanc_certificate %} href="{{ learner_registration.attachments.sanc_certificate.url }}"  class="btn btn-primary w-24 mr-2 mb-2" {% else %} disabled class="btn btn-secondary w-24 mr-2 mb-2" {% endif %}> <i data-lucide="landmark" class="w-4 h-4 mr-2"></i> View </a>
+                        </td>
+                        
+                    </tr>
+         
+                    <tr>
+                        <td class="font-medium">CERTIFIED COPY OF ENROLLED OR AUXILIARY CERTIFICATE (COLLEGE OR UNIVERSITY QUALIFICATION)</td>
+                        <td>
+                            {% if learner_registration.attachments.auxilary_certificate %}
+                                <button class="btn btn-success mr-1 mb-2 text-white"> <i data-lucide="check-square" class="w-5 h-5"></i> </button> 
+                            {% else %}
+                                <button class="btn btn-danger mr-1 mb-2 text-white"> <i data-lucide="x-square" class="w-5 h-5"></i> </button> 
+                            {% endif %} 
+                        </td>
+                        
+                            <td>
+                                <input name='auxilary_certificate' id="id_auxilary_certificate" type="file" class="form-control"> 
+                            </td>
+                    
+                        <td>
+                            <a  target='_blank' {% if learner_registration.attachments.auxilary_certificate %} href="{{ learner_registration.attachments.auxilary_certificate.url }}"  class="btn btn-primary w-24 mr-2 mb-2" {% else %} disabled class="btn btn-secondary w-24 mr-2 mb-2" {% endif %}> <i data-lucide="landmark" class="w-4 h-4 mr-2"></i> View </a>
+                        </td>
+                        
+                    </tr>
+               
+                    <tr>
+                        <td class="font-medium">CERTIFIED COPY OF ANNUAL PRACTICING CERTIFICATE (ALSO KNOWN AS SANC RECEIPT)</td>
+                        <td>
+                            {% if learner_registration.attachments.practicing_certificate %}
+                                <button class="btn btn-success mr-1 mb-2 text-white"> <i data-lucide="check-square" class="w-5 h-5"></i> </button> 
+                            {% else %}
+                                <button class="btn btn-danger mr-1 mb-2 text-white"> <i data-lucide="x-square" class="w-5 h-5"></i> </button> 
+                            {% endif %} 
+                        </td>
+                        
+                            <td>
+                                <input name='practicing_certificate' id="id_practicing_certificate" type="file" class="form-control">
+                            </td>
+                      
+                        <td>
+                            <a  target='_blank' {% if learner_registration.attachments.practicing_certificate %} href="{{ learner_registration.attachments.practicing_certificate.url }}"  class="btn btn-primary w-24 mr-2 mb-2" {% else %} disabled class="btn btn-secondary w-24 mr-2 mb-2" {% endif %}> <i data-lucide="landmark" class="w-4 h-4 mr-2"></i> View </a>
+                        </td>
+                        
+                    </tr>
+                {% endif %}
+                {% if lp.student.marticulated_sa == 'No' %}
+                    <tr>
+                        <td class="font-medium">CERTIFIED COPY SAQA EVALUATION</td>
+                        <td>
+                            {% if learner_registration.attachments.saqa_evaluation %}
+                                <button class="btn btn-success mr-1 mb-2 text-white"> <i data-lucide="check-square" class="w-5 h-5"></i> </button> 
+                            {% else %}
+                                <button class="btn btn-danger mr-1 mb-2 text-white"> <i data-lucide="x-square" class="w-5 h-5"></i> </button> 
+                            {% endif %} 
+                        </td>
+                        
+                            <td>
+                                <input name='saqa_evaluation' id="saqa_evaluation" type="file" class="form-control">
+                            </td>
+                      
+                        <td>
+                            <a  target='_blank' {% if learner_registration.attachments.saqa_evaluation %} href="{{ learner_registration.attachments.saqa_evaluation.url }}"  class="btn btn-primary w-24 mr-2 mb-2" {% else %} disabled class="btn btn-secondary w-24 mr-2 mb-2" {% endif %}> <i data-lucide="landmark" class="w-4 h-4 mr-2"></i> View </a>
+                        </td>
+                        
+                    </tr>
+                {% endif %}
+                {% if lp.student.residence_status.status  == "Other" or lp.student.residence_status.status  == "Unknown" %} 
+                    <tr>
+                        <td class="font-medium">CERTIFIED COPY OF STUDY PERMIT</td>
+                        <td>
+                            {% if learner_registration.attachments.study_permit %}
+                                <button class="btn btn-success mr-1 mb-2 text-white"> <i data-lucide="check-square" class="w-5 h-5"></i> </button> 
+                            {% else %}
+                                <button class="btn btn-danger mr-1 mb-2 text-white"> <i data-lucide="x-square" class="w-5 h-5"></i> </button> 
+                            {% endif %} 
+                        </td>
+                        
+                            <td>
+                                <input name='study_permit' id="id_study_permit" type="file" class="form-control">
+                            </td>
+                      
+                        <td>
+                            <a  target='_blank' {% if learner_registration.attachments.study_permit %} href="{{ learner_registration.attachments.study_permit.url }}"  class="btn btn-primary w-24 mr-2 mb-2" {% else %} disabled class="btn btn-secondary w-24 mr-2 mb-2" {% endif %}> <i data-lucide="landmark" class="w-4 h-4 mr-2"></i> View </a>
+                        </td>
+                        
+                    </tr>
+                {% endif %}
+            </table>   
+        </form>             
+    </div>
+</div>

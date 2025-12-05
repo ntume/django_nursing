@@ -1,0 +1,180 @@
+{% extends 'base_vertical.html' %}
+
+{% block main-content %}
+<div class="row">
+  <div class="col-md-12 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          <nav aria-label="breadcrumb">
+            <ol class="breadcrumb bg-inverse-info">
+              {% if user.is_authenticated and user.roles_id == 2 %}
+                <li class="breadcrumb-item"><a href="{% url 'wil:dashboard' %}">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'wil:event_create' %}">Add Recruitment Program</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'wil:event_list' %}">Recruitment Programs</a></li>
+                <li class="breadcrumb-item active" aria-current="page"><a>Company RSVPs</a></li>
+              {% elif user.is_authenticated and user.roles_id == 10 %}
+                <li class="breadcrumb-item"><a href="{% url 'psycad:dashboard' %}">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'psycad:event_create' %}">Add Recruitment Program</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'psycad:event_list' %}">Recruitment Programs</a></li>
+                <li class="breadcrumb-item active" aria-current="page"><a>Company RSVPs</a></li>
+              {% endif %}
+            </ol>
+            </nav>
+
+            {% include 'messages.html' %}
+
+        </div>
+      </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-lg-12 grid-margin stretch-card">
+              <div class="card">
+              <p class="card-title"></p>
+              <p class="card-description">
+                  <a href="{% url 'psycad:print_registrations_pdf' event.id %}" type="button" class="btn btn-warning btn-icon-text btn-rounded pull-right"> <i class="ti-printer btn-icon-prepend"></i>Export PDF</a>
+                  <a href="{% url 'psycad:export_registration_forms_excel' event.id %}" type="button" class="btn btn-primary btn-icon-text btn-rounded pull-right"> <i class="ti-printer btn-icon-prepend"></i>Export Excel</a>
+              </p>
+
+                    <div class="table-responsive">
+                      <table class="table table-bordered">
+                        <thead>
+                          <tr>
+                            <th>#</th>
+                            <th>Company</th>
+                            <th>Approved</th>
+                            <th>Paid</th>
+                            <th>Form</th>
+                            <th>Date</th>
+                            <th>Delete</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {% for c in rsvps %}
+                              <tr>
+                                <td class="py-1">
+                                  {{ forloop.counter }}
+                                </td>
+                                <td>
+                                  <b>{{ c.company.company_name }}</b>
+                                  <br><br>
+                                  {% for contact in c.contacts.all %}
+                                    <b>Name:</b> {{ contact.title }} {{ contact.name }} {{ contact.surname }}<br><br>
+                                    <b>Email:</b> {{contact.email}}<br><br>
+                                    <b>Cellphone:</b> {{contact.telephone}}
+                                  {% endfor %}
+                                </td>
+                                <td>
+                                  {% if c.approved == 'Yes' %}
+                                    <a href="{% url 'psycad:event_registration_company_approved' event.id c.id %}" class="btn btn-success btn-rounded btn-icon"> <br><i class="fa fa-thumbs-o-up"></i></a>
+                                  {% else %}
+                                    <a href="{% url 'psycad:event_registration_company_approved' event.id c.id %}" class="btn btn-warning btn-rounded btn-icon"> <br><i class="fa fa-thumbs-o-down"></i></a>
+                                  {% endif %}
+                                </td>
+                                <td>
+                                  {% if c.paid == 'Yes' %}
+                  									<a href="{% url 'psycad:event_registration_company_paid' event.id c.id %}" class="btn btn-success btn-rounded btn-icon"> <br><i class="fa fa-thumbs-o-up"></i></a>
+                  								{% else %}
+                  									<a href="{% url 'psycad:event_registration_company_paid' event.id c.id %}" class="btn btn-warning btn-rounded btn-icon"> <br><i class="fa fa-thumbs-o-down"></i></a>
+                  								{% endif %}
+                                </td>
+                                <td>
+                                  <a href="{% url 'psycad:event_registration_company_form_view' c.id %}" class="btn btn-primary btn-rounded btn-icon"> <br><i class="fa fa-sticky-note-o"></i></a>
+                                </td>
+
+                                <td> {{ c.created_at }} </td>
+
+
+                                <td>
+                                  <button type="button" class="btn btn-danger btn-rounded btn-icon" data-toggle="modal" data-target="#delete{{ c.id }}" > <i class="fa fa-trash-o"></i> </button>
+
+
+                                  <div class="modal fade" id="delete{{ c.id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel-3" aria-hidden="true">
+                                    <div class="modal-dialog" role="document">
+                                      <div class="modal-content">
+                                        <div class="modal-header">
+                                          <h5 class="modal-title" id="exampleModalLabel-3">Delete Registration</h5>
+                                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                          </button>
+                                        </div>
+                                        {% if user.is_authenticated and user.roles_id == 2 %}
+                                          <form action="{% url 'wil:event_registration_company_delete' event.id c.id %}" method="POST">
+                                        {% elif user.is_authenticated and user.roles_id == 10 %}
+                                          <form action="{% url 'psycad:event_registration_company_delete' event.id c.id %}" method="POST">
+                                        {% endif %}
+                                          {% csrf_token %}
+                                        <div class="modal-body">
+                                            <p>Are you sure you want to remove this registration? Please note that this can not be reversed</p>
+
+                                        </div>
+                                        <div class="modal-footer">
+                                          <button type="submit" class="btn btn-success">Delete</button>
+                                          <button type="button" class="btn btn-light" data-dismiss="modal">Cancel</button>
+                                        </div>
+                                        </form>
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                </td>
+                              </tr>
+                          {% empty %}
+                              <tr><td colspan="10">Sorry no companies have registered</td></tr>
+                          {% endfor %}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+              </div>
+            </div>
+
+{% endblock %}
+
+{% block js-content %}
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/jszip-2.5.0/dt-1.10.18/b-1.5.6/b-colvis-1.5.6/b-html5-1.5.6/b-print-1.5.6/cr-1.5.0/r-2.2.2/sl-1.3.0/datatables.min.css"/>
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/v/dt/jszip-2.5.0/dt-1.10.18/b-1.5.6/b-colvis-1.5.6/b-html5-1.5.6/b-print-1.5.6/cr-1.5.0/r-2.2.2/sl-1.3.0/datatables.min.js"></script>
+
+<script type="text/javascript" >
+
+    $(document).ready( function () {
+
+      $('#table_id_rsvps').DataTable({
+        "pageLength": 50,
+        dom: 'B<"clear">lfrtip',
+        buttons: {
+          name: 'primary',
+          buttons: [
+              {
+                  extend: 'copyHtml5',
+                  exportOptions: {
+                      columns: [ 0, ':visible' ]
+                  }
+              },
+              {
+                  extend: 'excelHtml5',
+                  exportOptions: {
+                      columns: ':visible'
+                  }
+              },
+              {
+                  extend: 'pdfHtml5',
+                  exportOptions: {
+                      columns: ':visible'
+                  }
+              },
+              'colvis'
+          ]
+        }}
+      );
+
+    });
+
+</script>
+
+
+
+{% endblock %}

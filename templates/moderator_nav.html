@@ -1,0 +1,57 @@
+<ul>
+    <li>
+        <a href="{% url 'college:moderator_dashboard' %}" class="side-menu side-menu{{ dash_menu }}">
+            <div class="side-menu__icon">
+                <i data-tw-merge="" data-lucide="home" class="stroke-1.5 w-5 h-5"></i>
+            </div>
+            <div class="side-menu__title">
+                Dashboard
+               
+            </div>
+        </a>
+    </li>
+
+    <li class="my-6 side-nav__divider"></li>
+    <li>
+        <a href="javascript:;" class="side-menu side-menu{{ cohort_menu }}">
+            <div class="side-menu__icon">
+                <i data-tw-merge="" data-lucide="edit" class="stroke-1.5 w-5 h-5"></i>
+            </div>
+            <div class="side-menu__title">
+                Learner Cohorts
+                <div class="side-menu__sub-icon ">
+                    <i data-tw-merge="" data-lucide="chevron-down" class="stroke-1.5 w-5 h-5"></i>
+                </div>
+            </div>
+        </a>
+        <ul class="">
+          {% for programme in MENU_PROGRAMMES %}
+              <li>
+                  <a href="{% url 'college:moderator_learning_programme_cohort_registration_periods' programme.id %}" class="side-menu">
+                      <div class="side-menu__icon">
+                          <i data-tw-merge="" data-lucide="activity" class="stroke-1.5 w-5 h-5"></i>
+                      </div>
+                      <div class="side-menu__title">
+                          {{ programme.programme_code }}
+                      </div>
+                  </a>
+              </li>
+            {% endfor %}
+        
+        </ul>
+    </li>
+
+    <li>
+        <a href="{% url 'appointments:appointments_my_list' %}" class="side-menu side-menu{{ appt_menu }}">
+            <div class="side-menu__icon">
+                <i data-tw-merge="" data-lucide="calendar" class="stroke-1.5 w-5 h-5"></i>
+            </div>
+            <div class="side-menu__title">
+                Appointment Requests
+                
+            </div>
+        </a>
+    </li>
+    
+  
+  </ul>

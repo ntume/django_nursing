@@ -1,0 +1,7 @@
+
+{{ message }}\n\n
+
+Sincerely\n\n
+
+{{ from_name }}\n
+{{ from_email }}

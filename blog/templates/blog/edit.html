@@ -1,0 +1,127 @@
+{% extends 'base_vertical.html' %}
+
+{% load bootstrap3 %}
+
+{% block main-content %}
+<div class="row">
+  <div class="col-md-12 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          <nav aria-label="breadcrumb">
+              <ol class="breadcrumb bg-inverse-info">
+                  <li class="breadcrumb-item"><a href="{% url 'psycad:dashboard' %}">Dashboard</a></li>
+                  <li class="breadcrumb-item"><a href="{% url 'psycad:blog_list' %}">Blog Entries</a></li>
+                  <li class="breadcrumb-item active" aria-current="page"><a>Edit Blog:{{ blog.title }} </a></li>
+              </ol>
+            </nav>
+
+            {% include 'messages.html' %}
+
+        </div>
+      </div>
+  </div>
+</div>
+
+  <div class="col-12 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          <h4 class="card-title">Edit Blog Post</h4>
+          <p class="card-description">
+            Please fill in the information below
+          </p>
+          <form class="forms-sample" method="POST" enctype="multipart/form-data" action="{% url 'psycad:blog_edit' blog.id %}">
+            {% csrf_token %}
+
+            <div class="form-group">
+              <label>Title</label>
+              <input type="text" name="title" id="title" value="{{ blog.title }}" class="form-control" required/>
+            </div>
+
+            <div class="form-group">
+              <label>Short Description</label>
+              <input type="text" name="short_description" id="short_description" value="{{ blog.short_description }}"  class="form-control" required/>
+            </div>
+
+            <div class="form-group">
+              <label>Publish</label>
+              <select name="publish" id="publish" class="form-control" required>
+                {% if blog.publish == 'Yes' %}
+                  <option value="Yes" selected>Yes</option>
+                  <option value="No">No</option>
+                {% else %}
+                  <option value="Yes">Yes</option>
+                  <option value="No" selected>No</option>
+                {% endif %}
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Viewership</label>
+              <select name="viewership" id="viewership" class="form-control" required>
+                {% if blog.viewership == 'Public' %}
+                  <option value="Public" selected>Public</option>
+                  <option value="Registered User">Registered User</option>
+                {% else %}
+                  <option value="Public">Public</option>
+                  <option value="Registered User" selected>Registered User</option>
+                {% endif %}
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Category</label>
+              <select name="category" id="category" class="form-control" required>
+                {% for cat in categories %}
+                  {% if cat == blog.category %}
+                    <option value="{{cat.id}}" selected>{{cat.category}}</option>
+                  {% else %}
+                    <option value="{{cat.id}}">{{cat.category}}</option>
+                  {% endif %}
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Blog Article</label>
+              <textarea id="summernote" name="article">{{ blog.article }}</textarea>
+            </div>
+            <div class="form-group">
+              <label>Link</label>
+              <input type="text" name="link" id="link" class="form-control" value="{{ blog.link }}">
+            </div>
+            <div class="form-group">
+              <div class="col-md-6">
+                <label>File Attachment</label>
+                {% bootstrap_field form_attachment.file_attachment show_label=False %}
+              </div>
+
+              <div class="col-md-6">
+                <label>Cover Image (please upload an image file: img / png / jpg)</label>
+                {% bootstrap_field form_coverimage.cover_image show_label=False %}
+              </div>
+              <div class="col-md-6">
+                {% if blog.cover_image %}
+                  <img class="card-img-top" src="{{blog.cover_image.url}}">
+                {% endif %}
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary mr-2">Edit Blog Post</button>
+            <button class="btn btn-light">Cancel</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+{% endblock %}
+
+{% block js-content %}
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.12/summernote.js"></script>
+
+<script>
+    $(document).ready(function() {
+        $('#summernote').summernote();
+    });
+  </script>
+
+{% endblock %}

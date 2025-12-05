@@ -1,0 +1,223 @@
+{% extends 'base_vertical.html' %}
+
+{% block main-content %}
+<div class="row">
+  <div class="col-md-12 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          <nav aria-label="breadcrumb">
+              <ol class="breadcrumb bg-inverse-info">
+                <li class="breadcrumb-item"><a href="{% url 'psycad:dashboard' %}">Dashboard</a></li>
+                  <li class="breadcrumb-item active" aria-current="page"><a>Messenger</a></li>
+             
+              </ol>
+            </nav>
+
+            {% include 'messages.html' %}
+
+        </div>
+      </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-lg-12 grid-margin stretch-card">
+              <div class="card">
+                <form action="{% url 'psycad:events_students_messenger_send_all' %}" method="POST" name="frmnotify" enctype="multipart/form-data">
+              
+                {% csrf_token %}
+                <input  type = "hidden" name = "userscustomLoop" value = "{{ students.count }}">
+                  <div class="card-body">
+                    <h4 class="card-title">Students Messenger</h4>
+                    <p class="card-description">
+
+                      <div class="form-group">
+                        <label for="subject">Subject</label>
+                        <input type="text" class="form-control" id="subject" name="subject" placeholder="Message Subject">
+                      </div>
+
+                      <div class="form-group">
+                        <label for="message">Message</label>
+                        <textarea name="message" class="form-control" id="message" placeholder="Email Message"></textarea>
+                      </div>
+
+                      <div class="form-group">
+                        <label for="subject">Attachment</label>
+                        <input type="file" class="form-control" id="id_attachment" name="attachment">
+                      </div>
+
+                      <button type="button" class="btn btn-warning btn-icon-text btn-rounded pull-right" onclick="sendNotifications()"> <i class="ti-email btn-icon-prepend"></i>Send Message</button>
+
+                    </p><br><br><br>
+                    <div class="table-responsive">
+                      <table class="table table-bordered">
+                        <thead>
+                          <tr>
+                            <th><input type="checkbox" name="toggle" value="all" class="form-control" onclick = "checkall()">ALL</th>
+                            <th>Student Details</th>
+                            <th>Contacts</th>
+                            <th>Date Added</th>
+                            <th>Employed</th>
+                            <th>Status</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {% for s in students %}
+                              <tr>
+                                <td class="py-1">
+                                  <input type="checkbox" name="students[]" value="{{ s.student.id }}">
+                                </td>
+                                <td>
+                                  <b>{{s.student.student_number}}</b><br><br>
+                                  {{s.student.name}} {{s.student.surname}}
+                                </td>
+                                <td>
+                                  <b>Email:</b> {{s.student.email}}<br><br>
+                                  <b>Alt Email:</b> {{s.student.alternate_email}}<br><br>
+                                  <b>Cellphone:</b> {{s.student.contact_number}}
+                                </td>                                
+                                <td> {{ s.student.created_at }} </td>
+                                <td>
+                                  {% if s.student.employed == 1 %}
+                                      <button type="button" class="btn btn-outline-success btn-rounded btn-icon">
+                                        <i class="ti-check"></i>
+                                      </button>
+                                  {% else %}
+                                      <button type="button" class="btn btn-outline-danger btn-rounded btn-icon">
+                                        <i class="ti-close"></i>
+                                      </button>
+                                  {% endif %}
+                                </td>
+                                <td>
+
+                                  {% if s.student.status == 1 %}
+                                      <button type="button" class="btn btn-outline-secondary btn-rounded btn-icon">
+                                        <i class="ti-thumb-up"></i>
+                                      </button>
+                                  {% elif s.student.status == 2 %}
+                                      <button type="button" class="btn btn-outline-secondary btn-rounded btn-icon">
+                                        <i class="ti-unlink"></i>
+                                      </button>
+                                  {% elif s.student.status == 3 %}
+                                      <button type="button" class="btn btn-outline-secondary btn-rounded btn-icon">
+                                        <i class="ti-thumb-down"></i>
+                                      </button>
+                                  {% endif %}
+
+                                </td>                                
+                              </tr>
+                          {% empty %}
+                              <tr><td colspan="10">Sorry no students</td></tr>
+                          {% endfor %}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+              </form>
+              </div>
+            </div>
+</div>
+
+
+          <div class="row">
+            <div class="col-lg-12 grid-margin stretch-card">
+                <div class="card">
+                  <div class="card-body">
+
+                    <nav>
+                    {% if is_paginated %}
+                      <ul class="pagination flex-wrap pagination-rounded">
+                        <li class="page-item"><a class="page-link" href="#"><i class="ti-angle-left"></i></a></li>
+                        {% if page_obj.has_previous %}
+                          <li class="page-item"><a  class="page-link" href="?page={{ page_obj.previous_page_number }}">&laquo;</a></li>
+                        {% else %}
+                          <li class="disabled page-link"><span>&laquo;</span></li>
+                        {% endif %}
+                        {% for i in paginator.page_range %}
+                          {% if page_obj.number == i %}
+                            <li class="active page-link"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+                          {% else %}
+                            <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+                          {% endif %}
+                        {% endfor %}
+                        {% if page_obj.has_next %}
+                          <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">&raquo;</a></li>
+                        {% else %}
+                          <li class="disabled page-link"><span>&raquo;</span></li>
+                        {% endif %}
+                        <li class="page-item"><a class="page-link" href="#"><i class="ti-angle-right"></i></a></li>
+                      </ul>
+                    {% endif %}
+                    </nav>                    
+                </div>
+                </div>
+            </div>
+          </div>
+
+{% endblock %}
+
+{% block js-content %}
+
+<script language="JavaScript" type="text/javascript">
+
+  function checkall(){
+    var loop = document.frmnotify.userscustomLoop.value;
+    //boxes = document.frmnotify.notify.length;
+    if (loop > 1){
+      for(i=0;i<loop;i++){
+          if(document.forms["frmnotify"].elements["students[]"][i].checked == true )
+             document.forms["frmnotify"].elements["students[]"][i].checked = false;
+           else if(document.forms["frmnotify"].elements["students[]"][i].checked == false)
+             document.forms["frmnotify"].elements["students[]"][i].checked = true;
+      }
+    }
+    else{
+      if(document.forms["frmnotify"].elements["students[]"].checked == true )
+         document.forms["frmnotify"].elements["students[]"].checked = false;
+       else if(document.forms["frmnotify"].elements["students[]"].checked == false)
+         document.forms["frmnotify"].elements["students[]"].checked = true;
+    }
+  }
+
+  function sendNotifications(){
+
+            var loop = document.frmnotify.userscustomLoop.value;
+            var message = document.frmnotify.message.value;
+            var subject = document.frmnotify.subject.value;
+            var tocheck = false;
+
+            if (loop > 1){
+              for (i = 0; i < loop; i++) {
+                 if (document.forms["frmnotify"].elements["students[]"][i].checked == true)
+                   tocheck = true;
+              }
+            }
+            else{
+              if (document.forms["frmnotify"].elements["students[]"].checked == true)
+                tocheck = true;
+            }
+
+            if(tocheck == true && subject != "" && message != "")
+                  document.frmnotify.submit();
+            else if(tocheck == false || subject == "" || message == "")
+                alert('Pease select atleast one student to send message to \nMake sure to fill the subject and message box as well');
+	}
+
+  function sendMsgCompStuds(){
+      var loop = document.frmnotify.userscustomLoop.value;
+      var tocheck = false;
+      for (i = 0; i < loop; i++) {
+         if (document.forms["frmnotify"].elements["cbid[]"][i].checked == true)
+           tocheck = true;
+      }
+
+      if(tocheck == true){
+            document.frmnotify.submit();
+      }
+      else if(tocheck == false)
+          alert('Pease select atleast one student to notify');
+  }
+
+</script>
+
+
+{% endblock %}

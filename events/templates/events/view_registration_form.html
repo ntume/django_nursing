@@ -1,0 +1,61 @@
+{% extends 'base_vertical.html' %}
+
+{% block main-content %}
+<div class="row">
+  <div class="col-md-12 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          <nav aria-label="breadcrumb">
+            <ol class="breadcrumb bg-inverse-info">
+              {% if user.is_authenticated and user.roles_id == 2 %}
+                <li class="breadcrumb-item"><a href="{% url 'wil:dashboard' %}">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'wil:event_create' %}">Add Recruitment Program</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'wil:event_list' %}">Recruitment Programs</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'wil:view_company_rsvps' rsvp.event.id %}">Company RSVPs</a></li>
+                <li class="breadcrumb-item active" aria-current="page"><a>Registration Form: {{ rsvp.company.company_name }}</a></li>
+              {% elif user.is_authenticated and user.roles_id == 10 %}
+                <li class="breadcrumb-item"><a href="{% url 'psycad:dashboard' %}">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'psycad:event_create' %}">Add Recruitment Program</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'psycad:event_list' %}">Recruitment Programs</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'psycad:view_company_rsvps' rsvp.event.id %}">Company RSVPs</a></li>
+                <li class="breadcrumb-item active" aria-current="page"><a>Registration Form: {{ rsvp.company.company_name }}</a></li>
+              {% endif %}
+            </ol>
+            </nav>
+
+            {% include 'messages.html' %}
+
+        </div>
+      </div>
+  </div>
+</div>
+      <div class="row">
+            <div class="col-12">
+              <div class="card">
+                <div class="card-body">
+                  <a href="{% url 'psycad:print_registration_form_pdf' rsvp.id %}" type="button" class="btn btn-primary btn-icon-text btn-rounded pull-right"> <i class="ti-printer btn-icon-prepend"></i>Print PDF</a>
+
+                  <p class="card-title">{{ rsvp.event.title }}</p>
+                  <p class="card-description">{{ rsvp.event.description }}</p>
+
+
+
+                  <p class="card-description">The registration form was submitted successfuly on: {{ rsvp.created_at }}</p>
+                  <br>
+                  {% for question in questions %}
+                    <label for="exampleInputName1"><b><u>{{ question.question }}</u></b></label><br>
+                    {% for answer in check_reg_form.event_form_answers.all %}
+
+                      {% if question.id == answer.question.id  %}
+                        <p>{{ answer.answer }}</p><br><br>
+                      {% endif %}
+                    {% endfor %}
+                  {% endfor %}
+
+
+                </div>
+              </div>
+            </div>
+          </div>
+
+{% endblock %}

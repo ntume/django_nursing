@@ -1,0 +1,71 @@
+{% extends 'base_vertical.html' %}
+
+{% block breadcrumb-content %}
+    <nav aria-label="breadcrumb" class="-intro-x h-full mr-auto">
+        <ol class="breadcrumb breadcrumb-light">
+            <li class="breadcrumb-item"><a href="{% url 'students:student_dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'students:student_learning_programmes' %}">Learning Programmes</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'students:student_learning_programme_registrations' learning_programme.id  %}">{{ learning_programme.programme_code }} Registrations</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'students:student_learning_programme_registrations_modules' registration.id  %}">Registered Modules</a></li>
+            
+            <li class="breadcrumb-item active" aria-current="page">{{ learning_programme.programme_code }} Registered Modules</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block main-content %}
+
+{% include 'messages.html' %}
+
+<div class="intro-y flex items-center mt-8">
+    <h2 class="text-lg font-medium mr-auto">
+        Registered Modules
+    </h2>
+</div>
+<div class="intro-y p-5 mt-5">
+        
+    <div class="overflow-x-auto">
+        <table class="table table-report -mt-2">
+            <thead>
+                <tr>
+                    <th class="whitespace-nowrap">#</th>                    
+                    <th class="whitespace-nowrap">Name</th>
+                    <th class="whitespace-nowrap">Code</th>
+                    <th class="whitespace-nowrap">Credits</th>
+                    <th class="whitespace-nowrap">Sections</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in items %}
+                <tr class="intro-x">
+                    <td class="w-40">
+                        {{ forloop.counter }}
+                    </td>
+                    <td>
+                        {{ r.study_unit_name }}
+                    </td>
+                    <td>
+                        {{ r.study_unit_code }}
+                    </td>
+                    <td>
+                        {{ r.credits }}
+                    </td>
+                    <td>
+                        {% for p in r.study_unit_sections.all %}
+                            <b> {{ p.section }} - {{ p.section_code }} </b>
+                            <br><hr><br>                            
+                        {% endfor %}
+                    </td>
+                  
+                </tr>
+                {% empty %}
+                <tr class="intro-x"><td colspan='4'>Nothing added yet</td></tr>
+                {% endfor %}
+                
+            <tbody>
+        </table>
+    </div>
+
+</div>
+
+{% endblock %}

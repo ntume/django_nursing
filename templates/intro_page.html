@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>WILMS</title>
+  <!-- plugins:css -->
+  <link rel="stylesheet" href="{% static 'vendors/iconfonts/ti-icons/css/themify-icons.css' %}">
+  <link rel="stylesheet" href="{% static 'vendors/css/vendor.bundle.base.css' %}">
+  <link rel="stylesheet" href="{% static 'vendors/css/vendor.bundle.addons.css' %}">
+  <link rel="stylesheet" href="{% static 'vendors/iconfonts/font-awesome/css/font-awesome.min.css' %}" />
+  <link rel="stylesheet" href="{% static 'vendors/summernote/dist/summernote-bs4.css' %}">
+  <!-- endinject -->
+  <!-- plugin css for this page -->
+  <!-- End plugin css for this page -->
+  <!-- inject:css -->
+  <link rel="stylesheet" href="{% static 'css/vertical-layout-light/style.css' %}">
+  <!-- endinject -->
+  <link rel="shortcut icon" href="{% static 'images/favicon.png' %}" />
+
+<style type="text/css">
+
+.countdown{
+	color: #fff;
+	margin: 40px auto 10px;
+	width: 70%;
+}
+.countdown_row{
+	display: block;
+	margin-left: 5px;
+	overflow: hidden;
+	width: 100%;
+}
+.countdown_section{
+	background: none repeat scroll 0 0 transparent;
+	border: 2px solid #ddd;
+	border-radius: 100%;
+	display: block;
+	float: left;
+	font-size: 25px;
+	margin: 15px 30px auto;
+	padding: 30px 12px;
+	text-align: center;
+	width: 140px;
+}
+.countdown_amount{
+	font-size: 25px;
+	font-weight: 800;
+}
+
+</style>
+
+</head>
+
+<body class="sidebar-dark">
+  <div class="container-scroller">
+    <div class="container-fluid page-body-wrapper full-page-wrapper">
+      <div class="content-wrapper d-flex align-items-center text-center error-page bg-primary">
+        <div class="row flex-grow">
+          <div class="col-lg-12 mx-auto text-white">
+            <div class="row align-items-center d-flex flex-row">
+              <div class="col-lg-6 text-lg-right pr-lg-4">
+                <div id="getting-started" class="countdown wow bounceInUp"></div>
+              </div>
+              <div class="col-lg-6 error-page-divider text-lg-left pl-lg-4">
+                <video width="100%" height="100%" controls>
+                    <source src="https://wilms-uj-media.s3-eu-west-1.amazonaws.com/media/resources/uj_video.mp4" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+              </div>
+
+
+
+
+
+            </div>
+            <div class="row mt-5">
+              <div class="col-12 text-center mt-xl-2">
+                <a class="text-white font-weight-medium" href="{% url 'blog-list' %}">We will be launching our new and improved YourCareer website soon</a>
+              </div>
+            </div>
+            <div class="row mt-5">
+              <div class="col-12 mt-xl-2">
+                <p class="text-white font-weight-medium text-center">Copyright &copy; 2020  All rights reserved.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- content-wrapper ends -->
+    </div>
+    <!-- page-body-wrapper ends -->
+  </div>
+  <!-- container-scroller -->
+  <!-- plugins:js -->
+  <script src="{% static 'vendors/js/vendor.bundle.base.js' %}"></script>
+  <script src="{% static 'vendors/js/vendor.bundle.addons.js' %}"></script>
+  <script src="{% static 'js/jquery.countdown.min.js' %}"></script>
+
+  <!-- endinject -->
+  <!-- inject:js -->
+  <script src="{% static 'js/off-canvas.js' %}"></script>
+  <script src="{% static 'js/hoverable-collapse.js' %}"></script>
+  <script src="{% static 'js/settings.js' %}"></script>
+  <script src="{% static 'js/todolist.js' %}"></script>
+  <!-- endinject -->
+  <script type="text/javascript">
+  $("#getting-started")
+  .countdown("2020/08/01", function(event) {
+    $(this).text(
+      event.strftime('%D days %H:%M:%S')
+    );
+  });
+</script>
+
+</body>
+
+</html>

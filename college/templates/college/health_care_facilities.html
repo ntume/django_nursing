@@ -1,0 +1,490 @@
+{% extends 'base_tpl.html' %}
+
+{% block breadcrumb-content %}
+    <nav aria-label="breadcrumb" class="-intro-x mr-auto hidden sm:flex">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'administration:dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Healthcare Facilities</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block main-content %}
+
+{% include 'messages.html' %}
+
+
+    <div class="intro-y flex flex-col sm:flex-row items-center mt-8">
+        <h2 class="text-lg font-medium mr-auto">
+            Healthcare Facilities
+        </h2>
+        <div class="w-full sm:w-auto flex mt-4 sm:mt-0">
+            <button data-tw-toggle="modal" data-tw-target="#add-modal"  class="btn btn-primary shadow-md mr-2">Add Healthcare Facility</button>
+
+            <div id="add-modal" class="modal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <form action="{% url 'college:health_care_facility_add' %}" method="POST">
+                            {% csrf_token %}
+                            <!-- BEGIN: Modal Header -->
+                            <div class="modal-header">
+                                <h2 class="font-medium text-base mr-auto">Add Healthcare Facility</h2>                                             
+                            </div> <!-- END: Modal Header -->
+                            <!-- BEGIN: Modal Body -->
+                            <div class="modal-body grid grid-cols-12 gap-4 gap-y-3">
+                                <div class="col-span-12 sm:col-span-12"> 
+                                    <label for="modal-form-1" class="form-label">Name*</label> 
+                                    <input id="name" name='name' type="text" class="form-control" placeholder="Health Care Facility Name" maxlength='100' required> 
+                                </div> 
+                                <div class="col-span-12 sm:col-span-12"> 
+                                    <label for="modal-form-1" class="form-label">Code*</label> 
+                                    <input id="code" name='code' type="text" class="form-control" placeholder="Code" maxlength='5' required> 
+                                </div> 
+                                <div class="col-span-12 sm:col-span-12"> 
+                                    <label for="physical_address_1" class="form-label">Physical Address 1*</label> 
+                                    <input id="physical_address_1" name='physical_address_1' type="text" class="form-control" placeholder="Physical Address 1" maxlength='100' required> 
+                                </div>  
+                                <div class="col-span-12 sm:col-span-12"> 
+                                    <label for="physical_address_1" class="form-label">Physical Address 2*</label> 
+                                    <input id="physical_address_2" name='physical_address_2' type="text" class="form-control" placeholder="Physical Address 2" maxlength='100' required> 
+                                </div>
+                                <div class="col-span-12 sm:col-span-12"> 
+                                    <label for="physical_address_1" class="form-label">Physical Address 3*</label> 
+                                    <input id="physical_address_3" name='physical_address_3' type="text" class="form-control" placeholder="Physical Address 3" maxlength='100' required> 
+                                </div>  
+                                <div class="col-span-12 sm:col-span-12"> 
+                                    <label for="physical_address_1" class="form-label">Category*</label> 
+                                    <select name='category' class='form-select' required>
+                                        <option></option>
+                                        <option value="Primary Health Care">Primary Health Care</option>
+                                        <option value="Hospital">Hospital</option>
+                                    </select>
+                                </div>                                         
+                            </div> <!-- END: Modal Body -->
+                            <!-- BEGIN: Modal Footer -->
+                            <div class="modal-footer"> 
+                                <button type="button" data-tw-dismiss="modal" class="btn btn-outline-secondary w-20 mr-1">Cancel</button> 
+                                <button type="submit" class="btn btn-primary w-40">Add Healthcare Facility</button> 
+                            </div> <!-- END: Modal Footer -->
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="intro-y box p-5 mt-5">
+        
+        <div class="overflow-x-auto">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th class="whitespace-nowrap">#</th>
+                        <th class="whitespace-nowrap">Name</th>
+                        <th class="whitespace-nowrap">Wards</th>
+                        <th class="whitespace-nowrap">Category</th>
+                        <th class="whitespace-nowrap">Learning Programme</th>
+                        <th class="whitespace-nowrap">Discipline</th>
+                        <th class="flex justify-center items-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in items %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>
+                                {{ item.name }}<br>
+                                {{ item.physical_address_1 }}<br>
+                                {{ item.physical_address_2 }}<br>
+                                {{ item.physical_address_3|default_if_none:"" }}
+
+                            </td>
+                            <td>
+                                {% for p in item.wards.all %}
+                                    <b> {{ p.ward.ward }} </b>
+                                    <br>
+                                    <a data-tw-toggle="modal" data-tw-target="#delete_ward_{{ item.id }}_{{ p.id }}" class='text-danger'>Delete</a><br>
+                                    <br><hr><br>
+                                        
+                                    <div id="delete_ward_{{ item.id }}_{{ p.id }}" class="modal" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-body p-0">
+                                                    <form action="{% url 'college:health_care_facility_ward_delete' p.id %}" method="POST">
+                                                        {% csrf_token %}
+                                                        <div class="p-5 text-center">
+                                                            <i data-lucide="x-circle" class="w-16 h-16 text-danger mx-auto mt-3"></i> 
+                                                            <div class="text-3xl mt-5">Are you sure?</div>
+                                                            <div class="text-slate-500 mt-2">
+                                                                Do you really want to delete this record? 
+                                                                <br>
+                                                                This process cannot be undone.
+                                                            </div>
+                                                        </div>
+                                                        <div class="px-5 pb-8 text-center">
+                                                            <button type="button" data-tw-dismiss="modal" class="btn btn-outline-secondary w-24 mr-1">Cancel</button>
+                                                            <button type="submit" class="btn btn-danger w-24">Delete</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+    
+                                <a class="btn btn-primary ml-2 text-white mb-5" data-tw-toggle="modal" data-tw-target="#add_ward_{{ item.id }}"> <i data-lucide="plus" class="w-4 h-4 mr-1"></i> Add</a>
+                                <div id="add_ward_{{ item.id }}" class="modal" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog modal-xl">
+                                        <form action="{% url 'college:health_care_facility_wards_add' item.id %}" method="POST">       
+                                            {% csrf_token %}                                  
+                                            <div class="modal-content">
+                                                <div class="modal-body p-5">
+                                                    <div class="mt-5 col-span-12 sm:col-span-12"> 
+                                                        <label for="id_beginning" class="form-label">Wards</label> 
+                                                        <select name='wards[]' class='tom-select' required multiple>
+                                                            <option></option>
+                                                            {% for ward in ward_list %}
+                                                                <option value="{{ ward.id }}">{{ ward.ward }}</option>
+                                                            {% endfor %}
+                                                        </select>
+                                                    </div>
+                                                                                                   
+                                                    <br><br>
+                                                    <div class="px-5 pb-8 text-center"> 
+                                                        <button type="button" data-tw-dismiss="modal" class="btn btn-outline-secondary w-24 mr-1">Cancel</button> 
+                                                        <button type="submit" class="btn btn-primary w-60 text-white">Add Wards</button> 
+                                                    </div>
+                                                    
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>{{ item.category }}</td>
+                            <td>
+                                {% for p in item.learning_programme_numbers.all %}
+                                    <b> {{ p.learning_programme.programme_name }} - {{ p.student_numbers }} Students</b>
+                                    <br>
+                                    <a data-tw-toggle="modal" data-tw-target="#edit_period_{{ item.id }}_{{ p.id }}" class='text-primary'>Edit</a>&nbsp;|&nbsp;<a data-tw-toggle="modal" data-tw-target="#delete_period_{{ item.id }}_{{ p.id }}" class='text-danger'>Delete</a><br>
+                                    <br><hr><br>
+                                    <div id="edit_period_{{ item.id }}_{{ p.id }}" class="modal" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog modal-xl">
+                                            <form action="{% url 'college:health_care_facility_learning_programme_edit' item.id p.id %}" method="POST">       
+                                                {% csrf_token %}                                  
+                                                <div class="modal-content">
+                                                    <div class="modal-body p-5">
+                                                        <div class="mt-5 col-span-12 sm:col-span-12"> 
+                                                            <label for="id_beginning" class="form-label">Learning Programme</label> 
+                                                            <select name='learning_programme' class='form-select' required>
+                                                                <option></option>
+                                                                {% for programme in learning_programmes %}
+                                                                    {% if p.learning_programme == programme %}
+                                                                        <option value="{{ programme.id }}" selected>{{ programme.programme_name }}</option>
+                                                                    {% else %}
+                                                                        <option value="{{ programme.id }}">{{ programme.programme_name }}</option>
+                                                                    {% endif %}
+                                                                {% endfor %}
+                                                            </select>
+                                                        </div>
+                                                        <div class="mt-5 col-span-12 sm:col-span-12"> 
+                                                            <label for="id_beginning" class="form-label">Number of Learners</label> 
+                                                            <input type='number' name="student_numbers" id="student_numbers" class="form-control" required min='1' value="{{ p.student_numbers }}">
+                                                        </div>                                                    
+                                                        <br><br>
+                                                        <div class="px-5 pb-8 text-center"> 
+                                                            <button type="button" data-tw-dismiss="modal" class="btn btn-outline-secondary w-24 mr-1">Cancel</button> 
+                                                            <button type="submit" class="btn btn-success w-60 text-white">Edit Student Numbers</button> 
+                                                        </div>
+                                                        
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+    
+                                    <div id="delete_period_{{ item.id }}_{{ p.id }}" class="modal" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-body p-0">
+                                                    <form action="{% url 'college:health_care_facility_learning_programme_delete' p.id %}" method="POST">
+                                                        {% csrf_token %}
+                                                        <div class="p-5 text-center">
+                                                            <i data-lucide="x-circle" class="w-16 h-16 text-danger mx-auto mt-3"></i> 
+                                                            <div class="text-3xl mt-5">Are you sure?</div>
+                                                            <div class="text-slate-500 mt-2">
+                                                                Do you really want to delete this record? 
+                                                                <br>
+                                                                This process cannot be undone.
+                                                            </div>
+                                                        </div>
+                                                        <div class="px-5 pb-8 text-center">
+                                                            <button type="button" data-tw-dismiss="modal" class="btn btn-outline-secondary w-24 mr-1">Cancel</button>
+                                                            <button type="submit" class="btn btn-danger w-24">Delete</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+    
+                                <a class="btn btn-success ml-2 text-white mb-5" data-tw-toggle="modal" data-tw-target="#add_period_{{ item.id }}"> <i data-lucide="plus" class="w-4 h-4 mr-1"></i> Add</a>
+                                <div id="add_period_{{ item.id }}" class="modal" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog modal-xl">
+                                        <form action="{% url 'college:health_care_facility_learning_programme_add' item.id %}" method="POST">       
+                                            {% csrf_token %}                                  
+                                            <div class="modal-content">
+                                                <div class="modal-body p-5">
+                                                    <div class="mt-5 col-span-12 sm:col-span-12"> 
+                                                        <label for="id_beginning" class="form-label">Learning Programme</label> 
+                                                        <select name='learning_programme' class='form-select' required>
+                                                            <option></option>
+                                                            {% for programme in learning_programmes %}
+                                                                <option value="{{ programme.id }}">{{ programme.programme_name }}</option>
+                                                            {% endfor %}
+                                                        </select>
+                                                    </div>
+                                                    <div class="mt-5 col-span-12 sm:col-span-12"> 
+                                                        <label for="id_beginning" class="form-label">Number of Learners</label> 
+                                                        <input type='number' name="student_numbers" id="student_numbers" class="form-control" required min='1'>
+                                                    </div>                                                    
+                                                    <br><br>
+                                                    <div class="px-5 pb-8 text-center"> 
+                                                        <button type="button" data-tw-dismiss="modal" class="btn btn-outline-secondary w-24 mr-1">Cancel</button> 
+                                                        <button type="submit" class="btn btn-success w-60 text-white">Add Student Numbers</button> 
+                                                    </div>
+                                                    
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                {% for p in item.discipline_numbers.all %}
+                                    <b> {{ p.learning_programme.programme_name }}</b><br>
+                                    <b> {{ p.discipline.discipline }} - {{ p.student_numbers }} Students</b>
+                                    <br>
+                                    <a data-tw-toggle="modal" data-tw-target="#edit_discipline_{{ item.id }}_{{ p.id }}" class='text-primary'>Edit</a>&nbsp;|&nbsp;<a data-tw-toggle="modal" data-tw-target="#delete_discipline_{{ item.id }}_{{ p.id }}" class='text-danger'>Delete</a><br>
+                                    <br><hr><br>
+                                    <div id="edit_discipline_{{ item.id }}_{{ p.id }}" class="modal" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog modal-xl">
+                                            <form action="{% url 'college:health_care_facility_discipline_edit' item.id p.id %}" method="POST">       
+                                                {% csrf_token %}                                  
+                                                <div class="modal-content">
+                                                    <div class="modal-body p-5">
+                                                        <div class="mt-5 col-span-12 sm:col-span-12"> 
+                                                        <label for="id_beginning" class="form-label">Learning Programme</label> 
+                                                        {{ p.learning_programme.programme_name }}
+                                                    </div>
+                                                        <div class="mt-5 col-span-12 sm:col-span-12"> 
+                                                            <label for="id_beginning" class="form-label">Discipline</label> 
+                                                            {{ p.discipline.discipline }}
+                                                        </div>
+                                                        <div class="mt-5 col-span-12 sm:col-span-12"> 
+                                                            <label for="id_beginning" class="form-label">Number of Learners</label> 
+                                                            <input type='number' name="student_numbers" id="student_numbers" class="form-control" required min='1' value="{{ p.student_numbers }}">
+                                                        </div>                                                    
+                                                        <br><br>
+                                                        <div class="px-5 pb-8 text-center"> 
+                                                            <button type="button" data-tw-dismiss="modal" class="btn btn-outline-secondary w-24 mr-1">Cancel</button> 
+                                                            <button type="submit" class="btn btn-success w-60 text-white">Edit Student Numbers</button> 
+                                                        </div>
+                                                        
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+    
+                                    <div id="delete_discipline_{{ item.id }}_{{ p.id }}" class="modal" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-body p-0">
+                                                    <form action="{% url 'college:health_care_facility_discipline_delete' p.id %}" method="POST">
+                                                        {% csrf_token %}
+                                                        <div class="p-5 text-center">
+                                                            <i data-lucide="x-circle" class="w-16 h-16 text-danger mx-auto mt-3"></i> 
+                                                            <div class="text-3xl mt-5">Are you sure?</div>
+                                                            <div class="text-slate-500 mt-2">
+                                                                Do you really want to delete this record? 
+                                                                <br>
+                                                                This process cannot be undone.
+                                                            </div>
+                                                        </div>
+                                                        <div class="px-5 pb-8 text-center">
+                                                            <button type="button" data-tw-dismiss="modal" class="btn btn-outline-secondary w-24 mr-1">Cancel</button>
+                                                            <button type="submit" class="btn btn-danger w-24">Delete</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+    
+                                <a class="btn btn-warning ml-2 text-white mb-5" data-tw-toggle="modal" data-tw-target="#add_discipline_{{ item.id }}"> <i data-lucide="plus" class="w-4 h-4 mr-1"></i> Add</a>
+                                <div id="add_discipline_{{ item.id }}" class="modal" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog modal-xl">
+                                        <form action="{% url 'college:health_care_facility_discipline_add' item.id %}" method="POST">       
+                                            {% csrf_token %}                                  
+                                            <div class="modal-content">
+                                                <div class="modal-body p-5">
+                                                    <div class="mt-5 col-span-12 sm:col-span-12"> 
+                                                        <label for="id_beginning" class="form-label">Learning Programme</label> 
+                                                        <select name='learning_programme' class='form-select' required>
+                                                            <option></option>
+                                                            {% for programme in learning_programmes %}
+                                                                <option value="{{ programme.id }}">{{ programme.programme_name }}</option>
+                                                            {% endfor %}
+                                                        </select>
+                                                    </div>
+                                                    <div class="mt-5 col-span-12 sm:col-span-12"> 
+                                                        <label for="id_beginning" class="form-label">Discipline</label> 
+                                                        <select name='discipline' class='form-select' required>
+                                                            <option></option>
+                                                            {% for discipline in disciplines %}
+                                                                <option value="{{ discipline.id }}">{{ discipline.discipline }}</option>
+                                                            {% endfor %}
+                                                        </select>
+                                                    </div>
+                                                    <div class="mt-5 col-span-12 sm:col-span-12"> 
+                                                        <label for="id_beginning" class="form-label">Number of Learners</label> 
+                                                        <input type='number' name="student_numbers" id="student_numbers" class="form-control" required min='1'>
+                                                    </div>                                                    
+                                                    <br><br>
+                                                    <div class="px-5 pb-8 text-center"> 
+                                                        <button type="button" data-tw-dismiss="modal" class="btn btn-outline-secondary w-24 mr-1">Cancel</button> 
+                                                        <button type="submit" class="btn btn-warning w-60 text-white">Add Student Numbers</button> 
+                                                    </div>
+                                                    
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+
+                                <div class="flex justify-center items-center">
+
+                                    <div class="dropdown ml-auto sm:ml-0">
+                                        <button class="dropdown-toggle btn px-2 box" aria-expanded="false" data-tw-toggle="dropdown">
+                                            <span class="w-5 h-5 flex items-center justify-center"> <i class="w-4 h-4" data-lucide="arrow-down"></i> </span>
+                                        </button>
+                                        <div class="dropdown-menu w-40">
+                                            <ul class="dropdown-content">
+                                                <li>
+                                                    <a class="dropdown-item" href="javascript:;" data-tw-toggle="modal" data-tw-target="#edit-modal_{{ item.id }}"> <i data-lucide="check-square" class="w-4 h-4 mr-1"></i> Edit </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item" href="javascript:;" data-tw-toggle="modal" data-tw-target="#delete-confirmation-modal_{{ item.id }}"> <i data-lucide="trash-2" class="w-4 h-4 mr-1"></i> Delete </a>
+                                                </li>
+                                                <li>
+                                                    <a href="{% url 'college:health_care_facility_hods' item.id %}" class="dropdown-item"> <i data-lucide="award" class="w-4 h-4 mr-2"></i> Unit Managers </a>
+                                                </li>
+                                               
+                                            </ul>
+                                        </div>
+                                    </div>
+                                                                   
+                                </div>
+
+
+                                    <div id="edit-modal_{{ item.id }}" class="modal" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <form action="{% url 'college:health_care_facility_edit' item.id %}" method="POST">
+                                                    {% csrf_token %}
+                                                    <!-- BEGIN: Modal Header -->
+                                                    <div class="modal-header">
+                                                        <h2 class="font-medium text-base mr-auto">Edit Health Care Facility</h2>                                             
+                                                    </div> <!-- END: Modal Header -->
+                                                    <!-- BEGIN: Modal Body -->
+                                                    <div class="modal-body grid grid-cols-12 gap-4 gap-y-3">
+                                                        <div class="col-span-12 sm:col-span-12"> 
+                                                            <label for="modal-form-1" class="form-label">Name*</label> 
+                                                            <input id="name" name='name' type="text" class="form-control" maxlength='100' value="{{ item.name }}" required> 
+                                                        </div> 
+                                                        <div class="col-span-12 sm:col-span-12"> 
+                                                            <label for="modal-form-1" class="form-label">Code*</label> 
+                                                            <input id="code" name='code' type="text" class="form-control" value="{{ item.code }}" maxlength='5' required> 
+                                                        </div> 
+                                                        <div class="col-span-12 sm:col-span-12"> 
+                                                            <label for="physical_address_1" class="form-label">Physical Address 1*</label> 
+                                                            <input id="physical_address_1" name='physical_address_1' type="text" class="form-control" placeholder="Physical Address 1" maxlength='100'  value="{{ item.physical_address_1 }}" required> 
+                                                        </div>  
+                                                        <div class="col-span-12 sm:col-span-12"> 
+                                                            <label for="physical_address_1" class="form-label">Physical Address 2*</label> 
+                                                            <input id="physical_address_2" name='physical_address_2' type="text" class="form-control" placeholder="Physical Address 2" maxlength='100'  value="{{ item.physical_address_2 }}" required> 
+                                                        </div>
+                                                        <div class="col-span-12 sm:col-span-12"> 
+                                                            <label for="physical_address_1" class="form-label">Physical Address 3*</label> 
+                                                            <input id="physical_address_3" name='physical_address_3' type="text" class="form-control" placeholder="Physical Address 3" maxlength='100'  value="{{ item.physical_address_3|default_if_none:"" }}"> 
+                                                        </div>  
+                                                        <div class="col-span-12 sm:col-span-12"> 
+                                                            <label for="physical_address_1" class="form-label">Category*</label> 
+                                                            <select name='category' class='form-select' required>
+                                                                <option></option>
+                                                                {% if item.category == 'Primary Health Care' %}
+                                                                    <option value="Primary Health Care" selected>Primary Health Care</option>
+                                                                    <option value="Hospital">Hospital</option>
+                                                                {% elif item.category == 'Hospital' %}
+                                                                    <option value="Primary Health Care">Primary Health Care</option>
+                                                                    <option value="Hospital" selected>Hospital</option>
+                                                                {% else %}
+                                                                    <option value="Primary Health Care">Primary Health Care</option>
+                                                                    <option value="Hospital">Hospital</option>
+                                                                {% endif %}
+                                                                
+                                                            </select>
+                                                        </div>                                            
+                                                    </div> <!-- END: Modal Body -->
+                                                    <!-- BEGIN: Modal Footer -->
+                                                    <div class="modal-footer"> 
+                                                        <button type="button" data-tw-dismiss="modal" class="btn btn-outline-secondary w-20 mr-1">Cancel</button> 
+                                                        <button type="submit" class="btn btn-primary w-60">Edit Healthcare Facility</button> 
+                                                    </div> <!-- END: Modal Footer -->
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div id="delete-confirmation-modal_{{ item.id }}" class="modal" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-body p-0">
+                                                    <form action="{% url 'college:health_care_facility_delete' item.id %}" method="POST">
+                                                        {% csrf_token %}
+                                                        <div class="p-5 text-center">
+                                                            <i data-lucide="x-circle" class="w-16 h-16 text-danger mx-auto mt-3"></i> 
+                                                            <div class="text-3xl mt-5">Are you sure?</div>
+                                                            <div class="text-slate-500 mt-2">
+                                                                Do you really want to delete this record? 
+                                                                <br>
+                                                                This process cannot be undone.
+                                                            </div>
+                                                        </div>
+                                                        <div class="px-5 pb-8 text-center">
+                                                            <button type="button" data-tw-dismiss="modal" class="btn btn-outline-secondary w-24 mr-1">Cancel</button>
+                                                            <button type="submit" class="btn btn-danger w-24">Delete</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    {% empty %}
+                    <tr><td colspan = '4'>No healthcare facility added, please add at least one healthcare facility</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+{% endblock %}

@@ -1,0 +1,361 @@
+{% extends 'base_tpl.html' %}
+
+{% block breadcrumb-content %}
+    <nav aria-label="breadcrumb" class="-intro-x mr-auto hidden sm:flex">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'administration:dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item active" aria-current="page">All Appointments</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block css-content %}
+
+
+
+
+{% endblock %}
+
+{% block main-content %}
+
+<div class="pos intro-y grid grid-cols-12 gap-5 mt-5">
+  <!-- BEGIN: Post Content -->
+
+  <div class="intro-y col-span-12 lg:col-span-12">
+    <!-- BEGIN: Form Layout -->
+    <div class="intro-y box p-5">
+        <form action="{% url 'appointments:appointments_all_list_filter' %}" method="POST">
+            {% csrf_token %}
+            <div class="grid grid-cols-3 gap-2">
+                <div>
+                    <select data-placeholder="Select Province" class="tom-select w-full" id="crud-form-2" name="category">
+                        <option value="0">Select Category</option>
+                        {% for p in categories %}
+                            <option value="{{ p.id }}">{{ p.category }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <select data-placeholder="Select Status" class="tom-select w-full" id="crud-form-2" name="status">
+                        <option value="0">Select Status</option>
+                        <option value="Assigned">Assigned</option>
+                        <option value="Approved">Approved</option>
+                        <option value="Declined">Declined</option>
+                        <option value="NewTime">New Time Requested</option>
+                        <option value="Completed">Completed</option>
+                    </select>
+                </div>
+                <div class="text-right">
+                  <button type="submit" class="btn btn-success w-24 text-white"><i data-lucide="filter" class="w-4 h-4 mr-2"></i>Filter</button>             
+              </div>
+            </div>         
+            
+          </form>
+        
+    </div>
+    <!-- END: Form Layout -->
+</div>
+
+  <div class="intro-y col-span-12 lg:col-span-12">
+      {% include 'messages.html' %}
+      <div class="post intro-y overflow-hidden box mt-5">
+          <ul class="post__tabs nav nav-tabs flex-col sm:flex-row bg-slate-200 dark:bg-darkmode-800" role="tablist">
+              <li class="nav-item">
+                  <button title="All Appointments" data-tw-toggle="tab" data-tw-target="#content" class="nav-link tooltip w-full sm:w-48 py-4 active" id="content-tab" role="tab" aria-controls="content" aria-selected="true"> <i data-lucide="user" class="w-4 h-4 mr-2"></i> My Appointments </button>
+              </li>    
+                         
+              
+          </ul>
+          <div class="post__content tab-content ">
+              <div id="content" class="tab-pane p-5 active" role="tabpanel" aria-labelledby="content-tab">
+                <div class="intro-y col-span-12 overflow-auto lg:overflow-visible">
+                  <table class="table table-report -mt-2">
+                    <thead>
+                      <tr>
+                        <th>#</th>
+                        <th>Student</th>
+                        <th>Description</th>
+                        <th>Details</th>
+                        <th>Category</th>
+                        <th>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for a in all_appointments %}
+                        <tr>
+                          <td>{{ forloop.counter }}</td>
+                          <td>
+                            {{ a.student.name }} {{ a.student.surname }}
+                            <br>
+                            {{ a.student.student_number }}
+                            <br>
+                            {{ a.student.email }}
+                            <br>
+                            {{ a.student.cellphone }}
+                          </td>
+                          <td>{{ a.description }}</td>
+                          <td>
+                            {{ a.appointment_date }}<br>
+                            {{ a.appointment_time_start }} to {{ a.appointment_time_end }}<br><br>
+                            <b>Contact Method:</b> {{ a.contact.contact }}
+                          </td>
+                          <td>{{ a.category.category }}</td>
+                          <td>
+
+                            <div class="badge badge-{% if a.status == 'Completed' %}success{% else %}danger{% endif %} badge-pill">{{ a.status }}</div>
+        
+                            <br><br>
+        
+                            {% if a.status == 'Completed' %}
+        
+                            <p>The following were recommended to the student <br>in order of importance: </p>
+        
+                              {% for outcome in a.outcome.all %}
+        
+                                {{ outcome.recommendation.recommendation }}<br>
+        
+                              {% endfor %}
+        
+        
+                            {% endif %}
+                                                                                
+        
+                          </td>
+                          
+                        
+                        </tr>
+        
+                      {% empty %}
+                        <tr><td colspan="7">Sorry no appointments</td></tr>
+                      {% endfor %}
+        
+                    </tbody>
+                  </table>
+                </div>
+
+                <!-- BEGIN: Pagination -->
+    <div class="intro-y col-span-12 overflow-x-auto scrollbar-hidden items-center">
+        <nav class="w-full sm:w-auto sm:mr-auto">
+            {% if is_paginated %}
+                <ul class="pagination">
+                    <li class="page-item"><a class="page-link" href="#"> <i class="w-4 h-4" data-lucide="chevrons-left"></i> </a></li>
+                    {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}"> <i class="w-4 h-4" data-lucide="chevron-left"></i> </a>
+                        </li>
+                    {% endif %}
+                    {% for i in paginator.page_range %}
+                        {% if page_obj.number == i %}
+                        <li class="active page-item"> <a class="page-link" href="#">{{ i }}</a> </li>
+                        {% else %}
+                        <li class="active page-item"> <a href="?page={{ i }}" class="page-link">{{ i }}</a> </li>
+                        {% endif %}
+                    {% endfor %}
+                    {% if page_obj.has_next %}               
+                        <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}"> <i class="w-4 h-4" data-lucide="chevron-right"></i> </a></li>
+                    {% endif %}
+                </ul>
+            {% endif %}           
+        </nav>  
+        
+        <nav class="w-full sm:w-auto sm:mr-auto">
+            {% if all_appointments.has_other_pages %}
+                <ul class="pagination">
+                    {% if all_appointments.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ all_appointments.previous_page_number }}&filter={{filter}}"> <i class="w-4 h-4" data-lucide="chevron-left"></i> </a>
+                        </li>
+                  
+                    {% endif %}
+                    {% for i in all_appointments.paginator.page_range %}
+                        {% if all_appointments.number == i %}
+                        <li class="active page-item"> <a class="page-link" href="#">{{ i }}</a> </li>
+                        {% else %}
+                        <li class="page-item"> <a href="?page={{ i }}&filter={{filter}}" class="page-link">{{ i }}</a> </li>
+                        {% endif %}
+                    {% endfor %}
+                    {% if all_appointments.has_next %}               
+                        <li class="page-item"><a class="page-link" href="?page={{ all_appointments.next_page_number }}&filter={{filter}}"> <i class="w-4 h-4" data-lucide="chevron-right"></i> </a></li>
+                   
+                    {% endif %}
+                </ul>
+            {% endif %}           
+        </nav>
+    </div>
+    <!-- END: Pagination -->
+
+              </div>
+
+          </div>
+      </div>
+  </div>
+
+  <!-- END: Post Content -->
+
+{% endblock %}
+
+
+{% block js-content  %}
+
+<script type="text/javascript">
+
+
+		function change_status(pk){
+			status = $('#id_status_'+pk).val()
+
+			if(status== "Approved"){
+					document.getElementById("div_feedback_field_"+pk).style.display = "block";
+					$("#id_appointment_acceptance_feedback_"+pk).attr("required", true);
+
+					$("#id_recommendations_"+pk).attr("required", false);
+					document.getElementById("div_completed_field_"+pk).style.display = "none";
+					document.getElementById("div_newtime_field_"+pk).style.display = "none";
+					$("#id_appointment_date_"+pk).attr("required", false);
+					$("#id_appointment_time_start_"+pk).attr("required", false);
+					$("#id_appointment_time_end_"+pk).attr("required", false);
+					$("#id_recommendations_"+pk).attr("required", false);
+			}
+			else if(status == "Declined"){
+					document.getElementById("div_feedback_field_"+pk).style.display = "block";
+					$("#id_appointment_acceptance_feedback_"+pk).attr("required", true);
+
+					$("#id_recommendations_"+pk).attr("required", false);
+					document.getElementById("div_completed_field_"+pk).style.display = "none";
+					document.getElementById("div_newtime_field_"+pk).style.display = "none";
+					$("#id_appointment_date_"+pk).attr("required", false);
+					$("#id_appointment_time_start_"+pk).attr("required", false);
+					$("#id_appointment_time_end_"+pk).attr("required", false);
+					$("#id_recommendations_"+pk).attr("required", false);
+			}
+			else if(status == "NewTime"){
+					document.getElementById("div_newtime_field_"+pk).style.display = "block";
+					document.getElementById("div_feedback_field_"+pk).style.display = "block";
+					$("#id_appointment_date_"+pk).attr("required", true);
+					$("#id_appointment_time_start_"+pk).attr("required", true);
+					$("#id_appointment_time_end_"+pk).attr("required", true);
+
+					$("#id_recommendations_"+pk).attr("required", false);
+					document.getElementById("div_completed_field_"+pk).style.display = "none";
+					$("#id_recommendations_"+pk).attr("required", false);
+			}
+			else if(status == "Completed"){
+					document.getElementById("div_completed_field_"+pk).style.display = "block";
+					$("#id_recommendations_"+pk).attr("required", true);
+
+					$("#id_appointment_date_"+pk).attr("required", false);
+					$("#id_appointment_time_start_"+pk).attr("required", false);
+					$("#id_appointment_time_end_"+pk).attr("required", false);
+					$("#id_appointment_acceptance_feedback_"+pk).attr("required", false);
+					document.getElementById("div_newtime_field_"+pk).style.display = "none";
+					document.getElementById("div_feedback_field_"+pk).style.display = "none";
+					$("#id_appointment_acceptance_feedback_"+pk).attr("required", false);
+			}
+			else if(status == "Assigned"){
+					document.getElementById("div_completed_field_"+pk).style.display = "none";
+					$("#id_recommendations_"+pk).attr("required", false);
+
+					$("#id_appointment_date_"+pk).attr("required", false);
+					$("#id_appointment_time_start_"+pk).attr("required", false);
+					$("#id_appointment_time_end_"+pk).attr("required", false);
+					$("#id_appointment_acceptance_feedback_"+pk).attr("required", false);
+					document.getElementById("div_newtime_field_"+pk).style.display = "none";
+					document.getElementById("div_feedback_field_"+pk).style.display = "none";
+					$("#id_appointment_acceptance_feedback_"+pk).attr("required", false);
+			}
+		}
+
+    $(document).ready(function(){
+      $('#id_status').on('change', function(){
+
+          if(this.value == "Approved"){
+              document.getElementById("div_feedback_field").style.display = "block";
+              $("#id_appointment_acceptance_feedback").attr("required", true);
+
+              $("#id_recommendations").attr("required", false);
+              document.getElementById("div_completed_field").style.display = "none";
+              document.getElementById("div_newtime_field").style.display = "none";
+              $("#id_appointment_date").attr("required", false);
+              $("#id_appointment_time_start").attr("required", false);
+              $("#id_appointment_time_end").attr("required", false);
+              $("#id_recommendations").attr("required", false);
+          }
+          else if(this.value == "Declined"){
+              document.getElementById("div_feedback_field").style.display = "block";
+              $("#id_appointment_acceptance_feedback").attr("required", true);
+
+              $("#id_recommendations").attr("required", false);
+              document.getElementById("div_completed_field").style.display = "none";
+              document.getElementById("div_newtime_field").style.display = "none";
+              $("#id_appointment_date").attr("required", false);
+              $("#id_appointment_time_start").attr("required", false);
+              $("#id_appointment_time_end").attr("required", false);
+              $("#id_recommendations").attr("required", false);
+          }
+          else if(this.value == "NewTime"){
+              document.getElementById("div_newtime_field").style.display = "block";
+              document.getElementById("div_feedback_field").style.display = "block";
+              $("#id_appointment_date").attr("required", true);
+              $("#id_appointment_time_start").attr("required", true);
+              $("#id_appointment_time_end").attr("required", true);
+
+              $("#id_recommendations").attr("required", false);
+              document.getElementById("div_completed_field").style.display = "none";
+              $("#id_recommendations").attr("required", false);
+          }
+          else if(this.value == "Completed"){
+              document.getElementById("div_completed_field").style.display = "block";
+              $("#id_recommendations").attr("required", true);
+
+              $("#id_appointment_date").attr("required", false);
+              $("#id_appointment_time_start").attr("required", false);
+              $("#id_appointment_time_end").attr("required", false);
+              $("#id_appointment_acceptance_feedback").attr("required", false);
+              document.getElementById("div_newtime_field").style.display = "none";
+              document.getElementById("div_feedback_field").style.display = "none";
+              $("#id_appointment_acceptance_feedback").attr("required", false);
+          }
+
+         // or $(this).val()
+        return false; // keeps the page from not refreshing
+      });
+    });
+  </script>
+
+  <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
+
+  <script type="text/javascript">
+
+    document.addEventListener('DOMContentLoaded', function() {
+      var calendarEl = document.getElementById('appointment_calendar');
+      var calendar = new FullCalendar.Calendar(calendarEl, {
+        initialDate: "{{ today|date:'Y-m-d' }}",
+        headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek,timeGridDay,listMonth'
+        },
+        views: {
+            dayGridMonth: { buttonText: 'month' },
+            timeGridWeek: { buttonText: 'week' },
+            timeGridDay: { buttonText: 'day' }
+        },
+        initialView: 'dayGridMonth',
+        events: [
+               
+          {% for a in all_appointments %}
+                {
+                  title: '{{ a.category.category }}\n{{ a.status }}',
+                  start: '{{ a.appointment_date|date:"Y-m-d" }}T{{ a.appointment_time_start|date:"h:i:s" }}',
+                  color: {% if a.status == 'Completed' %} '#40316E' {% elif a.status == "Declined" %} 'red' {% else %} 'orange' {% endif %}
+                },
+          {% endfor %}    
+        ]
+      });
+      calendar.render();
+    });
+
+  </script>
+
+
+
+{% endblock %}

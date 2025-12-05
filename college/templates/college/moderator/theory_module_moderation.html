@@ -1,0 +1,47 @@
+{% extends 'base_tpl.html' %}
+
+{% block breadcrumb-content %}
+    <nav aria-label="breadcrumb" class="-intro-x mr-auto hidden sm:flex">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'administration:dashboard_lecturer' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'college:moderator_learning_programme_cohort_registration_periods' learning_programme_cohort.id %}">{{ learning_programme_cohort.title }} Registrations</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'college:moderator_summative_module_list' learning_programme_cohort_period.id %}">{{ learning_programme_cohort_period.title }} - Modules</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'college:moderator_summative_module_list_students' learning_programme_cohort_period.id module.id %}">{{ module.module.module_code }}Student Marks</a></li>
+            
+            <li class="breadcrumb-item active" aria-current="page">Moderation Report</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block main-content %}
+
+<div class="intro-y flex flex-col sm:flex-row items-center mt-8">
+    <h2 class="text-lg font-medium mr-auto">
+        {{ module.module.module_code }} {{ module.module.module_name }} Moderation report
+    </h2>
+    
+</div>
+
+    <div class="intro-y p-5 mt-5">
+        
+        <div class="overflow-x-auto" id='moderation_report_div'>
+            {% include "college/moderator/partials/theory_module_moderation.html" %}
+        </div>
+    </div>
+{% endblock %}
+
+
+{% block js-content %}
+
+<script type="text/javascript">
+    
+    $(".editor").each(function() {
+        const el = this;
+        ClassicEditor.create(el).catch((error) => {
+            console.error(error);
+        });
+    });
+
+</script>
+
+{% endblock %}

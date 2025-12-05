@@ -1,0 +1,141 @@
+{% extends 'base_tpl.html' %}
+
+{% block breadcrumb-content %}
+    {% if user.logged_in_role_id == 1 or user.logged_in_role_id == 2 %}
+        <nav aria-label="breadcrumb" class="-intro-x mr-auto hidden sm:flex">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'administration:dashboard' %}">Dashboard</a></li>
+                
+            </ol>
+        </nav>
+    {% elif user.logged_in_role_id == 6 %}
+    <nav aria-label="breadcrumb" class="-intro-x mr-auto hidden sm:flex">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'administration:dashboard_programme_coordinator' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'college:learning_programme_cohorts' learning_programme.id %}">{{ learning_programme.programme_code }} Cohorts</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'students:learning_programme_cohort_registrations' learning_programme_cohort.id registration_period.id %}">{{ learning_programme_cohort.title }} Registered Students</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'students:view_learner_educational_plan' registration.student_learning_programme.id registration.id %}">{{ registration.student_learning_programme.student.first_name }} {{ registration.student_learning_programme.student.last_name }} Education Plan</a></li>
+            
+            <li class="breadcrumb-item active" aria-current="page">Wards</li>
+            
+        </ol>
+    </nav>
+    {% elif user.logged_in_role_id == 10 %}
+        <nav aria-label="breadcrumb" class="-intro-x mr-auto hidden sm:flex">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'students:student_dashboard' %}">Dashboard</a></li>
+                
+            </ol>
+        </nav>
+    {% endif %}
+{% endblock %}
+
+{% block main-content %}
+{% include 'messages.html' %}
+<form method = "POST" action="{% url 'students:edit_learners_days'  plan.id %}" name="frmnotify" class="mt-5">
+
+    <div class="intro-y flex flex-col sm:flex-row items-center mt-8">
+        <h2 class="text-lg font-medium mr-auto">
+            {{ registration.student_learning_programme.student.first_name }} {{ registration.student_learning_programme.student.last_name }}<br>
+            <b>Week:</b> {{ plan.education_plan_section_week.start_of_week }} to {{ plan.education_plan_section_week.end_of_week }}<br>
+            <b>Facility:</b> {{ plan.facility.name }}<br>
+            <b>Discipline:</b> {{ plan.discipline.discipline }}
+        </h2>
+    
+    </div>
+
+
+
+    {% if user.logged_in_role_id == 6 %}   
+    <div class="intro-y flex flex-col sm:flex-row items-center mt-8">
+        <div class="w-full sm:w-auto flex mt-4 sm:mt-0">
+            
+                {% csrf_token %}
+                <input  type = "hidden" name = "userscustomLoop" value = "{{ plan.days.count }}">
+        
+                <div class="intro-y col-span-12 overflow-auto lg:overflow-visible">
+                    <div class="grid grid-cols-3 gap-4">
+                       
+                        <div>
+                            <label for="id_admin" class="form-label w-48">Ward</label>
+                            <select id="ward" name='ward' class="form-control" required> 
+                                <option></option>                                    
+                                {% for ward in wards %}
+                                    {% if ward == r.ward %}
+                                        <option value="{{ ward.id }}" selected>{{ ward.ward }}</option>
+                                    {% else %}
+                                        <option value="{{ ward.id }}">{{ ward.ward }}</option>
+                                    {% endif %}
+                                    
+                                {% endfor %}                                                                                          
+                            </select>
+                        </div>
+                        <div>                       
+                            <button type="submit" class="btn btn-primary w-48 text-white mt-6   ">Add Ward</button>
+                        </div>
+                    </div>  
+                </div>  
+
+        </div>
+    </div>
+    {% endif %}
+
+
+<div class="grid grid-cols-12 gap-6 mt-5">
+    
+    <!-- BEGIN: Data List -->
+    <div class="intro-y col-span-12 overflow-auto lg:overflow-visible">
+        <table class="table table-report -mt-2">
+            <thead>
+                <tr>
+                    {% if user.logged_in_role_id == 6 %}
+                        <th class="whitespace-nowrap"><input type="checkbox" name="toggle" value="all" class="form-check-input" onclick = "checkall(this)"></th>  
+                    {% endif %}                
+                    <th class="whitespace-nowrap">Day</th>
+                    <th class="whitespace-nowrap">Ward</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in plan.days.all %}
+                <tr class="intro-x">
+                    {% if user.logged_in_role_id == 6 %}
+                        <td class="w-40">
+                            <input type="checkbox" name="days_selected[]" value="{{ r.id }}" class="form-check-input">
+                        </td>
+                    {% endif %}
+                    <td>
+                        {{ r.day }} 
+                    </td>
+                    
+                    <td>
+                        {{ r.ward.ward }}
+                    </td>                            
+                </tr>
+                {% empty %}
+                <tr class="intro-x"><td colspan='3'>Nothing added yet</td></tr>
+                {% endfor %}
+                
+            <tbody>
+        </table>
+    </div>
+</div>
+
+</form>
+
+{% endblock %}
+
+{% block js-content %}
+
+<script type="text/javascript">
+    
+    function checkall(source){
+        var loop = document.frmnotify.userscustomLoop.value;        
+        checkboxes = document.getElementsByName('days_selected[]');
+        for(var i=0, n=checkboxes.length;i<n;i++) {
+            checkboxes[i].checked = source.checked;
+        }
+      }
+
+</script>
+
+{% endblock %}

@@ -1,0 +1,152 @@
+{% extends 'base_vertical.html' %}
+{% load bootstrap3 %}
+
+{% block main-content %}
+
+<div class="row">
+  <div class="col-md-12 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          <nav aria-label="breadcrumb">
+              <ol class="breadcrumb bg-inverse-info">
+                {%  if user.is_authenticated and user.roles_id == 2  %}
+                  <li class="breadcrumb-item"><a href="{% url 'wil:dashboard' %}">Dashboard</a></li>
+                  <li class="breadcrumb-item"><a href="{% url 'wil:event_list' %}">Recruitment Programs</a></li>
+                  <li class="breadcrumb-item active" aria-current="page"><a>Recruitment Program Types</a></li>
+                {% elif user.is_authenticated and user.roles_id == 10 or user.is_authenticated and user.roles_id == 11 %}
+                  <li class="breadcrumb-item"><a href="{% url 'psycad:dashboard' %}">Dashboard</a></li>
+                  <li class="breadcrumb-item"><a href="{% url 'psycad:event_list' %}">Recruitment Programs</a></li>
+                  <li class="breadcrumb-item active" aria-current="page"><a>Recruitment Program Types</a></li>
+                {% endif %}
+              </ol>
+            </nav>
+
+            {% include 'messages.html' %}
+
+        </div>
+      </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-lg-12 grid-margin stretch-card">
+              <div class="card">
+                <div class="card-body">
+                  <h4 class="card-title">List of Recruitment Program Types</h4>
+                  <p class="card-description">
+                    <button type="button" class="btn btn-success btn-icon-text btn-rounded pull-right" data-toggle="modal" data-target="#new_type"> <i class="ti-plus btn-icon-prepend"></i>Add New Type </button><br><br>
+                    <div class="modal fade" id="new_type" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true">
+                      <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="ModalLabel">Add Type</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                              <span aria-hidden="true">&times;</span>
+                            </button>
+                          </div>
+                          <form action="{% url 'psycad:add_event_types' %}" method="POST">
+                            {% csrf_token %}
+                          <div class="modal-body">
+
+                              <div class="form-group">
+                                <label for="period">Type (required)</label>
+                                {% bootstrap_field form.type show_label=False %}
+                              </div>
+
+                          </div>
+                          <div class="modal-footer">
+                            <button type="submit" class="btn btn-success">Add Recruitment Program Type</button>
+                            <button type="button" class="btn btn-light" data-dismiss="modal">Close</button>
+                          </div>
+                          </form>
+                        </div>
+                      </div>
+                    </div>
+                  </p>
+                  <div class="table-responsive">
+                    <table class="table table-striped table-bordered">
+                      <thead>
+                        <tr>
+                          <th>#</th>
+                          <th>Type</th>
+                          <th>Registration Forms</th>
+                          <th>Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for type in types %}
+                            <tr>
+                              <td class="py-1">{{ forloop.counter }}</td>
+                              <td>{{type.type}}</td>
+                              <td><a href="{% url 'psycad:event_types_registration_form' type.id %}">Forms</a></td>
+                              <td>
+                                <button type="button" class="btn btn-success btn-rounded btn-icon" data-toggle="modal" data-target="#edit{{ type.id }}" > <i class="fa fa-edit"></i></button>
+
+                                <button type="button" class="btn btn-danger btn-rounded btn-icon" data-toggle="modal" data-target="#del{{ type.id }}" > <i class="fa fa-trash-o"></i> </button>
+
+                                <div class="modal fade" id="edit{{ type.id }}" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true">
+                                  <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                      <div class="modal-header">
+                                        <h5 class="modal-title" id="ModalLabel">Edit Type</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                          <span aria-hidden="true">&times;</span>
+                                        </button>
+                                      </div>
+                                      <form action="{% url 'psycad:edit_event_types' type.id %}" method="POST">
+                                        {% csrf_token %}
+                                      <div class="modal-body">
+
+                                          <div class="form-group">
+                                            <label for="period">Type (required)</label>
+                                            <input id="type" class="form-control" name="type" minlength="2" type="text" value="{{ type.type }}" required>
+                                          </div>
+
+                                      </div>
+                                      <div class="modal-footer">
+                                        <input type="hidden" name="task" value="edit">
+                                        <button type="submit" class="btn btn-success">Edit Type</button>
+                                        <button type="button" class="btn btn-light" data-dismiss="modal">Close</button>
+                                      </div>
+                                      </form>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                <div class="modal fade" id="del{{ type.id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel-3" aria-hidden="true">
+                                  <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                      <div class="modal-header">
+                                        <h5 class="modal-title" id="exampleModalLabel-3">Delete Type Entry</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                          <span aria-hidden="true">&times;</span>
+                                        </button>
+                                      </div>
+                                      <form action="{% url 'psycad:edit_event_types' type.id %}" method="POST">
+                                        {% csrf_token %}
+                                      <div class="modal-body">
+                                        <p>Are you sure you want to delete {{ type.type }}?</p>
+                                      </div>
+                                      <div class="modal-footer">
+                                        <input type="hidden" name="task" value="delete">
+                                        <button type="submit" class="btn btn-success">Yes</button>
+                                        <button type="button" class="btn btn-light" data-dismiss="modal">No</button>
+                                      </div>
+                                      </form>
+                                    </div>
+                                  </div>
+                                </div>
+
+                              </td>
+                            </tr>
+                        {% empty %}
+                            <tr><td colspan="8">Sorry no types added</td></tr>
+                        {% endfor %}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+</div>
+{% endblock %}

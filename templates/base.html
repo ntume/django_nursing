@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+
+<head>
+
+  <style>
+      /* Loading Spinner */
+      .spinner{margin:0;width:70px;height:18px;margin:-35px 0 0 -9px;position:absolute;top:50%;left:50%;text-align:center}.spinner > div{width:18px;height:18px;background-color:#333;border-radius:100%;display:inline-block;-webkit-animation:bouncedelay 1.4s infinite ease-in-out;animation:bouncedelay 1.4s infinite ease-in-out;-webkit-animation-fill-mode:both;animation-fill-mode:both}.spinner .bounce1{-webkit-animation-delay:-.32s;animation-delay:-.32s}.spinner .bounce2{-webkit-animation-delay:-.16s;animation-delay:-.16s}@-webkit-keyframes bouncedelay{0%,80%,100%{-webkit-transform:scale(0.0)}40%{-webkit-transform:scale(1.0)}}@keyframes bouncedelay{0%,80%,100%{transform:scale(0.0);-webkit-transform:scale(0.0)}40%{transform:scale(1.0);-webkit-transform:scale(1.0)}}
+  </style>
+
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="loadforge-site-verification" content="57a7ec7b791a88b3fdefd0a506e819d16d0056b0a78e580b0ce6ac6ad0bd4d5cffab9b070f1a363dd528f86771458a85bab572e87f45da205be68120be6049e0" />
+  <title>Your Career. Reimagined</title>
+  <!-- plugins:css -->
+  <link rel="stylesheet" href="{% static 'vendors/iconfonts/ti-icons/css/themify-icons.css' %}">
+  <link rel="stylesheet" href="{% static 'vendors/css/vendor.bundle.base.css' %}">
+  <link rel="stylesheet" href="{% static 'vendors/css/vendor.bundle.addons.css' %}">
+  <link rel="stylesheet" href="{% static 'vendors/iconfonts/font-awesome/css/font-awesome.min.css' %}" />
+  <link rel="stylesheet" href="{% static 'vendors/summernote/dist/summernote-bs4.css' %}">
+  <link rel="stylesheet" href="{% static 'vendors/lightgallery/css/lightgallery.css' %}">
+  <!-- endinject -->
+  <!-- plugin css for this page -->
+  <!-- End plugin css for this page -->
+  <!-- inject:css -->
+  <link rel="stylesheet" href="{% static 'css/horizontal-layout-light/style.css' %}">
+  <!-- endinject -->
+  <link rel="shortcut icon" href="{% static 'images/favicon.ico' %}" />
+
+  {% block css-content %}
+
+  {% endblock %}
+
+</head>
+
+<body>
+  <div class="container-scroller">
+    <!-- partial:partials/_horizontal-navbar.html -->
+    <div class="horizontal-menu">
+      <nav class="navbar top-navbar col-lg-12 col-12 p-0 navbar-warning">
+        <div class="container">
+          <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-center">
+            <a class="navbar-brand brand-logo" href="index.html"><img src="{% static 'images/logo_opaque.jpg' %}" alt="logo"/></a>
+            <!--<a class="navbar-brand brand-logo-mini" href="index.html"><img src="{% static 'images/logo-mini.svg' %}" alt="logo"/></a>-->
+          </div>
+          <div class="navbar-menu-wrapper d-flex align-items-center justify-content-end">
+            <ul class="navbar-nav mr-lg-2">
+
+              <li class="nav-item nav-search d-none d-lg-block">
+                <div class="input-group">
+                  <div class="input-group-prepend hover-cursor" id="navbar-search-icon">
+                    <span class="input-group-text" id="search">
+                      <i class="ti-search"></i>
+                    </span>
+                  </div>
+                  <input type="text" class="form-control" id="navbar-search-input" placeholder="Search now" aria-label="search" aria-describedby="search">
+                </div>
+              </li>
+            </ul>
+            <ul class="navbar-nav navbar-nav-right">
+              {% if user.is_authenticated %}
+              {% if user.roles_id == 4 or user.roles_id == 6  %}
+              <li class="nav-item dropdown mr-1">
+                <a class="nav-link count-indicator d-flex justify-content-center align-items-center" id="messageDropdown" href="{% url 'student:surveys' %}" data-toggle="tooltip" data-placement="bottom" title="Surveys">
+                  <i class="ti-receipt mx-0"></i>
+                </a>
+              </li>
+              <li class="nav-item dropdown mr-1">
+                <a class="nav-link count-indicator d-flex justify-content-center align-items-center" id="messageDropdown" href="{% url 'student:resources' %}" data-toggle="tooltip" data-placement="bottom" title="Resources">
+                  <i class="ti-info-alt mx-0"></i>
+                </a>
+              </li>
+              <li class="nav-item dropdown mr-1">
+                <a class="nav-link count-indicator d-flex justify-content-center align-items-center" id="messageDropdown" href="{% url 'student:blog_list' %}" data-toggle="tooltip" data-placement="bottom" title="Blog">
+                  <i class="ti-thought mx-0"></i>
+                </a>
+              </li>
+                <li class="nav-item dropdown mr-1">
+                  <a class="nav-link count-indicator dropdown-toggle d-flex justify-content-center align-items-center" id="messageDropdown" href="#" data-toggle="dropdown">
+                    <i class="ti-calendar mx-0"></i>
+                    {% if MENU_STUDENT_APPOINTMENTS %}<span class="count"></span>{% endif %}
+                  </a>
+                  <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list" aria-labelledby="messageDropdown">
+                    <p class="mb-0 font-weight-normal float-left dropdown-header">Appointments</p>
+                    <div class="pull-right">
+                      <a href="{% url 'student:appointment_student_list' %}" type="button" class="btn btn-inverse-primary btn-rounded btn-icon">
+                        <br><i class="ti-calendar mx-0"></i>
+
+                      </a>
+                    </div>
+                    {% for a in MENU_STUDENT_APPOINTMENTS %}
+                      <a class="dropdown-item preview-item">
+
+                        <div class="preview-item-content flex-grow">
+                          <h6 class="preview-subject ellipsis font-weight-normal">{{ a.category.category }}
+                          </h6>
+                          <p class="font-weight-light small-text text-muted mb-0">
+                            {{ a.status }}<br>{% if a.updates.last.who_updates == 'staff' %}{{ a.updates.last }}{% endif %}
+                          </p>
+                        </div>
+                      </a>
+                    {% empty %}
+                      <a class="dropdown-item preview-item">
+                        <div class="preview-item-content flex-grow">
+                          <p class="font-weight-light small-text text-muted mb-0">
+                            No Appointments added
+                          </p>
+                        </div>
+                      </a>
+                    {% endfor %}
+                    <hr>
+                    <a href="{% url 'student:appointment_student_list' %}" class="dropdown-item preview-item">View All Appointments</a>
+
+                  </div>
+                </li>
+
+                <li class="nav-item dropdown">
+                  <a class="nav-link count-indicator dropdown-toggle" id="notificationDropdown" href="#" data-toggle="dropdown">
+                    <i class="ti-bell mx-0"></i>
+                    {% if MENU_INTERVIEWS %}<span class="count"></span>{% endif %}
+                  </a>
+                  <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list" aria-labelledby="notificationDropdown">
+                    <p class="mb-0 font-weight-normal float-left dropdown-header">Interviews</p>
+                    {% for i in MENU_INTERVIEWS %}
+                      <a class="dropdown-item preview-item">
+                        <div class="preview-thumbnail">
+                          <div class="preview-icon bg-success">
+                            <i class="ti-info-alt mx-0"></i>
+                          </div>
+                        </div>
+                        <div class="preview-item-content">
+                          <h6 class="preview-subject font-weight-normal">{{ i.interview.company.company_name }}</h6>
+                          <p class="font-weight-light small-text mb-0 text-muted">
+                            {{ i.interview.date_interview }} at {{ i.interview.time_interview }}
+                          </p>
+                        </div>
+                      </a>
+                    {% empty %}
+                    <a class="dropdown-item preview-item">
+                      <div class="preview-thumbnail">
+                        <div class="preview-icon bg-success">
+                          <i class="ti-info-alt mx-0"></i>
+                        </div>
+                      </div>
+                      <div class="preview-item-content">
+                        <h6 class="preview-subject font-weight-normal">No Scheduled Interviews</h6>
+
+                      </div>
+                    </a>
+                    {% endfor %}
+                    <hr>
+                    <a href="{% url 'student:student_interviews_list' %}" class="dropdown-item preview-item">View All Interviews</a>
+
+                  </div>
+                </li>
+                {% endif %}
+              {% endif %}
+              <li class="nav-item nav-profile dropdown">
+                <a class="nav-link count-indicator dropdown-toggle d-flex justify-content-center align-items-center" id="profileDropdown" href="#" data-toggle="dropdown">
+                  <i class="ti-user mx-0"></i>
+                </a>
+                <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="profileDropdown">
+                  {% if user.is_authenticated %}
+                    <a href="{% url 'accounts:logout' %}" class="dropdown-item">
+                      <i class="ti-unlock text-primary"></i>
+                      Logout
+                    </a>                    
+                    {% if user.roles_id == 4 or user.roles_id == 6  %}
+                      <a href="{% url 'student:profile' %}" class="dropdown-item">
+                        <i class="ti-user text-primary"></i>
+                        Profile
+                      </a>
+                      <a href="{% url 'student:update_email_preferences' %}" class="dropdown-item">
+                        <i class="ti-email text-primary"></i>
+                        Email Preferences
+                      </a>
+                      <a href="#" class="dropdown-item" data-toggle="modal" data-target="#del_student">
+                        <i class="ti-trash text-primary"></i>
+                        Delete My Account
+                      </a>    
+                      <a href="{% url 'student:manual_register' %}" class="dropdown-item">
+                        <i class="ti-help text-primary"></i>
+                        User Manual
+                      </a>                   
+                    {% endif %}
+                  {% else %}
+                  <a href="{% url 'accounts:login' %}" class="dropdown-item">
+                    <i class="ti-lock text-primary"></i>
+                    Login
+                  </a>
+                  <a  href="{% url 'students:signup' %}" class="dropdown-item">
+                    <i class="ti-plus text-primary"></i>
+                    Sign Up
+                  </a>
+                  {% endif %}
+                </div>
+              </li>
+            </ul>
+            <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button" data-toggle="horizontal-menu-toggle">
+              <span class="ti-menu"></span>
+            </button>
+          </div>
+        </div>
+      </nav>
+      {% block nav-content %}
+
+        {% if user.is_authenticated and user.roles_id == 6 or user.roles_id == 4 %}
+          {% include 'student_nav.html' %}
+        {% elif user.is_authenticated and user.roles_id == 12 %}
+          {% include 'mentor_nav.html' %}
+        {% elif user.is_authenticated and user.roles_id == 3 %}
+          {% include 'contact_nav.html' %}
+        {% else %}
+          {% include 'guest_nav.html' %}
+        {%endif%}
+
+      {% endblock %}
+
+    </div>
+
+    <!-- partial -->
+    <div class="container-fluid page-body-wrapper">
+      <div class="main-panel">
+        <div class="content-wrapper">
+
+          {% block main-content %}
+
+          {% endblock %}
+          {% if user.is_authenticated and user.roles_id == 6 or user.roles_id == 4 %}
+            <div class="modal fade" id="del_student" role="dialog" aria-labelledby="exampleModalLabel-3" aria-hidden="true">
+              <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel-3">Delete Your Account?</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                  <form action="{% url 'student:profile_delete' MENU_DESIGNATION.student.id%}" method="POST">
+                    {% csrf_token %}
+                  <div class="modal-body">
+                    <p>Are you sure you want to delete your UJCareerWiz account ? This is irreversible but you can sign up again at a later stage.</p>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="submit" class="btn btn-danger">Delete Account</button>
+                    <button type="button" class="btn btn-light" data-dismiss="modal">No</button>
+                  </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          {% endif %}
+        </div>
+        <!-- content-wrapper ends -->
+        <!-- partial:partials/_footer.html -->
+        <footer class="footer">
+          <div class="w-100 clearfix">
+            <span class="text-muted d-block text-center text-sm-left d-sm-inline-block">Copyright © 2020 <a href="https://www.wilms.co.za/" target="_blank">UJCareerWiz powered by WILMS</a>. All rights reserved.</span>
+            <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center"><i class="ti-heart text-danger ml-1"></i></span>
+          </div>
+        </footer>
+        <!-- partial -->
+      </div>
+      <!-- main-panel ends -->
+    </div>
+    <!-- page-body-wrapper ends -->
+  </div>
+  <!-- container-scroller -->
+
+  <!-- plugins:js -->
+  <script src="{% static 'vendors/js/vendor.bundle.base.js' %}"></script>
+  <script src="{% static 'vendors/js/vendor.bundle.addons.js' %}"></script>
+  <!-- endinject -->
+  <!-- Plugin js for this page-->
+  <!-- End plugin js for this page-->
+  <!-- inject:js -->
+  <script src="{% static 'js/off-canvas.js' %}"></script>
+  <script src="{% static 'js/hoverable-collapse.js' %}"></script>
+  <script src="{% static 'js/template.js' %}"></script>
+  <script src="{% static 'js/settings.js' %}"></script>
+  <script src="{% static 'js/todolist.js' %}"></script>
+  <script src="{% static 'vendors/summernote/dist/summernote-bs4.min.js' %}"></script>
+  <!-- endinject -->
+  <!-- Custom js for this page-->
+  <script src="{% static 'js/dashboard.js' %}"></script>
+  <script src="{% static 'js/todolist.js' %}"></script>
+  <script src="{% static 'js/x-editable.js' %}"></script>
+  <script src="{% static 'js/select2.js' %}"></script>
+  <script src="{% static 'js/form-addons.js' %}"></script>
+  <script src="{% static 'vendors/lightgallery/js/lightgallery-all.min.js' %}"></script>
+  <script src="{% static 'js/light-gallery.js' %}"></script>
+  <script src="{% static 'js/tooltips.js' %}"></script>
+  <script src="{% static 'js/popover.js' %}"></script>
+  {% block js-content %}
+
+  {% endblock %}
+  <!-- End custom js for this page-->
+</body>
+
+</html>
