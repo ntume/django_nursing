@@ -854,9 +854,8 @@ def staff_delete(request,pk):
 
         try:
             staff_instance = Staff.objects.get(id = pk)
-            staff_instance.active = 'No'
-            staff_instance.save()
-            messages.success(request,"Successfully deactivated college staff")
+            staff_instance.delete()
+            messages.success(request,"Successfully deleted college staff")
         except Exception as e:
             messages.warning(request,f"An error has occurred, please try again - Error: {str(e)}")
 

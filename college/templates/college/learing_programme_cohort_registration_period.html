@@ -105,7 +105,7 @@
                         <td>
                             <b class='text-danger'>{{ r.programme_coordinator.first_name }} {{ r.programme_coordinator.last_name }}</b><br><br>
                             
-                            {% if user.logged_in_role_id == 2 %}
+                            {% if user.logged_in_role_id == 2 or  user.logged_in_role_id == 1 %}
                                 <a class="flex items-center mr-3" href="javascript:;" data-tw-toggle="modal" data-tw-target="#programme_coordinator-modal_{{ r.id }}"> <i data-lucide="user" class="w-4 h-4 mr-1"></i> Assign Programme Coordinator </a>
                                 <div id="programme_coordinator-modal_{{ r.id }}" class="modal" tabindex="-1" aria-hidden="true">
                                     <div class="modal-dialog modal-xl">

@@ -43,15 +43,15 @@ def number_gen(passlen):
 def password_validator(password):
     message = ''
     valid = True
-    if not re.findall('\d', password):
+    if not re.findall(r'\d', password):
         message = message + "Your password must contain at least 1 digit, 0-9.<br>"
         valid = False
 
-    if not re.findall('[A-Z]', password):
+    if not re.findall(r'[A-Z]', password):
         message = message + "Your password must contain at least 1 uppercase letter, A-Z.<br>"
         valid = False
 
-    if not re.findall('[()[\]{}|\\`~!@#$%^&*_\-+=;:\'",<>./?]', password):
+    if not re.findall(r'[()[\]{}|\\`~!@#$%^&*_\-+=;:\'",<>./?]', password):
         message = message + "Your password must contain at least 1 special character: ()[]{}|\`~!@#$%^&*_-+=;:'\",<>./?<br>"
         valid = False
     if len(password) < 14:

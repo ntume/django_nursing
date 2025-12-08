@@ -24,7 +24,7 @@
         </h2>
 
         <div class="w-full sm:w-auto flex mt-4 sm:mt-0">
-            <a href="{% url 'students:process_procedure_summative_assessment_final_mark' student_registration.id   %}"  class="btn btn-primary shadow-md mr-2">Process Final Mark</a>
+            <a href="{% url 'students:process_procedure_summative_assessment_final_mark' student_registration.id procedure_entry.id %}"  class="btn btn-primary shadow-md mr-2">Process Final Mark</a>
         </div>
         
     </div>
