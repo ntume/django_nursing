@@ -1,5 +1,5 @@
 <!-- BEGIN: Page -->
-<div class="intro-y box col-span-12 2xl:col-span-6">
+<div class="intro-y box col-span-12 2xl:col-span-12">
     <div class="flex items-center px-5 py-5 sm:py-3 border-b border-slate-200/60 dark:border-darkmode-400">
         <h2 class="font-medium text-base mr-auto">
             {{ programme_block.block_name }}
@@ -101,16 +101,21 @@
 
                                         <div class="col-span-12 sm:col-span-12">
                                             <label for="id_telephone" class="form-label w-48">What ward was your shift?*</label>
-                                            <select name='facility_ward' id='id_ward' class='form-select' required>
+                                            <select name='facility_ward' id='id_ward_new' class='form-select' required>
                                                 <option></option>
-                                                
+                                                {% for ward in wards %}
+                                                    <option value="{{ ward.id }}">{{ ward.ward }}</option>
+                                                {% endfor %}                                                
                                             </select>
                                         </div>
                                 
                                         <div class="col-span-12 sm:col-span-12">
                                             <label for="id_telephone" class="form-label w-80">What discipline was your shift?*</label>
-                                            <select name='discipline' id='id_discipline' class='form-select' required>
+                                            <select name='discipline' id='id_discipline_new' class='form-select' required>
                                                 <option></option>
+                                                {% for discipline in disciplines %}
+                                                    <option value="{{ discipline.id }}">{{ discipline.discipline }}</option>
+                                                {% endfor %}
                                                 
                                             </select>
                                         </div> 
@@ -350,9 +355,9 @@
 
                                                         <div class="col-span-12 sm:col-span-12">
                                                             <label for="id_telephone" class="form-label w-48">What ward was your shift?*</label>
-                                                            <select name='facility_ward' id='id_ward_{{ entry.id }}' class='form-select' required>
+                                                            <select name='facility_ward' id='id_ward' class='form-select' required>
                                                                 <option></option>
-                                                                {% for w in entry.fetch_healthcare_facility_wards %}
+                                                                {% for w in wards %}
                                                                     {% if w.id == entry.facility_ward_id %}
                                                                         <option value="{{ w.id }}" selected>{{ w.ward.ward }}</option>
                                                                     {% else %}
@@ -365,7 +370,7 @@
                                                 
                                                         <div class="col-span-12 sm:col-span-12">
                                                             <label for="id_telephone" class="form-label w-48">What discipline was your shift?*</label>
-                                                            <select name='discipline' id='id_discipline_{{ entry.id }}' class='form-select' required>
+                                                            <select name='discipline' id='id_discipline' class='form-select' required>
                                                                 <option></option>
                                                                 {% for discipline in disciplines %}
                                                                     {% if entry.discipline == discipline %}

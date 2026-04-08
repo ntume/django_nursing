@@ -39,12 +39,12 @@
             </div>
             <div class="p-5 border-t border-slate-200/60 dark:border-darkmode-400">
                 {% for block in simulated_blocks %}
-                    <a class="flex items-center mt-5 {% if block.id == programme_block.id %} text-primary font-medium{% endif %}" href="{% url 'students:simulated_wil_logsheets' registration.id block.id 1 %}"> <i data-lucide="activity" class="w-4 h-4 mr-2"></i> {{ block.block_code }} - {{ block.block_name }} </a>
+                    <a class="flex items-center mt-5 {% if block.id == programme_block.id %} text-primary font-medium{% endif %}" href="{% url 'students:staff_simulated_wil_logsheets' registration.id block.id 1 %}"> <i data-lucide="activity" class="w-4 h-4 mr-2"></i> {{ block.block_code }} - {{ block.block_name }} </a>
                 {% endfor %}
             </div>
             <div class="p-5 border-t border-slate-200/60 dark:border-darkmode-400">
                 {% for block in non_simulated_blocks %}
-                    <a class="flex items-center mt-5 {% if block.id == programme_block.id %} text-primary font-medium{% endif %}" href="{% url 'students:non_simulated_wil_logsheets' registration.id block.id 1 %}"> <i data-lucide="activity" class="w-4 h-4 mr-2"></i> {{ block.block_code }} - {{ block.block_name }} </a>
+                    <a class="flex items-center mt-5 {% if block.id == programme_block.id %} text-primary font-medium{% endif %}" href="{% url 'students:staff_non_simulated_wil_logsheets' registration.id block.id 1 %}"> <i data-lucide="activity" class="w-4 h-4 mr-2"></i> {{ block.block_code }} - {{ block.block_name }} </a>
                 {% endfor %}
             </div>
             <div class="p-5 border-t border-slate-200/60 dark:border-darkmode-400">
@@ -59,12 +59,12 @@
         <div class="grid grid-cols-12 gap-6">
          
             {% if simulated %}
-                {% include 'students/learning_programme/wil/simulated.html' %}
+                {% include 'students/learning_programme/wil_staff/simulated.html' %}
             {% elif simulated == False %}
-                {% include 'students/learning_programme/wil/non-simulated.html' %}        
+                {% include 'students/learning_programme/wil_staff/non-simulated.html' %}        
             {% endif %}
             {% if summary %}
-                {% include 'students/learning_programme/wil/wil_logsheet_hours.html' %}        
+                {% include 'students/learning_programme/wil_staff/wil_logsheet_hours.html' %}        
             {% endif %}
            
         </div>

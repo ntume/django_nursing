@@ -1,0 +1,78 @@
+<!-- BEGIN: Page -->
+<div class="intro-y box col-span-12 2xl:col-span-12">
+    <div class="flex items-center px-5 py-5 sm:py-3 border-b border-slate-200/60 dark:border-darkmode-400">
+        <h2 class="font-medium text-base mr-auto">
+            {{ programme_block.block_name }}
+        </h2>
+    </div>
+    <div class="p-5">
+
+        <!-- BEGIN: Data List -->
+        <div class="intro-y col-span-12 overflow-x-auto scrollbar-hidden mt-10">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th><div class="flex items-center justify-center">Procedure</div></th> 
+                        <th><div class="flex items-center justify-center">Time</div></th>
+                        <th><div class="flex items-center justify-center">Hours</div></th>   
+                        <th><div class="flex items-center justify-center">Verified</div></th>               
+                        <th><div class="flex items-center justify-center">ACTIONS</div></th>
+                  
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for entry in entries %}
+                        <tr class="intro-x">
+                            <td>
+                                {{ entry.cohort_procedure.procedure.task }}
+                            </td>
+                            <td>
+                                <div class="flex items-center justify-center">{{ entry.date }} {{ entry.start }}</div> to 
+                                <div class="flex items-center justify-center">  {{ entry.end_date }} {{ entry.end }}</div>
+                            </td>
+                            <td>{{ entry.hours }}</td>                            
+                            <td><div class="flex items-center justify-center">{{ entry.mentor_acknowledgment }}</div></td>
+                            <td class="table-report__action">
+                                
+                            </td>
+                     
+                        </tr>
+                    
+                    {% empty %}
+                        <tr class="intro-x">
+                            <td colspan="8">
+                                Nothing Added
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-12 grid-margin stretch-card">
+                <div class="card">
+                  <div class="card-body">
+
+                    <nav>
+                    
+                      <ul class="pagination flex-wrap pagination-rounded">
+                        
+                        {% for i in months %}
+                          {% if selected_month == i.id %}
+                            <li class="active page-link"><span>{{ i.month }} <span class="sr-only">(current)</span></span></li>
+                          {% else %}
+                            <li class="page-item"><a class="page-link" href="{% url 'students:staff_simulated_wil_logsheets' registration.id programme_block.id i.id %}">[ {{ i.month }} ]</a></li>
+                          {% endif %}
+                        {% endfor %}
+                        
+                      </ul>
+                    </nav>
+
+                </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

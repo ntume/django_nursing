@@ -104,7 +104,10 @@ def student_view_logsheet(request,pk):
     Logsheet
     '''
 
-    if (request.user.logged_in_role_id == 10):
+    if (request.user.logged_in_role_id == 10 or 
+        request.user.logged_in_role_id == 1 or 
+        request.user.logged_in_role_id == 6 or 
+        request.user.logged_in_role_id == 4):
         
         registration = StudentLearningProgrammeRegistration.objects.get(id = pk)
         period = registration.registration_period.period.period
@@ -112,8 +115,12 @@ def student_view_logsheet(request,pk):
         simulated_blocks = ProgarmmeBlock.objects.filter(internal = 'Yes',wil='Yes')
         non_simulated_blocks = ProgarmmeBlock.objects.filter(internal = 'No',wil='Yes')
         
-       
-        return render(request,'students/learning_programme/wil/logsheet_tpl.html',
+        if request.user.logged_in_role_id == 10:
+            template = 'students/learning_programme/wil/logsheet_tpl.html'
+        else:
+            template = 'students/learning_programme/wil_staff/logsheet_tpl.html'
+            
+        return render(request,template,
                       {'registration':registration,
                        'period':period,
                        'student':student,
@@ -262,6 +269,153 @@ class StudentLearningProgrammeRegistrationNonSimulatedWILLogsheetList(LoginRequi
         context['blocks'] = blocks
         context['disciplines'] = Discipline.objects.all()
         context['shifts'] = ShiftType.objects.all()
+        context['wards'] = Ward.objects.all()
+        context['programme_block'] = ProgarmmeBlock.objects.get(id = self.kwargs['block_pk'])     
+        context['reg_active'] = '--active'
+        context['simulated_blocks'] = ProgarmmeBlock.objects.filter(internal = 'Yes',wil='Yes')
+        context['non_simulated_blocks'] = ProgarmmeBlock.objects.filter(internal = 'No',wil='Yes')
+        context['simulated'] = False
+        return context
+    
+
+
+class StudentLearningProgrammeRegistrationSimulatedWILLogsheetStaffList(LoginRequiredMixin,ListView):
+    template_name = 'students/learning_programme/wil_staff/logsheet_tpl.html'
+    context_object_name = 'entries'
+
+    def get(self, *args, **kwargs):
+        if self.request.user.logged_in_role_id != 1 and self.request.user.logged_in_role_id != 6 and self.request.user.logged_in_role_id != 10 and self.request.user.logged_in_role_id != 4:
+            messages.warning(self.request,"You do not have rights to that portion of the site, you have been logged off!")
+            return redirect('accounts:logout')
+        return super(StudentLearningProgrammeRegistrationSimulatedWILLogsheetStaffList, self).get(*args, **kwargs)
+
+    def get_queryset(self):
+        return StudentLogSheet.objects.filter(registration_id = self.kwargs['pk'],
+                                              block_id = self.kwargs['block_pk'],
+                                              date__month = self.kwargs['month_pk'])
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        registration = StudentLearningProgrammeRegistration.objects.get(id = self.kwargs['pk'])
+        period = registration.registration_period.period.period
+        student = registration.student_learning_programme.student
+        blocks = ProgarmmeBlock.objects.all()
+        context['today'] = today
+        context['selected_month'] = self.kwargs['month_pk']
+        context['months'] = [
+                    {'month':'Jan','id':'1'},
+                    {'month':'Feb','id':'2'},
+                    {'month':'Mar','id':'3'},
+                    {'month':'Apr','id':'4'},
+                    {'month':'May','id':'5'},
+                    {'month':'June','id':'6'},
+                    {'month':'Jul','id':'7'},
+                    {'month':'Aug','id':'8'},
+                    {'month':'Sept','id':'9'},
+                    {'month':'Oct','id':'10'},
+                    {'month':'Nov','id':'11'},
+                    {'month':'Dec','id':'12'},
+                ]
+        context['time_choices'] = [                                    
+                                    '07:00',
+                                    '08:00',
+                                    '09:00',
+                                    '10:00',
+                                    '11:00',
+                                    '12:00',
+                                    '13:00',
+                                    '14:00',
+                                    '15:00',
+                                    '16:00',
+                                    '17:00',
+                                    '18:00',                                    
+                                ]
+        context['registration'] = registration
+        context['period'] = period
+        context['student'] = student
+        context['blocks'] = blocks
+        context['procedures'] = registration.registration_period.cohort_period_procedures.all()
+        context['shifts'] = ShiftType.objects.all()
+        context['programme_block'] = ProgarmmeBlock.objects.get(id = self.kwargs['block_pk'])     
+        context['reg_active'] = '--active'
+        context['simulated_blocks'] = ProgarmmeBlock.objects.filter(internal = 'Yes',wil='Yes')
+        context['non_simulated_blocks'] = ProgarmmeBlock.objects.filter(internal = 'No',wil='Yes')
+        context['simulated'] = True
+        return context
+    
+
+class StudentLearningProgrammeRegistrationNonSimulatedWILLogsheetStaffList(LoginRequiredMixin,ListView):
+    template_name = 'students/learning_programme/wil_staff/logsheet_tpl.html'
+    context_object_name = 'entries'
+
+    def get(self, *args, **kwargs):
+        if self.request.user.logged_in_role_id != 1 and self.request.user.logged_in_role_id != 6 and self.request.user.logged_in_role_id != 10 and self.request.user.logged_in_role_id != 4:
+            messages.warning(self.request,"You do not have rights to that portion of the site, you have been logged off!")
+            return redirect('accounts:logout')
+        return super(StudentLearningProgrammeRegistrationNonSimulatedWILLogsheetStaffList, self).get(*args, **kwargs)
+
+    def get_queryset(self):
+        return StudentLogSheet.objects.filter(registration_id = self.kwargs['pk'],
+                                              block_id = self.kwargs['block_pk'],
+                                              date__month = self.kwargs['month_pk']).order_by('date')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        registration = StudentLearningProgrammeRegistration.objects.get(id = self.kwargs['pk'])
+        period = registration.registration_period.period.period
+        student = registration.student_learning_programme.student
+        blocks = ProgarmmeBlock.objects.all()
+        context['today'] = today
+        context['selected_month'] = self.kwargs['month_pk']
+        context['months'] = [
+                    {'month':'Jan','id':'1'},
+                    {'month':'Feb','id':'2'},
+                    {'month':'Mar','id':'3'},
+                    {'month':'Apr','id':'4'},
+                    {'month':'May','id':'5'},
+                    {'month':'June','id':'6'},
+                    {'month':'Jul','id':'7'},
+                    {'month':'Aug','id':'8'},
+                    {'month':'Sept','id':'9'},
+                    {'month':'Oct','id':'10'},
+                    {'month':'Nov','id':'11'},
+                    {'month':'Dec','id':'12'},
+                ]
+        context['time_choices_old'] = [
+                                ('00:00', '00:00 AM'),
+                                ('01:00', '01:00 AM'),
+                                ('02:00', '02:00 AM'),
+                                ('03:00', '03:00 AM'),
+                                ('04:00', '04:00 AM'),
+                                ('05:00', '05:00 AM'),
+                                ('06:00', '06:00 AM'),
+                                ('07:00', '07:00 AM'),
+                                ('08:00', '08:00 AM'),
+                                ('09:00', '09:00 AM'),
+                                ('10:00', '10:00 AM'),
+                                ('11:00', '11:00 AM'),
+                                ('12:00', '12:00 PM'),
+                                ('13:00', '01:00 PM'),
+                                ('14:00', '02:00 PM'),
+                                ('15:00', '03:00 PM'),
+                                ('16:00', '04:00 PM'),
+                                ('17:00', '05:00 PM'),
+                                ('18:00', '06:00 PM'),
+                                ('19:00', '07:00 PM'),
+                                ('20:00', '08:00 PM'),
+                                ('21:00', '09:00 PM'),
+                                ('22:00', '10:00 PM'),
+                                ('23:00', '11:00 PM'),
+                            ]
+        context['time_choices'] = [f"{i:02}" for i in range(24)]
+        context['time_minutes'] = [f"{i:02}" for i in range(60)]
+        context['registration'] = registration
+        context['period'] = period
+        context['student'] = student
+        context['blocks'] = blocks
+        context['disciplines'] = Discipline.objects.all()
+        context['shifts'] = ShiftType.objects.all()
+        context['wards'] = Ward.objects.all()
         context['programme_block'] = ProgarmmeBlock.objects.get(id = self.kwargs['block_pk'])     
         context['reg_active'] = '--active'
         context['simulated_blocks'] = ProgarmmeBlock.objects.filter(internal = 'Yes',wil='Yes')
@@ -406,7 +560,10 @@ def wil_logsheet_hours(request,pk):
     WIL Logsheet
     '''
 
-    if (request.user.logged_in_role_id == 10):
+    if (request.user.logged_in_role_id == 10 or 
+        request.user.logged_in_role_id == 1 or
+        request.user.logged_in_role_id == 6 or 
+        request.user.logged_in_role_id == 4):
         registration = StudentLearningProgrammeRegistration.objects.get(id = pk)
         wil_hours = StudentEducationPlanSectionWILRequirement.objects.filter(student_education_plan_section__registration = registration)
         disciplines = Discipline.objects.all()
@@ -431,9 +588,10 @@ def wil_logsheet_hours(request,pk):
             discipline_map = {'discipline':d}        
             #check if there are any hours captured
             discipline_map['hours'] = logsheets.filter(discipline = d).aggregate(Sum('hours'))['hours__sum'] or 0
-            discipline_map['total_quarter_hours'] = logsheets.filter(discipline = d,
-                                                                     date__gte = plan_year_section.start_date,
-                                                                     date__lte=plan_year_section.end_date).aggregate(Sum('hours'))['hours__sum'] or 0
+            if plan_year_section:
+                discipline_map['total_quarter_hours'] = logsheets.filter(discipline = d,
+                                                                        date__gte = plan_year_section.start_date,
+                                                                        date__lte=plan_year_section.end_date).aggregate(Sum('hours'))['hours__sum'] or 0
             #check required hours
             discipline_map['total_required_hours'] = wil_hours.filter(period_wil_requirement__discipline = d).aggregate(Sum('hours'))['hours__sum'] or 0
             discipline_map['total_required_quarter_hours'] = wil_hours.filter(period_wil_requirement__discipline = d,student_education_plan_section__education_plan_year_section = plan_year_section).aggregate(Sum('hours'))['hours__sum'] or 0
@@ -453,8 +611,14 @@ def wil_logsheet_hours(request,pk):
         non_simulated_blocks = ProgarmmeBlock.objects.filter(internal = 'No',wil='Yes')
         simulated = False
 
+        if (request.user.logged_in_role_id == 10):
+            template = 'students/learning_programme/wil/logsheet_tpl.html'
+
+        if (request.user.logged_in_role_id == 1 or request.user.logged_in_role_id == 6 or request.user.logged_in_role_id == 4):
+            template = 'students/learning_programme/wil_staff/logsheet_tpl.html'
+
         return render(request,
-                      'students/learning_programme/wil/logsheet_tpl.html',
+                      template,
                       {'ward_hours':ward_hours,
                        'discipline_hours':discipline_hours,
                        'registration':registration,

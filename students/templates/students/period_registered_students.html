@@ -81,12 +81,15 @@
                                                         <a href="{{ l.registration_details.pop.url }}" class="dropdown-item tooltip" title="Click to View Proof of Registration"> <i data-lucide="files" class="w-4 h-4 mr-2"></i> Proof of Registration</a>
                                                     </li>
                                                 {% endif %}
-                                                {% if user.logged_in_role_id == 6 or user.logged_in_role_id == 1 or user.logged_in_role_id == 10 %}
+                                                {% if user.logged_in_role_id == 6 or user.logged_in_role_id == 1 or user.logged_in_role_id == 10 or user.logged_in_role_id == 4 %}
                                                     <li>
                                                         <a href="{% url 'students:view_learner_educational_plan' l.student.id l.registration_details.id %}" class="dropdown-item tooltip" title="Click to View Educational Plan"> <i data-lucide="files" class="w-4 h-4 mr-2"></i> Educational Plan</a>
                                                     </li> 
                                                     <li>
                                                         <a href="{% url 'students:view_learner_educational_plan_sections' l.registration_details.id %}" class="dropdown-item tooltip" title="Click to View Discipline Hours"> <i data-lucide="clock" class="w-4 h-4 mr-2"></i> Discipline Hours</a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="{% url 'students:student_view_logsheet' l.registration_details.id %}" class="dropdown-item tooltip" title="Click to View Discipline Hours"> <i data-lucide="clock" class="w-4 h-4 mr-2"></i> WIL</a>
                                                     </li>
                                                 {% endif %}
                                             {% endif %}                                          
