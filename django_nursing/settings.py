@@ -135,16 +135,16 @@ DATABASES = {
         # MySQL database engine class.
         'ENGINE': 'django.db.backends.mysql',
         # MySQL database host ip.
-        'HOST': 'ahcnursingcollege.mysql.database.azure.com',
+        'HOST': '102.130.121.37',
         # port number.
         'PORT': '3306',
         # database name.
-        'NAME': 'ahc',
+        'NAME': 'sims_nursing',
         # user name.
         #'USER': 'wilmsaho_mark',
-        'USER': 'ahc',
+        'USER': 'sims_ahc',
         # password
-        'PASSWORD': os.getenv('DB_PASSWAORD'),
+        'PASSWORD': os.getenv('DB_PASSWORD'),
         # connect options
         'OPTIONS': {'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",},
     }
